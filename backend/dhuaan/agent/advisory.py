@@ -108,9 +108,12 @@ def template_notice(lang: str, plan: dict) -> str:
 def _script_ok(lang: str, text: str) -> bool:
     if lang == "en":
         return bool(text) and not _SCRIPT["hi"].search(text) and not _SCRIPT["pa"].search(text)
+    # Strict: every letter must be the native script or plain ASCII Latin (for PM2.5, IST, NAQI, school names).
+    # Small models sometimes leak Devanagari/Tamil/Kannada/Hebrew letters into Gurmukhi; such a notice is rejected.
     letters = [c for c in text if c.isalpha()]
     native = len(_SCRIPT[lang].findall(text))
-    return bool(letters) and native / len(letters) >= 0.5
+    foreign = [c for c in letters if not c.isascii() and not _SCRIPT[lang].match(c) and c not in "µμ"]
+    return bool(letters) and not foreign and native / len(letters) >= 0.5
 
 
 def _strands_llm(model_factory: Callable[[str | None], Any] | None = None) -> LLMCall:
