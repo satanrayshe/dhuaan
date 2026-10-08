@@ -31,7 +31,7 @@ from dhuaan.config import settings
 from dhuaan.ingest.common import iso_z, now_utc
 from dhuaan.model.types import Fire, Receptor
 
-from . import gk2a, inputs, metrics as M, ratio
+from . import gk2a, inputs, metrics as M, ratio, regional
 
 log = logging.getLogger("dhuaan.backtest")
 UTC = timezone.utc
@@ -112,10 +112,12 @@ def _rnd(x: Any, k: int = 3) -> float | None:
 
 
 def score(obs: np.ndarray, stitched: np.ndarray, fc: dict[datetime, np.ndarray], axis: list[datetime],
-          alpha: float) -> dict[str, Any]:
-    """Held-out metrics, pooled over stations. obs, stitched: (Nr, T) on the window axis."""
+          alpha: float | np.ndarray) -> dict[str, Any]:
+    """Held-out metrics, pooled over stations. obs, stitched: (Nr, T) on the window axis.
+    alpha: one pooled value, or one value per station (exploratory regional calibration)."""
     held = np.array([t >= HELD_START for t in axis])
-    pred = alpha * stitched
+    a_st = np.broadcast_to(np.asarray(alpha, dtype=np.float64), (obs.shape[0],))
+    pred = a_st[:, None] * stitched
     n_ep = n_hit = n_pep = n_fa = 0
     leads: list[int] = []
     per_station = []
@@ -126,7 +128,7 @@ def score(obs: np.ndarray, stitched: np.ndarray, fc: dict[datetime, np.ndarray],
         pe_h = [e for e in pe if held[e[0]]]
         hits = [e for e in oe_h if M.is_hit(pred[s], e)]
         fa = M.false_alarms(pe_h, oe)
-        iss = [(int((I - axis[0]).total_seconds() // 3600), alpha * arr[s]) for I, arr in fc.items()]
+        iss = [(int((I - axis[0]).total_seconds() // 3600), a_st[s] * arr[s]) for I, arr in fc.items()]
         st_leads = [lt for e in oe_h if (lt := M.lead_time(e, iss)) is not None]
         leads += st_leads
         n_ep += len(oe_h)
@@ -287,6 +289,7 @@ def main(argv: list[str] | None = None) -> int:
                  "pulled down by Punjab stations where the model is noisy near the fires, so calibrated forecasts "
                  "rarely reach 60 ug/m3 and the episode hit rate is near zero. Correlation, not the 60 ug/m3 "
                  "threshold, is where the model shows some (weak) skill, and B correlates better than A in Delhi.")
+    exploratory = regional.exploratory(obs, stitched, fcs, axis, fit, kept, score, _rnd)
     doc = {
         "window": {"start_utc": iso_z(WIN_START), "end_utc": iso_z(WIN_END), "episode_date": "2025-11-11",
                    "fit": [iso_z(WIN_START), iso_z(FIT_END)], "held_out": [iso_z(HELD_START), iso_z(WIN_END)],
@@ -299,6 +302,7 @@ def main(argv: list[str] | None = None) -> int:
                         "method": "least squares through the origin, excess ~ alpha * C, 25 Oct 00Z to 5 Nov 23Z, "
                                   "all kept stations pooled, lead 12-35 h"},
         "secondary_lead_0_23h": nowcast,
+        "exploratory_regional": exploratory,
         "excluded_stations": [{"id": str(s["id"]), "name": s["name"], "completeness": s["completeness"]} for s in excluded],
         "members": a.members, "generated_utc": iso_z(now_utc()),
         "facts": {k: facts.get(k) for k in ("afternoon_share_2025", "n_detections", "source")},
@@ -317,6 +321,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {cfg} (lead 0-23 h, secondary): " + ", ".join(f"{k}={v}" for k, v in nowcast[cfg].items()))
     for st in stations_out:
         print(f"    {st['name']:<38} A {st['metrics']['A']}\n    {'':<38} B {st['metrics']['B']}")
+    print(f"  EXPLORATORY regional alphas: {exploratory['alphas']}")
+    for cfg in ("A", "B"):
+        print(f"  {cfg} (exploratory regional): " + ", ".join(f"{k}={v}" for k, v in exploratory["metrics"][cfg].items()))
+        for r, d in exploratory["by_region"].items():
+            print(f"     {r}: {d.get(cfg)}")
     print(f"  wrote {where}  ({time.perf_counter() - t_all:.0f}s)")
     return 0
 
