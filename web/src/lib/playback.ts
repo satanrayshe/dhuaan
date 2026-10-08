@@ -21,7 +21,13 @@ interface State {
   reducedMotion: boolean;
 }
 
-const state: State = { minutes: 24 * 60, playing: false, speed: 4, reducedMotion: false };
+const state: State = {
+  minutes: 24 * 60,
+  playing: false,
+  speed: 4,
+  // read at load so the map never fetches trips.json for reduced-motion users
+  reducedMotion: typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true,
+};
 const subs = new Set<() => void>();
 const frameSubs = new Set<(minutes: number) => void>();
 let raf = 0;

@@ -1,13 +1,13 @@
 "use client";
 
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import { COORDINATE_SYSTEM, type Layer, type PickingInfo } from "@deck.gl/core";
-import { BitmapLayer, ScatterplotLayer } from "@deck.gl/layers";
+import type { Layer, PickingInfo } from "@deck.gl/core";
+import { ScatterplotLayer, TextLayer } from "@deck.gl/layers";
 import { TripsLayer } from "@deck.gl/geo-layers";
 import { useTheme } from "next-themes";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Map as MapView, MapArc, MapControls, useMap, type MapArcDatum } from "@/components/ui/map";
-import { FIRE_COLOR, SMOKE_RAMP, hexToRgb, smokeLut, type ThemeName } from "@/lib/colors";
+import { FIRE_COLOR, SMOKE_RAMP, TRAIL_COLOR, hexToRgb, smokeLut, type ThemeName } from "@/lib/colors";
 import { playback } from "@/lib/playback";
 import { H_MIN, istTime, toMs } from "@/lib/time";
 import type { FiresGeoJSON, GridFile, PlaceIndexEntry, TripsFile } from "@/lib/types";
@@ -44,13 +44,19 @@ export interface SmokeMapProps {
   highlightCluster?: { lon: number; lat: number } | null;
   reducedMotion?: boolean;
   initialZoom?: number;
+  initialCenter?: [number, number];
   className?: string;
+  /** geo-anchored note over fires outside India ("Across the border / Pakistani Punjab") */
+  borderLabel?: { lon: number; lat: number; text: string } | null;
+  /** draw smoke and pins beneath the basemap's place labels (default true) */
+  labelsOnTop?: boolean;
   /** show smoke at a fixed hour instead of following playback (district view) */
   staticHour?: number | null;
   ariaLabel: string;
 }
 
-const INITIAL_CENTER: [number, number] = [76.0, 29.95];
+// west of centre: most of this season's burning sits in the two Punjabs
+const INITIAL_CENTER: [number, number] = [75.55, 30.1];
 
 function decodeFrames(grid: GridFile): Uint8Array[] {
   return grid.frames.map((b64) => {
@@ -82,6 +88,125 @@ class FrameCache {
   }
 }
 
+type TripRow = TripsFile["trips"][number];
+
+/**
+ * trips.json is sampled hourly (small on the wire). Re-densify each path with a uniform
+ * Catmull-Rom spline (`k` sub-steps per hour) so trails curve instead of zig-zagging when
+ * zoomed in. Timestamps are interpolated linearly; done once per file.
+ */
+function smoothTrips(trips: TripRow[], k = 3): TripRow[] {
+  return trips.map((tr) => {
+    const P = tr.path, T = tr.ts, n = P.length;
+    if (n < 3) return tr;
+    const path: [number, number][] = [];
+    const ts: number[] = [];
+    for (let i = 0; i < n - 1; i++) {
+      const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(n - 1, i + 2)];
+      for (let s = 0; s < k; s++) {
+        const u = s / k, u2 = u * u, u3 = u2 * u;
+        const c = (a: number, b: number, cc: number, d: number) =>
+          0.5 * (2 * b + (-a + cc) * u + (2 * a - 5 * b + 4 * cc - d) * u2 + (-a + 3 * b - 3 * cc + d) * u3);
+        path.push([c(p0[0], p1[0], p2[0], p3[0]), c(p0[1], p1[1], p2[1], p3[1])]);
+        ts.push(T[i] + (T[i + 1] - T[i]) * u);
+      }
+    }
+    path.push(P[n - 1]);
+    ts.push(T[n - 1]);
+    return { cluster_id: tr.cluster_id, path, ts };
+  });
+}
+
+/** alpha falloff over the outer cells, so the model domain edge doesn't read as a hard wall of smoke */
+function edgeFade(i: number, j: number, nx: number, ny: number, cells = 4) {
+  const d = Math.min(i + 0.5, nx - i - 0.5, j + 0.5, ny - j - 0.5);
+  return d >= cells ? 1 : (d / cells) ** 1.5;
+}
+
+type MlMap = NonNullable<ReturnType<typeof useMap>["map"]>;
+const FIELD_SRC = "dhuaan-smoke-field";
+
+/**
+ * The smoke field as a maplibre canvas source + raster layer inserted beneath the first
+ * symbol layer, so basemap place names stay legible on top of dense smoke. The deck.gl
+ * overlay (trails, fires, pins) still draws above. Repaints only when the frame changes.
+ */
+function useFieldSource(map: MlMap | null, grid: GridFile | undefined, belowLabels: boolean) {
+  const st = useRef<{ canvas: HTMLCanvasElement | null; key: string | null; visible: boolean }>({ canvas: null, key: null, visible: true });
+  useEffect(() => {
+    if (!map || !grid) return;
+    const state = st.current;
+    if (process.env.NODE_ENV !== "production") (window as unknown as { __dhuaanMap: unknown }).__dhuaanMap = map;
+    const c = document.createElement("canvas");
+    c.width = grid.nx;
+    c.height = grid.ny;
+    state.canvas = c;
+    state.key = null;
+    const coords: [[number, number], [number, number], [number, number], [number, number]] = [
+      [grid.lon0, grid.lat0 + grid.ny * grid.dlat],
+      [grid.lon0 + grid.nx * grid.dlon, grid.lat0 + grid.ny * grid.dlat],
+      [grid.lon0 + grid.nx * grid.dlon, grid.lat0],
+      [grid.lon0, grid.lat0],
+    ];
+    const ensure = () => {
+      // isStyleLoaded() also waits for every tile; addSource only needs the style JSON
+      if (!map.style || map.getSource(FIELD_SRC)) return;
+      try {
+        map.addSource(FIELD_SRC, { type: "canvas", canvas: c, coordinates: coords, animate: false });
+      } catch {
+        return; // style JSON still loading; the next styledata/idle event retries
+      }
+      const before = belowLabels ? map.getStyle().layers?.find((l) => l.type === "symbol")?.id : undefined;
+      map.addLayer(
+        {
+          id: FIELD_SRC,
+          type: "raster",
+          source: FIELD_SRC,
+          layout: { visibility: state.visible ? "visible" : "none" },
+          paint: { "raster-resampling": "linear", "raster-fade-duration": 0, "raster-opacity": 1 },
+        },
+        before,
+      );
+    };
+    ensure();
+    // theme switches reload the basemap style and drop custom layers: put it back
+    map.on("styledata", ensure);
+    map.on("idle", ensure);
+    return () => {
+      map.off("styledata", ensure);
+      map.off("idle", ensure);
+      try {
+        if (map.getLayer(FIELD_SRC)) map.removeLayer(FIELD_SRC);
+        if (map.getSource(FIELD_SRC)) map.removeSource(FIELD_SRC);
+      } catch {}
+      state.canvas = null;
+    };
+  }, [map, grid, belowLabels]);
+
+  return useMemo(
+    () => ({
+      paint(key: string, frame: HTMLCanvasElement) {
+        const c = st.current.canvas;
+        if (!c || !map || st.current.key === key) return;
+        st.current.key = key;
+        const ctx = c.getContext("2d")!;
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.drawImage(frame, 0, 0);
+        const src = map.getSource(FIELD_SRC) as { play?: () => void; pause?: () => void } | undefined;
+        // play() marks the texture dirty and repaints; pause() uploads it once and stops
+        src?.play?.();
+        src?.pause?.();
+      },
+      setVisible(v: boolean) {
+        if (st.current.visible === v || !map) return;
+        st.current.visible = v;
+        if (map.getLayer(FIELD_SRC)) map.setLayoutProperty(FIELD_SRC, "visibility", v ? "visible" : "none");
+      },
+    }),
+    [map],
+  );
+}
+
 function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
   const { map, isLoaded } = useMap();
   const overlayRef = useRef<MapboxOverlay | null>(null);
@@ -90,6 +215,7 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
   const [splitLon, setSplitLon] = useState<number | null>(null);
 
   const { fires, grid, trips, places, theme, splitAt } = props;
+  const field = useFieldSource(map, grid, props.labelsOnTop !== false);
 
   // derived, memoised data
   const fireRows = useMemo(
@@ -103,6 +229,7 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
     [fires],
   );
   const frames = useMemo(() => (grid ? decodeFrames(grid) : null), [grid]);
+  const tripRows = useMemo(() => (trips ? smoothTrips(trips.trips) : null), [trips]);
   const cache = useMemo(() => new FrameCache(), []);
   useEffect(() => () => cache.clear(), [cache, frames, theme]);
   const lut = useMemo(() => smokeLut(theme), [theme]);
@@ -127,6 +254,18 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
     };
   }, [map, splitAt]);
 
+  // last result per key: stable array identities across animation frames
+  const memo = useRef(new globalThis.Map<string, { key: string; value: unknown }>());
+  const keep = <T,>(key: string, make: () => T): T => {
+    const slot = key.slice(0, key.indexOf(":"));
+    const hit = memo.current.get(slot);
+    if (hit && hit.key === key) return hit.value as T;
+    const value = make();
+    memo.current.set(slot, { key, value });
+    return value;
+  };
+  useEffect(() => memo.current.clear(), [fires, places]);
+
   const buildRef = useRef<(minutes: number) => Layer[]>(() => []);
   const build = (minutes: number) => {
     const p = propsRef.current;
@@ -137,6 +276,7 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
     const surface = theme === "dark" ? [15, 17, 19] : [255, 255, 255];
 
     // 1. smoke field (bitmap), interpolated between hours
+    field.setVisible(!!(p.layers.field && grid && frames));
     if (p.layers.field && grid && frames) {
       const pos = Math.max(0, Math.min(frames.length - 1, hourOffset - H_MIN));
       const q = p.reducedMotion || p.staticHour != null ? Math.round(pos) : Math.round(pos * 6) / 6;
@@ -158,45 +298,42 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
             img.data[o] = lut[v * 4];
             img.data[o + 1] = lut[v * 4 + 1];
             img.data[o + 2] = lut[v * 4 + 2];
-            img.data[o + 3] = lut[v * 4 + 3];
+            img.data[o + 3] = lut[v * 4 + 3] * edgeFade(i, j, grid.nx, grid.ny);
           }
         }
         ctx.putImageData(img, 0, 0);
         return c;
       });
-      out.push(
-        new BitmapLayer({
-          id: "smoke-field",
-          image: canvas,
-          bounds: [grid.lon0, grid.lat0, grid.lon0 + grid.nx * grid.dlon, grid.lat0 + grid.ny * grid.dlat],
-          _imageCoordinateSystem: COORDINATE_SYSTEM.LNGLAT,
-          textureParameters: { minFilter: "linear", magFilter: "linear" },
-          opacity: 1,
-          pickable: false,
-        }),
-      );
+      field.paint(key, canvas);
     }
 
     // 2. smoke trails
-    if (p.layers.trails && trips && !p.reducedMotion && p.staticHour == null) {
-      const rgb = hexToRgb(theme === "dark" ? SMOKE_RAMP.dark[5] : SMOKE_RAMP.light[2]);
+    // Dark: warm additive glow (overlapping strands brighten, like lit smoke).
+    // Light: sepia ink at normal blending, so dense plumes read as darker, never as glare.
+    if (p.layers.trails && tripRows && !p.reducedMotion && p.staticHour == null) {
+      const dark = theme === "dark";
+      const rgb = hexToRgb(dark ? TRAIL_COLOR.dark : TRAIL_COLOR.light);
       out.push(
         new TripsLayer({
           id: "smoke-trails",
-          data: trips.trips,
-          getPath: (d: TripsFile["trips"][number]) => d.path,
-          getTimestamps: (d: TripsFile["trips"][number]) => d.ts,
+          data: tripRows,
+          getPath: (d: TripRow) => d.path,
+          getTimestamps: (d: TripRow) => d.ts,
           getColor: [rgb[0], rgb[1], rgb[2]],
-          opacity: theme === "dark" ? 0.4 : 0.38,
+          opacity: dark ? 0.2 : 0.17,
+          widthUnits: "pixels",
+          getWidth: zoom >= 8 ? 2 : 1.35,
           widthMinPixels: 1,
-          widthMaxPixels: 2,
-          getWidth: 600,
           capRounded: true,
           jointRounded: true,
           fadeTrail: true,
-          trailLength: 180,
+          trailLength: 240,
           currentTime: minutes,
           pickable: false,
+          parameters: dark
+            ? { blend: true, blendColorOperation: "add", blendColorSrcFactor: "src-alpha", blendColorDstFactor: "one", blendAlphaOperation: "add", blendAlphaSrcFactor: "one", blendAlphaDstFactor: "one-minus-src-alpha" }
+            : undefined,
+          updateTriggers: { getWidth: zoom >= 8 },
         }),
       );
     }
@@ -208,7 +345,8 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
       out.push(
         new ScatterplotLayer({
           id: "fires-midday",
-          data: fireRows.filter((f) => !f.p.afternoon && f.ms <= nowMs),
+          // fires appear once detected; re-filter only when the hour changes
+          data: keep(`fm:${Math.floor(nowMs / 3600_000)}`, () => fireRows.filter((f) => !f.p.afternoon && f.ms <= nowMs)),
           getPosition: (d: (typeof fireRows)[number]) => [d.lon, d.lat],
           getRadius: (d: (typeof fireRows)[number]) => radius(d.p.frp_mw),
           radiusMinPixels: 2.2,
@@ -227,7 +365,9 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
       out.push(
         new ScatterplotLayer({
           id: "fires-evening",
-          data: fireRows.filter((f) => f.p.afternoon && f.ms <= nowMs && (splitL == null || f.lon >= splitL)),
+          data: keep(`fe:${Math.floor(nowMs / 3600_000)}:${splitL?.toFixed(3)}`, () =>
+            fireRows.filter((f) => f.p.afternoon && f.ms <= nowMs && (splitL == null || f.lon >= splitL)),
+          ),
           getPosition: (d: (typeof fireRows)[number]) => [d.lon, d.lat],
           getRadius: (d: (typeof fireRows)[number]) => radius(d.p.frp_mw) * 0.85,
           radiusMinPixels: 3.2,
@@ -243,7 +383,36 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
       );
     }
 
-    // 4. highlighted cluster ring
+    // 4. "across the border" note, anchored west of the cross-border fires
+    if (p.borderLabel && zoom < 9.5) {
+      const dark = theme === "dark";
+      out.push(
+        new TextLayer({
+          id: "border-label",
+          data: [p.borderLabel],
+          getPosition: (d: { lon: number; lat: number }) => [d.lon, d.lat],
+          getText: (d: { text: string }) => d.text,
+          getSize: 11,
+          lineHeight: 1.35,
+          fontFamily: fontFamily(),
+          fontWeight: 600,
+          characterSet: "auto",
+          // right edge on the anchor: the label always extends west, away from India
+          getTextAnchor: "end",
+          getAlignmentBaseline: "center",
+          getColor: dark ? [239, 236, 228, 235] : [21, 23, 26, 230],
+          background: true,
+          getBackgroundColor: dark ? [21, 23, 27, 215] : [255, 255, 255, 225],
+          getBorderColor: dark ? [70, 76, 86, 255] : [200, 199, 193, 255],
+          getBorderWidth: 1,
+          backgroundPadding: [7, 4, 7, 4],
+          pickable: false,
+          updateTriggers: { getColor: theme, getBackgroundColor: theme, getBorderColor: theme },
+        }),
+      );
+    }
+
+    // 5. highlighted cluster ring
     if (p.highlightCluster) {
       out.push(
         new ScatterplotLayer({
@@ -260,14 +429,20 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
       );
     }
 
-    // 5. receptor pins (zoom-gated)
+    // 6. receptor pins (zoom-gated). Data arrays are reused between frames so deck.gl
+    // doesn't rebuild attributes 60 times a second during playback.
     if (p.layers.places && places) {
-      const visible = places.filter((pl) => {
-        if (pl.id === p.selectedPlaceId) return true;
-        if (pl.kind === "city") return zoom >= 6.5;
-        if (pl.kind === "ward" || pl.kind === "town") return zoom >= 7.75;
-        return zoom >= 8.75;
-      });
+      const zb = zoom >= 9.5 ? 3 : zoom >= 8.5 ? 2 : zoom >= 7 ? 1 : 0;
+      const visible = keep(`places:${zb}:${p.selectedPlaceId}:${places.length}`, () =>
+        places.filter((pl) => {
+          if (pl.id === p.selectedPlaceId) return false; // drawn on its own layer below
+          if (pl.arrival_utc) return zb >= 1 || pl.kind === "city" || pl.kind === "town";
+          // no smoke expected: context only once zoomed in (the basemap already names cities)
+          if (zb === 3) return true;
+          if (zb === 2) return pl.kind === "city" || pl.kind === "town" || pl.kind === "ward";
+          return false;
+        }),
+      );
       const ink = theme === "dark" ? [239, 236, 228] : [21, 23, 26];
       const smoke = hexToRgb(theme === "dark" ? SMOKE_RAMP.dark[4] : SMOKE_RAMP.light[2]);
       out.push(
@@ -275,25 +450,52 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
           id: "places",
           data: visible,
           getPosition: (d: PlaceIndexEntry) => [d.lon, d.lat],
-          getRadius: (d: PlaceIndexEntry) => (d.id === p.selectedPlaceId ? 9 : d.kind === "city" ? 5 : 4),
+          getRadius: (d: PlaceIndexEntry) => (d.arrival_utc ? (d.kind === "city" ? 4.5 : 3.75) : 2.75),
           radiusUnits: "pixels",
           getFillColor: (d: PlaceIndexEntry) =>
-            d.id === p.selectedPlaceId ? [...smoke, 255] : [...(surface as [number, number, number]), 255],
+            d.arrival_utc ? [...smoke, 255] : [...(surface as [number, number, number]), 230],
           stroked: true,
-          getLineColor: [...ink, 255] as [number, number, number, number],
-          getLineWidth: (d: PlaceIndexEntry) => (d.id === p.selectedPlaceId ? 2.5 : 1.5),
+          getLineColor: (d: PlaceIndexEntry) => [...ink, d.arrival_utc ? 255 : 150] as [number, number, number, number],
+          getLineWidth: (d: PlaceIndexEntry) => (d.arrival_utc ? 1.25 : 1),
           lineWidthUnits: "pixels",
           pickable: true,
           autoHighlight: true,
           highlightColor: [...smoke, 255],
-          updateTriggers: {
-            getRadius: p.selectedPlaceId,
-            getFillColor: [p.selectedPlaceId, theme],
-            getLineWidth: p.selectedPlaceId,
-            getLineColor: theme,
-          },
+          updateTriggers: { getFillColor: theme, getLineColor: theme },
         }),
       );
+      const sel = p.selectedPlaceId ? keep(`sel:${p.selectedPlaceId}:${places.length}`, () => places.filter((pl) => pl.id === p.selectedPlaceId)) : [];
+      if (sel.length) {
+        out.push(
+          new ScatterplotLayer({
+            id: "place-selected",
+            data: sel,
+            getPosition: (d: PlaceIndexEntry) => [d.lon, d.lat],
+            getRadius: 7,
+            radiusUnits: "pixels",
+            getFillColor: [...smoke, 255],
+            stroked: true,
+            getLineColor: [...(surface as [number, number, number]), 255],
+            getLineWidth: 2.5,
+            lineWidthUnits: "pixels",
+            pickable: true,
+            updateTriggers: { getFillColor: theme, getLineColor: theme },
+          }),
+          new ScatterplotLayer({
+            id: "place-selected-ring",
+            data: sel,
+            getPosition: (d: PlaceIndexEntry) => [d.lon, d.lat],
+            getRadius: 12,
+            radiusUnits: "pixels",
+            filled: false,
+            stroked: true,
+            getLineColor: [...ink, 230] as [number, number, number, number],
+            getLineWidth: 1.5,
+            lineWidthUnits: "pixels",
+            updateTriggers: { getLineColor: theme },
+          }),
+        );
+      }
     }
     return out;
   };
@@ -307,12 +509,14 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
   // create the deck overlay once the map exists
   useEffect(() => {
     if (!map) return;
+    // Not interleaved: deck 9.4's interleaved mode reads maplibre<6 transform internals.
+    // The smoke field is a maplibre canvas source instead (below the labels); see useFieldSource.
     const overlay = new MapboxOverlay({
       interleaved: false,
       layers: [],
       getCursor: ({ isHovering }) => (isHovering ? "pointer" : "grab"),
       onClick: (info: PickingInfo) => {
-        if (info.layer?.id === "places" && info.object) propsRef.current.onPickPlace?.((info.object as PlaceIndexEntry).id);
+        if ((info.layer?.id === "places" || info.layer?.id === "place-selected") && info.object) propsRef.current.onPickPlace?.((info.object as PlaceIndexEntry).id);
       },
       getTooltip: (info: PickingInfo) => {
         if (!info.object) return null;
@@ -328,7 +532,7 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
           fontVariantNumeric: "tabular-nums",
           boxShadow: "0 4px 16px rgb(0 0 0 / 0.12)",
         };
-        if (info.layer?.id === "places") {
+        if (info.layer?.id === "places" || info.layer?.id === "place-selected") {
           const d = info.object as PlaceIndexEntry;
           return { html: `<strong>${escapeHtml(d.name)}</strong><br/><span style="opacity:.7">${escapeHtml(d.district)}</span>`, style };
         }
@@ -372,6 +576,19 @@ function Overlay(props: SmokeMapProps & { theme: ThemeName }) {
   return null;
 }
 
+let cachedFont: string | null = null;
+function fontFamily() {
+  if (cachedFont) return cachedFont;
+  if (typeof document === "undefined") return "monospace";
+  // next/font registers a hashed family name; read it from the mono label style
+  const probe = document.createElement("span");
+  probe.className = "font-mono";
+  document.body.appendChild(probe);
+  cachedFont = getComputedStyle(probe).fontFamily || "monospace";
+  probe.remove();
+  return cachedFont;
+}
+
 function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
@@ -384,7 +601,7 @@ export default function SmokeMap(props: SmokeMapProps) {
     <div className={props.className} role="region" aria-label={props.ariaLabel}>
       <MapView
         theme={theme}
-        center={INITIAL_CENTER}
+        center={props.initialCenter ?? INITIAL_CENTER}
         zoom={props.initialZoom ?? 6.6}
         minZoom={4.5}
         maxZoom={13}

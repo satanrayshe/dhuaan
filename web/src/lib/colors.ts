@@ -55,6 +55,12 @@ export function naqiFromPm25(pm: number): NaqiCategory {
   return "severe";
 }
 
+/** smoke trails (TripsLayer): sepia ink on light, warm ember glow (additive) on dark */
+export const TRAIL_COLOR: Record<ThemeName, string> = {
+  light: "#86561a",
+  dark: "#ffb347",
+};
+
 /** fires: one hot hue; afternoon/geostationary detections differ by SHAPE (ring), not colour */
 export const FIRE_COLOR: Record<ThemeName, [number, number, number]> = {
   light: [214, 64, 12],

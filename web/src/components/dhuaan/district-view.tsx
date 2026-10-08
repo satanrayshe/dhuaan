@@ -6,9 +6,10 @@ import { ArrowDownIcon, ArrowUpIcon, DownloadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useClusters, useFires, useGrid, useMeta, useReceptors } from "@/lib/data";
-import { headlineStat, useMediaQuery } from "@/lib/derive";
+import { abroadCentroid, abroadShare, headlineStat, isAbroad, useMediaQuery } from "@/lib/derive";
 import { useI18n } from "@/lib/i18n";
 import { istDayTime, istTime, toMs } from "@/lib/time";
 import type { Cluster } from "@/lib/types";
@@ -55,19 +56,35 @@ export function DistrictView() {
   const idx = useReceptors();
   const isDesktop = useMediaQuery("(min-width: 1024px)", true);
   const [district, setDistrict] = useState<string>("all");
+  // district teams can only act on Indian fires: list those by default, keep the rest one click away
+  const [scope, setScope] = useState<"india" | "all">("india");
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "rank", dir: 1 });
   const [selected, setSelected] = useState<string | null>(null);
 
   const all = useMemo(() => clusters.data?.clusters ?? [], [clusters.data]);
-  const districts = useMemo(() => [...new Set(all.map((c) => c.district))].sort(), [all]);
-  const stat = useMemo(() => (all.length ? headlineStat(all) : null), [all]);
+  const scoped = useMemo(() => (scope === "all" ? all : all.filter((c) => !isAbroad(c.state))), [all, scope]);
+  const districts = useMemo(() => [...new Set(scoped.map((c) => c.district))].sort(), [scoped]);
+  const activeDistrict = district !== "all" && districts.includes(district) ? district : "all";
+  const filtered = useMemo(
+    () => scoped.filter((c) => activeDistrict === "all" || c.district === activeDistrict),
+    [scoped, activeDistrict],
+  );
+  // the headline is computed for exactly what the table lists
+  const stat = useMemo(() => (filtered.length ? headlineStat(filtered) : null), [filtered]);
+  const border = useMemo(() => abroadShare(all), [all]);
   const maxShare = useMemo(() => Math.max(0.0001, ...all.map((c) => c.exposure_share)), [all]);
+  const borderLabel = useMemo(() => {
+    const c = abroadCentroid(all);
+    return c ? { lon: c.lon, lat: c.lat, text: `${t("map.border")}
+${t("map.borderSub")}` } : null;
+  }, [all, t]);
+  const headlineKey = activeDistrict !== "all" ? "district.headlineDistrict" : scope === "india" ? "district.headlineIndia" : "district.headline";
 
   const rows = useMemo(() => {
-    const r = all.filter((c) => district === "all" || c.district === district);
+    const r = filtered;
     const val = (c: Cluster) => (sort.key === "rank" ? c.rank : sort.key === "frp" ? -c.frp_sum_mw : toMs(c.first_seen_utc));
     return [...r].sort((a, b) => (val(a) - val(b)) * sort.dir);
-  }, [all, district, sort]);
+  }, [filtered, sort]);
 
   const sel = all.find((c) => c.cluster_id === selected) ?? null;
   const placeById = useMemo(() => new Map((idx.data?.places ?? []).map((p) => [p.id, p])), [idx.data]);
@@ -110,10 +127,10 @@ export function DistrictView() {
         {stat && (
           <section aria-label="Headline" className="mt-8 rounded-lg border border-border p-5">
             <p className="text-2xl leading-snug font-semibold tracking-tight sm:text-3xl">
-              {t("district.headline")
-                .split(/(\{[knx]\})/)
+              {t(headlineKey)
+                .split(/(\{[knxd]\})/)
                 .map((part, i) => {
-                  const v = part === "{k}" ? stat.k : part === "{n}" ? stat.n : part === "{x}" ? stat.pct : null;
+                  const v = part === "{k}" ? stat.k : part === "{n}" ? stat.n : part === "{x}" ? stat.pct : part === "{d}" ? activeDistrict : null;
                   return v == null ? <span key={i}>{part}</span> : <span key={i} className="text-smoke">{v}</span>;
                 })}
             </p>
@@ -121,11 +138,33 @@ export function DistrictView() {
               {t("district.headlineSub", { d: stat.detections.toLocaleString("en-IN") })}
               {meta.data && ` · t0 ${istDayTime(meta.data.t0_utc, lang)} IST`}
             </p>
+            {scope === "india" && border.n > 0 && (
+              <p className="mt-4 border-t border-border pt-3 text-sm text-muted-foreground">
+                {t("district.border", { n: border.n, x: border.pct })}
+              </p>
+            )}
           </section>
         )}
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-          <Select value={district} onValueChange={setDistrict}>
+          <div className="flex flex-wrap items-center gap-2">
+          <ToggleGroup
+            type="single"
+            size="sm"
+            variant="outline"
+            spacing={0}
+            value={scope}
+            onValueChange={(v) => v && setScope(v as "india" | "all")}
+            aria-label={t("district.scope")}
+          >
+            <ToggleGroupItem value="india" className="px-3 text-sm">
+              {t("district.scopeIndia")}
+            </ToggleGroupItem>
+            <ToggleGroupItem value="all" className="px-3 text-sm">
+              {t("district.scopeAll")}
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <Select value={activeDistrict} onValueChange={setDistrict}>
             <SelectTrigger className="w-56" aria-label={t("district.filter")}>
               <SelectValue />
             </SelectTrigger>
@@ -138,27 +177,29 @@ export function DistrictView() {
               ))}
             </SelectContent>
           </Select>
+          </div>
           <div className="flex items-center gap-3">
-            <p className="hidden text-xs text-muted-foreground md:block">{t("district.hint")}</p>
             <Button variant="outline" size="sm" disabled={!rows.length} onClick={() => exportCsv(rows, meta.data?.run_id ?? "run")}>
               <DownloadIcon aria-hidden /> {t("district.export")}
             </Button>
           </div>
         </div>
 
+        <p className="mt-2 hidden text-xs text-muted-foreground md:block">{t("district.hint")}</p>
+
         {clusters.status === "ready" && all.length === 0 ? (
           <p className="mt-10 rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">{t("district.empty")}</p>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+          <div className="mt-3 overflow-x-auto rounded-lg border border-border">
             <Table>
               <TableHeader>
                 <TableRow>
                   {sortBtn("rank", t("district.rank"), "w-14")}
-                  <TableHead>{t("district.place")}</TableHead>
+                  <TableHead className="min-w-44">{t("district.place")}</TableHead>
                   {sortBtn("detected", t("district.detected"))}
                   {sortBtn("frp", t("district.frp"), "text-right")}
-                  <TableHead className="min-w-32">{t("district.exposure")}</TableHead>
-                  <TableHead className="min-w-44">{t("district.downwind")}</TableHead>
+                  <TableHead className="w-36">{t("district.exposure")}</TableHead>
+                  <TableHead className="min-w-40">{t("district.downwind")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -179,11 +220,16 @@ export function DistrictView() {
                       className={cn("cursor-pointer focus-visible:bg-muted focus-visible:outline-none", active && "bg-smoke-soft hover:bg-smoke-soft")}
                     >
                       <TableCell className="font-mono text-xs">{c.rank}</TableCell>
-                      <TableCell>
+                      <TableCell className="max-w-60 whitespace-normal">
                         <p className="font-medium">{c.nearest_place}</p>
                         <p className="text-xs text-muted-foreground">
-                          {c.district} · <span className="font-mono">{c.lat.toFixed(3)}, {c.lon.toFixed(3)}</span>
+                          {c.district} · <span className="font-mono">{c.lat.toFixed(2)}, {c.lon.toFixed(2)}</span>
                         </p>
+                        {isAbroad(c.state) && (
+                          <p className="mt-1 inline-flex items-center rounded-sm border border-border px-1.5 py-px font-mono text-[0.62rem] tracking-wide text-muted-foreground uppercase">
+                            {t("district.borderShort")} · {c.state.replace(/\s*\(Pakistan\)/i, "")}, PK
+                          </p>
+                        )}
                       </TableCell>
                       <TableCell className="font-mono text-xs">
                         {istDayTime(c.first_seen_utc, lang)}
@@ -199,7 +245,7 @@ export function DistrictView() {
                           <span className="w-12 text-right font-mono text-xs">{(c.exposure_share * 100).toFixed(1)}%</span>
                         </div>
                       </TableCell>
-                      <TableCell className="min-w-44 text-xs whitespace-normal">
+                      <TableCell className="min-w-40 text-xs leading-relaxed whitespace-normal">
                         {c.downwind.slice(0, 3).map((d, i) => (
                           <span key={d.place_id}>
                             {i > 0 && ", "}
@@ -228,10 +274,12 @@ export function DistrictView() {
             places={idx.data?.places}
             layers={{ fires: true, missed: true, trails: false, field: true, places: true }}
             staticHour={0}
+            borderLabel={borderLabel}
             arcs={arcs}
             highlightCluster={sel ? { lon: sel.lon, lat: sel.lat } : null}
             flyTo={sel ? { lon: sel.lon, lat: sel.lat, zoom: 7.4, key: sel.cluster_id } : null}
-            initialZoom={6.4}
+            initialZoom={6.5}
+            initialCenter={[74.9, 30.45]}
           />
         )}
         {sel && (

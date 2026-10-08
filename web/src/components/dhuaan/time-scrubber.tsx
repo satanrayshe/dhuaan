@@ -12,7 +12,10 @@ import { cn } from "@/lib/utils";
 
 const SPAN = H_MAX - H_MIN;
 
-export function TimeScrubber({ t0, className }: { t0: string; className?: string }) {
+/** below this mixing height (m) smoke stays near the ground */
+const TRAPPED_M = 300;
+
+export function TimeScrubber({ t0, blh, className }: { t0: string; blh?: number[]; className?: string }) {
   const { t, lang } = useI18n();
   const hour = useHour();
   const playing = usePlaying();
@@ -34,6 +37,20 @@ export function TimeScrubber({ t0, className }: { t0: string; className?: string
   const hours = useMemo(() => Array.from({ length: SPAN + 1 }, (_, i) => i + H_MIN), []);
   const midnights = useMemo(() => hours.filter((h) => istHourOf(t0ms + h * HOUR_MS) < 1), [hours, t0ms]);
   const pct = (h: number) => ((h - H_MIN) / SPAN) * 100;
+  // real domain-mean boundary-layer height from the run when present, else a typical cycle
+  const real = !!blh && blh.length === SPAN + 1;
+  const blhMax = real ? Math.max(1200, ...blh!) : 1;
+  const band = useMemo(
+    () =>
+      hours.map((h, i) => {
+        const ms = t0ms + h * HOUR_MS;
+        return real
+          ? { d: Math.max(0.04, blh![i] / blhMax), night: blh![i] < TRAPPED_M }
+          : { d: mixingDepth(ms), night: isNightIst(ms) };
+      }),
+    [hours, t0ms, real, blh, blhMax],
+  );
+  const nowBlh = real ? blh![hour - H_MIN] : null;
   const label = istDayTime(t0ms + hour * HOUR_MS, lang);
   const rel = hour === 0 ? t("scrub.now") : `${hour > 0 ? "+" : ""}${hour} h`;
 
@@ -107,25 +124,23 @@ export function TimeScrubber({ t0, className }: { t0: string; className?: string
         {/* boundary-layer band: why nights are worse */}
         <div data-coach="blh" className="mt-1">
           <svg viewBox={`0 0 ${SPAN + 1} 12`} preserveAspectRatio="none" className="block h-5 w-full" role="img" aria-label={`${t("scrub.mixing")}: ${t("scrub.trapped")}; ${t("scrub.mixed")}`}>
-            {hours.map((h, i) => {
-              const ms = t0ms + h * HOUR_MS;
-              const d = mixingDepth(ms);
-              return (
-                <g key={h}>
-                  {isNightIst(ms) && <rect x={i} y={0} width={1.02} height={12} fill="var(--night)" />}
-                  <rect x={i + 0.1} y={12 - d * 11} width={0.8} height={d * 11} fill="var(--muted-foreground)" opacity={0.35} />
-                </g>
-              );
-            })}
+            {band.map(({ d, night }, i) => (
+              <g key={i}>
+                {night && <rect x={i} y={0} width={1.02} height={12} fill="var(--night)" />}
+                <rect x={i + 0.1} y={12 - d * 11} width={0.8} height={d * 11} fill="var(--muted-foreground)" opacity={0.35} />
+              </g>
+            ))}
             <rect x={hour - H_MIN} y={0} width={1} height={12} fill="var(--foreground)" opacity={0.5} />
           </svg>
           <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 text-[0.66rem] text-muted-foreground">
             <span>
-              {t("scrub.mixing")} <span className="opacity-70">({t("scrub.climo")})</span>
+              {t("scrub.mixing")}
+              {nowBlh != null && <span className="font-mono text-foreground"> {nowBlh.toLocaleString("en-IN")} m</span>}{" "}
+              <span className="opacity-70">({real ? t("scrub.real") : t("scrub.climo")})</span>
             </span>
             <span className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1">
-                <span className="inline-block size-2 rounded-[1px] bg-[var(--night)] ring-1 ring-border" aria-hidden /> {t("scrub.trapped")}
+                <span className="inline-block size-2 rounded-[1px] bg-[var(--night)] ring-1 ring-border" aria-hidden /> {real ? t("scrub.trappedReal") : t("scrub.trapped")}
               </span>
               <span className="hidden items-center gap-1 sm:inline-flex">
                 <span className="inline-block h-2 w-1 rounded-[1px] bg-muted-foreground/40" aria-hidden /> {t("scrub.mixed")}

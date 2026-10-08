@@ -23,6 +23,15 @@ const OUTDOOR: Record<OutdoorAdvice, { key: DictKey; Icon: typeof CheckIcon }> =
   indoors: { key: "schools.indoors", Icon: XIcon },
 };
 
+/** demo school (backend/data/demo_places.json); the one with a published advisory */
+const DEMO_SCHOOL_ID = "osm-w1090680897";
+
+/** advisories carry hour_ist as 7 or "07:00" */
+function hourLabel(h: number | string): string {
+  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`;
+  return /^\d{1,2}$/.test(h) ? `${h.padStart(2, "0")}:00` : h;
+}
+
 function outdoorFor(pm: number): OutdoorAdvice {
   return pm <= 60 ? "ok" : pm <= 120 ? "limit" : "indoors";
 }
@@ -58,14 +67,14 @@ function Timeline({ plan }: { plan: AdvisoryHour[] }) {
   const { t } = useI18n();
   const theme = useThemeName();
   return (
-    <ol className="grid grid-cols-4 gap-1.5 sm:grid-cols-8" aria-label="07:00 to 14:00 IST">
+    <ol className={cn("grid grid-cols-4 gap-1.5", plan.length === 7 ? "sm:grid-cols-7" : "sm:grid-cols-8")} aria-label="07:00 to 14:00 IST">
       {plan.map((p) => {
         const o = OUTDOOR[p.outdoor];
         return (
           <li key={p.hour_ist} className="flex flex-col overflow-hidden rounded-md border border-border">
             <span className="h-1.5" style={{ background: NAQI_COLORS[theme][p.category] }} aria-hidden />
             <div className="flex flex-1 flex-col gap-1.5 p-2">
-              <span className="font-mono text-xs text-muted-foreground">{String(p.hour_ist).padStart(2, "0")}:00</span>
+              <span className="font-mono text-xs text-muted-foreground">{hourLabel(p.hour_ist)}</span>
               <span
                 className={cn(
                   "inline-flex size-6 items-center justify-center rounded-full border",
@@ -78,7 +87,7 @@ function Timeline({ plan }: { plan: AdvisoryHour[] }) {
                 <o.Icon className="size-3.5" />
               </span>
               <span className="text-xs leading-tight font-medium">{t(o.key)}</span>
-              <span className="font-mono text-[0.7rem] text-muted-foreground">{p.est_pm25} µg/m³</span>
+              <span className="font-mono text-[0.7rem] whitespace-nowrap text-muted-foreground">{p.est_pm25} µg/m³</span>
             </div>
           </li>
         );
@@ -150,7 +159,10 @@ export function SchoolsView() {
   const [open, setOpen] = useState(false);
 
   const schools = useMemo(() => (idx.data?.places ?? []).filter((p) => p.kind === "school"), [idx.data]);
-  const fallbackId = useMemo(() => (schools.find((s) => /bhawanigarh/i.test(s.name)) ?? schools[0])?.id ?? null, [schools]);
+  const fallbackId = useMemo(
+    () => (schools.find((s) => s.id === DEMO_SCHOOL_ID) ?? schools.find((s) => /bhawanigarh/i.test(s.name)) ?? schools[0])?.id ?? null,
+    [schools],
+  );
   const schoolId = params.get("id") ?? fallbackId;
   const school = schools.find((s) => s.id === schoolId) ?? null;
 
@@ -164,6 +176,9 @@ export function SchoolsView() {
   const plan = advisory?.plan ?? computed?.plan ?? null;
   const date = advisory?.date_ist ?? computed?.date ?? null;
   const worst = plan?.reduce((a, b) => (b.est_pm25 > a.est_pm25 ? b : a));
+  // no published advisory and no calibration to compute one from: say so, don't spin
+  const loadingPlan = !plan && (adv.status === "loading" || place.status === "loading" || meta.status === "loading");
+  const noPlan = !plan && !loadingPlan;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
@@ -218,7 +233,11 @@ export function SchoolsView() {
             <section aria-labelledby="plan-title" className="rounded-lg border border-border p-4 sm:p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 id="plan-title" className="text-base font-semibold">
-                  {date ? t("schools.today", { date: istDate(Date.parse(date + "T06:30:00Z") , lang) }) : t("common.loading")}
+                  {date
+                    ? t("schools.today", { date: istDate(Date.parse(date + "T06:30:00Z"), lang) })
+                    : noPlan
+                      ? t("schools.noPlan")
+                      : t("common.loading")}
                 </h2>
                 {worst && <NaqiChip category={worst.category} value={worst.est_pm25} />}
               </div>
@@ -228,10 +247,17 @@ export function SchoolsView() {
               <div className="mt-4">
                 {plan ? (
                   <Timeline plan={plan} />
-                ) : adv.status === "loading" || place.status === "loading" ? (
+                ) : loadingPlan ? (
                   <Skeleton className="h-28" />
                 ) : (
-                  <p className="text-sm text-muted-foreground">{t("schools.computed")}</p>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <p>{meta.data && !meta.data.calibrated ? t("schools.noPlanUncal") : t("schools.computed")}</p>
+                    {schoolId !== DEMO_SCHOOL_ID && schools.some((s) => s.id === DEMO_SCHOOL_ID) && (
+                      <Button variant="outline" size="sm" onClick={() => router.replace(`/schools/?id=${DEMO_SCHOOL_ID}`, { scroll: false })}>
+                        {t("schools.seeDemo")}
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
               {!advisory && computed && <p className="mt-3 text-xs text-muted-foreground">{t("schools.computed")}</p>}

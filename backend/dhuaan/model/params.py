@@ -63,8 +63,9 @@ class Params:
     school_hours_ist: tuple[int, int] = (7, 14)   # [07:00, 14:00)
     exposure_hours: int = 48
     # artifacts
-    trip_step_min: int = 30
-    max_trips: int = 6000
+    trip_step_min: int = 60          # web interpolates between points
+    max_trips: int = 3000
+    trip_dp: int = 3                  # coordinate decimals in trips.json (~100 m)
     arrival_frac: float = 0.15
     scale_pct: float = 99.0
     members: tuple[Member, ...] = field(default=DEFAULT_MEMBERS)

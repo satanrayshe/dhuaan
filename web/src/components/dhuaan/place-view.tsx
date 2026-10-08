@@ -13,7 +13,13 @@ import { msToOffset, toMs } from "@/lib/time";
 import { AskPanel } from "./ask-panel";
 import { AqNowChip, ArrivalPeak, PlaceCardSkeleton } from "./place-card";
 import { setSearchOpen } from "./place-search";
-import { AttributionBars, ForecastChart } from "./forecast-chart";
+import { AttributionBars } from "./attribution-bars";
+
+// Recharts (~110 KB gzip) loads only when a forecast is on screen
+const ForecastChart = dynamic(() => import("./forecast-chart").then((m) => m.ForecastChart), {
+  ssr: false,
+  loading: () => <div className="h-72 animate-pulse rounded-md bg-muted/40" />,
+});
 import { SampleBadge } from "./top-bar";
 
 const SmokeMap = dynamic(() => import("./smoke-map"), { ssr: false, loading: () => <div className="h-full bg-surface-map" /> });
@@ -119,7 +125,7 @@ export function PlaceView() {
               />
             )}
           </div>
-          <AskPanel placeId={place.id} placeName={place.name} />
+          <AskPanel placeId={place.id} placeName={place.name} placeKind={place.kind} />
         </aside>
       </div>
     </div>

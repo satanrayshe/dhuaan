@@ -18,9 +18,14 @@ interface Turn {
   status: "pending" | "done" | "error";
   res?: AskResponse;
   error?: string;
+  /** HTTP status of a failed ask (429/503 = rate limit or model busy) */
+  code?: number;
 }
 
-const SUGGESTIONS: DictKey[] = ["ask.s1", "ask.s2", "ask.s3"];
+/** starter questions that fit the place: the school one only on school pages */
+function suggestionsFor(kind?: string): DictKey[] {
+  return kind === "school" ? ["ask.s2", "ask.s1", "ask.s3"] : ["ask.s1", "ask.s3"];
+}
 
 export function GroundingBadge({ verified, total, unverified }: { verified: number; total: number; unverified?: string[] }) {
   const { t } = useI18n();
@@ -39,12 +44,59 @@ export function GroundingBadge({ verified, total, unverified }: { verified: numb
   );
 }
 
+/** "Government Senior Secondary Boys School, Bhawanigarh" -> as written; "Rohini (ward 21, pre-2022)" -> "Rohini" */
+function shortName(name?: string) {
+  if (!name) return "here";
+  return name.replace(/\s*\(.*\)\s*$/, "");
+}
+
+/** **bold** spans only; everything else stays plain text (no HTML from the model) */
+function inline(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong> : part,
+  );
+}
+
+/** Paragraphs and "- " bullet lists from the agent's plain-text answer. */
+function AnswerText({ text }: { text: string }) {
+  const blocks: { list: boolean; lines: string[] }[] = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) {
+      blocks.push({ list: false, lines: [] });
+      continue;
+    }
+    const bullet = /^[-*•]\s+/.test(line);
+    const cur = blocks[blocks.length - 1];
+    const body = line.replace(/^[-*•]\s+/, "");
+    if (cur && cur.list === bullet && (bullet || cur.lines.length)) cur.lines.push(body);
+    else blocks.push({ list: bullet, lines: [body] });
+  }
+  return (
+    <div className="space-y-2 text-sm leading-relaxed">
+      {blocks
+        .filter((b) => b.lines.length)
+        .map((b, i) =>
+          b.list ? (
+            <ul key={i} className="list-disc space-y-1 pl-4 marker:text-muted-foreground">
+              {b.lines.map((l, j) => (
+                <li key={j}>{inline(l)}</li>
+              ))}
+            </ul>
+          ) : (
+            <p key={i}>{inline(b.lines.join(" "))}</p>
+          ),
+        )}
+    </div>
+  );
+}
+
 function Answer({ turn }: { turn: Turn }) {
   const { t } = useI18n();
   const r = turn.res!;
   return (
     <div className="space-y-2">
-      <p className="text-sm leading-relaxed whitespace-pre-line">{r.answer}</p>
+      <AnswerText text={r.answer} />
       <div className="flex flex-wrap items-center gap-2">
         <GroundingBadge verified={r.grounding.verified} total={r.grounding.total} unverified={r.grounding.unverified} />
         <span className="font-mono text-[0.7rem] text-muted-foreground">
@@ -80,7 +132,17 @@ function Answer({ turn }: { turn: Turn }) {
   );
 }
 
-export function AskPanel({ placeId, placeName, className }: { placeId?: string; placeName?: string; className?: string }) {
+export function AskPanel({
+  placeId,
+  placeName,
+  placeKind,
+  className,
+}: {
+  placeId?: string;
+  placeName?: string;
+  placeKind?: string;
+  className?: string;
+}) {
   const { t, lang } = useI18n();
   const health = useHealth();
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -98,7 +160,8 @@ export function AskPanel({ placeId, placeName, className }: { placeId?: string; 
       const res = await ask({ question: text, place_id: placeId, lang });
       setTurns((ts) => ts.map((x) => (x.id === id ? { ...x, status: "done", res, at: Date.now() } : x)));
     } catch (e) {
-      setTurns((ts) => ts.map((x) => (x.id === id ? { ...x, status: "error", error: (e as Error).message } : x)));
+      const code = (e as Error & { status?: number }).status;
+      setTurns((ts) => ts.map((x) => (x.id === id ? { ...x, status: "error", error: (e as Error).message, code } : x)));
     }
   };
 
@@ -128,15 +191,15 @@ export function AskPanel({ placeId, placeName, className }: { placeId?: string; 
         <>
           {turns.length === 0 && (
             <div className="flex flex-col items-start gap-1.5">
-              {SUGGESTIONS.map((k) => (
+              {suggestionsFor(placeKind).map((k) => (
                 <button
                   key={k}
                   type="button"
-                  onClick={() => submit(t(k))}
+                  onClick={() => submit(t(k, { place: shortName(placeName) }))}
                   disabled={health.status !== "ready"}
                   className="rounded-md border border-border px-2.5 py-1.5 text-left text-xs transition-colors hover:border-foreground/30 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50"
                 >
-                  {t(k)}
+                  {t(k, { place: shortName(placeName) })}
                 </button>
               ))}
             </div>
@@ -155,7 +218,9 @@ export function AskPanel({ placeId, placeName, className }: { placeId?: string; 
               {last.status === "error" && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2 rounded-md border border-destructive/40 px-3 py-2 text-sm">
-                    <span className="text-destructive">{t("ask.error")}</span>
+                    <span className="text-destructive">
+                      {last.code === 429 ? t("ask.limited") : last.code === 503 ? t("ask.busy") : t("ask.error")}
+                    </span>
                     <Button variant="outline" size="sm" onClick={() => submit(last.question)}>
                       <RotateCwIcon aria-hidden /> {t("ask.retry")}
                     </Button>
@@ -187,7 +252,7 @@ export function AskPanel({ placeId, placeName, className }: { placeId?: string; 
               id={`ask-${placeId ?? "any"}`}
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder={placeName ? `${t("ask.placeholder")} · ${placeName}` : t("ask.placeholder")}
+              placeholder={t("ask.placeholder")}
               className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               maxLength={400}
             />

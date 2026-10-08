@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ExternalLinkIcon, Share2Icon, XIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -14,7 +15,13 @@ import type { Meta, PlaceDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { AskPanel } from "./ask-panel";
 import { NaqiChip, SectionLabel } from "./bits";
-import { AttributionBars, ForecastChart } from "./forecast-chart";
+import { AttributionBars } from "./attribution-bars";
+
+// Recharts (~110 KB gzip) loads only when a forecast is on screen
+const ForecastChart = dynamic(() => import("./forecast-chart").then((m) => m.ForecastChart), {
+  ssr: false,
+  loading: () => <div className="h-72 animate-pulse rounded-md bg-muted/40" />,
+});
 
 function sharePlace(id: string, name: string, copiedMsg: string) {
   const url = `${window.location.origin}/place/?id=${encodeURIComponent(id)}`;
@@ -167,7 +174,7 @@ export function PlaceCard({
       <ForecastChart place={place} meta={meta.data} cursorHour={hour} />
       <AttributionBars place={place} />
       <AqNowChip place={place} />
-      <AskPanel placeId={place.id} placeName={place.name} />
+      <AskPanel placeId={place.id} placeName={place.name} placeKind={place.kind} />
     </article>
   );
 }

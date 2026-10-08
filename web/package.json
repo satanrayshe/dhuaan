@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "data:sync": "node scripts/sync-data.mjs",
+    "data:fixtures": "node scripts/make-fixtures.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@deck.gl/core": "^9.4.0",

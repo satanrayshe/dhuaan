@@ -2,16 +2,16 @@
 
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AlertTriangleIcon, FlameIcon, RotateCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { artifactUrl, isStale, reload, useFires, useGrid, useMeta, useReceptors, useTrips } from "@/lib/data";
-import { hasEveningLayer, missedByMidday, useMediaQuery } from "@/lib/derive";
+import { artifactUrl, isStale, reload, useClusters, useFires, useGrid, useMeta, useReceptors, useTrips } from "@/lib/data";
+import { abroadCentroid, hasEveningLayer, missedByMidday, useMediaQuery } from "@/lib/derive";
 import { useI18n } from "@/lib/i18n";
 import { playback, useReducedMotionFlag } from "@/lib/playback";
-import { ageLabel, H_MAX, H_MIN, istDayTime, toMs } from "@/lib/time";
+import { ageLabel, H_MAX, H_MIN, istDayTime, istTime, toMs } from "@/lib/time";
 import { CoachMarks } from "./coach-marks";
 import { LayerPanel } from "./layer-panel";
 import { setSearchOpen } from "./place-search";
@@ -75,6 +75,10 @@ function SplitHandle({ value, onChange }: { value: number; onChange: (v: number)
   );
 }
 
+const noop = () => () => {};
+
+export const DEMO_IDS = { school: "osm-w1090680897", ward: "dlw-21", town: "gn-1260107" } as const;
+
 export function MapApp() {
   const { t, lang } = useI18n();
   const router = useRouter();
@@ -86,8 +90,11 @@ export function MapApp() {
   const meta = useMeta();
   const fires = useFires();
   const grid = useGrid();
-  const trips = useTrips(!reducedMotion);
+  // after hydration only: the server snapshot can't know the reduced-motion preference
+  const hydrated = useSyncExternalStore(noop, () => true, () => false);
+  const trips = useTrips(hydrated && !reducedMotion);
   const idx = useReceptors();
+  const clusters = useClusters();
 
   const [layers, setLayers] = useState<MapLayersState>({ fires: true, missed: true, trails: true, field: true, places: true });
   // ?split=1 opens the midday-vs-evening comparison, ?autoplay=1 starts playback (demo recording links)
@@ -97,6 +104,18 @@ export function MapApp() {
   const t0 = meta.data?.t0_utc ?? grid.data?.t0_utc;
   const evening = hasEveningLayer(fires.data);
   const missed = useMemo(() => missedByMidday(fires.data), [fires.data]);
+  // an empty geostationary layer is a real state (no evening fires yet), not a broken layer
+  const eveningNote = useMemo(() => {
+    if (evening) return undefined;
+    const geo = meta.data?.sources.find((s) => /LSA SAF|MSG|IODC/i.test(s.name));
+    const last = geo?.latest_obs_utc ? t("layers.missedLast", { t: istTime(geo.latest_obs_utc) }) : "";
+    return t("layers.missedNone", { last });
+  }, [evening, meta.data, t]);
+  const borderLabel = useMemo(() => {
+    const c = abroadCentroid(clusters.data?.clusters);
+    return c ? { lon: c.lon, lat: c.lat, text: `${t("map.border")}
+${t("map.borderSub")}` } : null;
+  }, [clusters.data, t]);
 
   // start the clock at "now" relative to the run, once
   const started = useRef(false);
@@ -131,8 +150,14 @@ export function MapApp() {
 
   const quickPicks = useMemo(() => {
     const ps = idx.data?.places ?? [];
+    const byId = (id: string) => ps.find((p) => p.id === id);
     const find = (re: RegExp, kind?: string) => ps.find((p) => re.test(p.name) && (!kind || p.kind === kind));
-    const picks = [find(/bhawanigarh/i, "school"), find(/rohini/i, "ward"), find(/patiala/i, "city")].filter(Boolean);
+    // the demo places (backend/data/demo_places.json), by id first, by name as a fallback
+    const picks = [
+      byId(DEMO_IDS.school) ?? find(/bhawanigarh/i, "school"),
+      byId(DEMO_IDS.ward) ?? find(/rohini/i, "ward"),
+      byId(DEMO_IDS.town) ?? find(/^patiala$/i, "city"),
+    ].filter(Boolean);
     const top = [...ps].filter((p) => !picks.includes(p)).sort((a, b) => b.peak_smoke - a.peak_smoke).slice(0, 4);
     return { picks: picks as typeof ps, top };
   }, [idx.data]);
@@ -150,6 +175,7 @@ export function MapApp() {
             grid={grid.data}
             places={idx.data?.places}
             layers={{ ...layers, missed: layers.missed && evening }}
+            borderLabel={borderLabel}
             selectedPlaceId={placeId}
             onPickPlace={(id) => select(id)}
             splitAt={compare && evening ? split : null}
@@ -186,13 +212,15 @@ export function MapApp() {
 
         {t0 && (
           <>
-            <div className="absolute top-3 left-3 z-10 flex max-w-[calc(100%-4.5rem)] flex-col items-start gap-2">
+            {/* desktop: chrome sits over the quiet eastern hills; the burning is in the west */}
+            <div className="absolute top-3 left-3 z-10 flex max-w-[calc(100%-4.5rem)] flex-col items-start gap-2 lg:right-16 lg:left-auto lg:items-end">
               <LayerPanel
                 key={isDesktop ? "desktop" : "mobile"}
                 defaultOpen={isDesktop}
                 layers={layers}
                 setLayers={setLayers}
                 hasEvening={evening}
+                eveningNote={eveningNote}
                 compare={compare}
                 setCompare={setCompare}
               />
@@ -230,7 +258,7 @@ export function MapApp() {
             {compare && evening && <SplitHandle value={split} onChange={setSplit} />}
 
             <div className="absolute inset-x-2 bottom-2 z-10 sm:inset-x-3 sm:bottom-3 lg:right-auto lg:left-1/2 lg:w-[min(46rem,calc(100%-1.5rem))] lg:-translate-x-1/2">
-              <TimeScrubber t0={t0} />
+              <TimeScrubber t0={t0} blh={grid.data?.blh_m} />
             </div>
           </>
         )}

@@ -1,18 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
-import { ChartContainer, ChartTooltip, type ChartConfig } from "@/components/ui/chart";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BACKTEST_COLORS } from "@/lib/colors";
-import { useBacktest } from "@/lib/data";
+import { artifactUrl, revalidate, useBacktest } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
-import { istDate, istDayTime, toMs } from "@/lib/time";
-import type { BacktestStation, Lang } from "@/lib/types";
+import type { Lang } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { useThemeName } from "./bits";
+
+// Recharts loads after the metrics and method text are on screen
+const StationChart = dynamic(() => import("./backtest-chart").then((m) => m.StationChart), {
+  ssr: false,
+  loading: () => <div className="h-60 animate-pulse rounded-lg border border-border bg-muted/30" />,
+});
 
 const METRIC_LABELS: Record<string, { label: string; fmt: (v: number) => string; better: "up" | "down" }> = {
   hit_rate: { label: "Hit rate (smoke episodes)", fmt: (v) => `${Math.round(v * 100)}%`, better: "up" },
@@ -24,23 +27,23 @@ const METRIC_LABELS: Record<string, { label: string; fmt: (v: number) => string;
 
 const METHOD: Record<Lang, string[]> = {
   en: [
-    "Window 25 Oct to 20 Nov 2025, centred on the 11 Nov 2025 episode. Definitions were fixed before looking at the data.",
+    "A season replay around the 11 Nov 2025 smoke episode (window shown above). Definitions were fixed before looking at the data.",
     "Observed smoke signal: PM2.5 minus a rolling 7-day 10th-percentile baseline at the same station.",
-    "Calibration: least squares PM2.5 excess ≈ α × model smoke, fitted 25 Oct to 5 Nov; scored on 6 to 20 Nov only.",
+    "Calibration: least squares PM2.5 excess ≈ α × model smoke, fitted on the first part of the window; skill is scored on the held-out remainder only.",
     "An episode is an excess of at least 60 µg/m³ for 3 or more hours; a hit is a forecast crossing within ±6 h.",
     "A uses VIIRS/MODIS detections only, as official counts do. B adds hourly afternoon geostationary detections. The A-to-B difference is the measured cost of the afternoon gap.",
   ],
   hi: [
-    "अवधि 25 अक्टूबर से 20 नवंबर 2025, 11 नवंबर 2025 की घटना पर केंद्रित। परिभाषाएँ डेटा देखने से पहले तय की गईं।",
+    "11 नवंबर 2025 की धुआँ घटना के आसपास सीज़न का दोहराव (अवधि ऊपर दी गई है)। परिभाषाएँ डेटा देखने से पहले तय की गईं।",
     "देखा गया धुआँ संकेत: PM2.5 में से उसी स्टेशन की 7-दिन की 10वीं प्रतिशतक आधार रेखा घटाकर।",
-    "अंशांकन: 25 अक्टूबर से 5 नवंबर पर न्यूनतम वर्ग; अंक केवल 6 से 20 नवंबर पर।",
+    "अंशांकन: अवधि के पहले हिस्से पर न्यूनतम वर्ग; कौशल केवल बाकी, अलग रखे गए हिस्से पर मापा गया।",
     "घटना: कम से कम 3 घंटे तक 60 µg/m³ या अधिक अतिरिक्त; सफलता: ±6 घंटे में पूर्वानुमान का पार होना।",
     "A में केवल VIIRS/MODIS, B में दोपहर बाद के भूस्थिर उपग्रह भी। A और B का अंतर दोपहर बाद की कमी की मापी गई कीमत है।",
   ],
   pa: [
-    "ਮਿਆਦ 25 ਅਕਤੂਬਰ ਤੋਂ 20 ਨਵੰਬਰ 2025, 11 ਨਵੰਬਰ 2025 ਦੀ ਘਟਨਾ 'ਤੇ ਕੇਂਦਰਿਤ। ਪਰਿਭਾਸ਼ਾਵਾਂ ਡਾਟਾ ਵੇਖਣ ਤੋਂ ਪਹਿਲਾਂ ਤੈਅ ਕੀਤੀਆਂ।",
+    "11 ਨਵੰਬਰ 2025 ਦੀ ਧੂੰਆਂ ਘਟਨਾ ਦੇ ਆਲੇ-ਦੁਆਲੇ ਸੀਜ਼ਨ ਦਾ ਦੁਹਰਾਅ (ਮਿਆਦ ਉੱਪਰ ਦਿੱਤੀ ਹੈ)। ਪਰਿਭਾਸ਼ਾਵਾਂ ਡਾਟਾ ਵੇਖਣ ਤੋਂ ਪਹਿਲਾਂ ਤੈਅ ਕੀਤੀਆਂ।",
     "ਵੇਖਿਆ ਧੂੰਆਂ ਸੰਕੇਤ: PM2.5 ਵਿੱਚੋਂ ਉਸੇ ਸਟੇਸ਼ਨ ਦੀ 7-ਦਿਨ 10ਵੀਂ ਪ੍ਰਤੀਸ਼ਤਕ ਆਧਾਰ ਰੇਖਾ ਘਟਾ ਕੇ।",
-    "ਕੈਲੀਬ੍ਰੇਸ਼ਨ: 25 ਅਕਤੂਬਰ ਤੋਂ 5 ਨਵੰਬਰ 'ਤੇ ਘੱਟੋ-ਘੱਟ ਵਰਗ; ਅੰਕ ਸਿਰਫ਼ 6 ਤੋਂ 20 ਨਵੰਬਰ 'ਤੇ।",
+    "ਕੈਲੀਬ੍ਰੇਸ਼ਨ: ਮਿਆਦ ਦੇ ਪਹਿਲੇ ਹਿੱਸੇ 'ਤੇ ਘੱਟੋ-ਘੱਟ ਵਰਗ; ਹੁਨਰ ਸਿਰਫ਼ ਬਾਕੀ, ਵੱਖਰੇ ਰੱਖੇ ਹਿੱਸੇ 'ਤੇ ਮਾਪਿਆ।",
     "ਘਟਨਾ: ਘੱਟੋ-ਘੱਟ 3 ਘੰਟੇ 60 µg/m³ ਜਾਂ ਵੱਧ ਵਾਧੂ; ਸਫਲਤਾ: ±6 ਘੰਟਿਆਂ ਵਿੱਚ ਭਵਿੱਖਬਾਣੀ ਦਾ ਪਾਰ ਹੋਣਾ।",
     "A ਵਿੱਚ ਸਿਰਫ਼ VIIRS/MODIS, B ਵਿੱਚ ਦੁਪਹਿਰ ਬਾਅਦ ਦੇ ਭੂ-ਸਥਿਰ ਉਪਗ੍ਰਹਿ ਵੀ। A ਅਤੇ B ਦਾ ਫ਼ਰਕ ਦੁਪਹਿਰ ਬਾਅਦ ਦੀ ਕਮੀ ਦੀ ਮਾਪੀ ਕੀਮਤ ਹੈ।",
   ],
@@ -70,88 +73,29 @@ const LIMITS: Record<Lang, string[]> = {
   ],
 };
 
-function StationChart({ st, view }: { st: BacktestStation; view: "chart" | "table" }) {
-  const theme = useThemeName();
-  const { t, lang } = useI18n();
-  const c = BACKTEST_COLORS[theme];
-  const config = {
-    obs_excess: { label: t("backtest.obs"), color: c.obs },
-    pred_A: { label: "A", color: c.A },
-    pred_B: { label: "B", color: c.B },
-  } satisfies ChartConfig;
-  const data = useMemo(() => st.series.map((p) => ({ ...p, ms: toMs(p.t) })), [st]);
-  const ticks = useMemo(() => data.filter((_, i) => i % Math.max(1, Math.floor(data.length / 5)) === 0).map((d) => d.ms), [data]);
+/** raw counts shown inside the hit-rate tile, not as tiles of their own */
+const COUNT_KEYS = new Set(["n_episodes", "n_hits", "episodes", "hits", "n_false_alarms", "n_stations", "n_hours"]);
 
-  return (
-    <figure className="min-w-0 rounded-lg border border-border p-4">
-      <figcaption className="flex items-baseline justify-between gap-2">
-        <span className="truncate text-sm font-medium">{st.name}</span>
-        <span className="shrink-0 font-mono text-[0.68rem] text-muted-foreground">µg/m³</span>
-      </figcaption>
-      {view === "chart" ? (
-        <ChartContainer config={config} className="mt-2 h-44 w-full">
-          <LineChart data={data} margin={{ top: 6, right: 6, bottom: 0, left: 0 }} accessibilityLayer>
-            <CartesianGrid vertical={false} stroke="var(--grid-line)" />
-            <XAxis
-              dataKey="ms"
-              type="number"
-              domain={["dataMin", "dataMax"]}
-              ticks={ticks}
-              tickFormatter={(ms: number) => istDate(ms, lang)}
-              tickLine={false}
-              axisLine={false}
-              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-            />
-            <YAxis tickLine={false} axisLine={false} width={36} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
-            <Line dataKey="obs_excess" stroke={c.obs} strokeWidth={2} dot={false} isAnimationActive={false} connectNulls={false} />
-            <Line dataKey="pred_A" stroke={c.A} strokeWidth={1.5} dot={false} isAnimationActive={false} strokeDasharray="4 3" />
-            <Line dataKey="pred_B" stroke={c.B} strokeWidth={1.5} dot={false} isAnimationActive={false} />
-            <ChartTooltip
-              cursor={{ stroke: "var(--foreground)", strokeOpacity: 0.25 }}
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null;
-                const p = payload[0].payload as (typeof data)[number];
-                return (
-                  <div className="rounded-md border border-border bg-popover px-2.5 py-2 text-xs shadow-md">
-                    <p className="font-medium">{istDayTime(p.ms, lang)} IST</p>
-                    {(["obs_excess", "pred_A", "pred_B"] as const).map((k) => (
-                      <p key={k} className="mt-0.5 flex items-center gap-1.5 font-mono">
-                        <span className="h-0.5 w-3" style={{ background: config[k].color }} aria-hidden />
-                        {config[k].label}: {p[k] ?? "n/a"}
-                      </p>
-                    ))}
-                  </div>
-                );
-              }}
-            />
-          </LineChart>
-        </ChartContainer>
-      ) : (
-        <ScrollArea className="mt-2 h-44 rounded-md border border-border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>IST</TableHead>
-                <TableHead className="text-right">obs</TableHead>
-                <TableHead className="text-right">A</TableHead>
-                <TableHead className="text-right">B</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="font-mono text-xs">
-              {data.map((p) => (
-                <TableRow key={p.t}>
-                  <TableCell className="py-1">{istDayTime(p.ms, lang)}</TableCell>
-                  <TableCell className="py-1 text-right">{p.obs_excess ?? "-"}</TableCell>
-                  <TableCell className="py-1 text-right">{p.pred_A ?? "-"}</TableCell>
-                  <TableCell className="py-1 text-right">{p.pred_B ?? "-"}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-      )}
-    </figure>
-  );
+const fmtAlpha = (v: unknown) => (typeof v === "number" ? (+v.toPrecision(3)).toString() : "-");
+
+/** backtest.json `window` is free-form in CONTRACTS: accept a string or {start,end,...} */
+function windowText(w: unknown): string {
+  if (!w) return "";
+  if (typeof w === "string") return w;
+  if (typeof w === "object") {
+    const o = w as Record<string, unknown>;
+    const day = (v: unknown) => (typeof v === "string" ? v.slice(0, 10) : String(v));
+    const start = o.start ?? o.start_utc ?? o.from;
+    const end = o.end ?? o.end_utc ?? o.to;
+    if (start && end) return `${day(start)} → ${day(end)}`;
+    return Object.entries(o)
+      .map(([k, v]) =>
+        Array.isArray(v) && v.length === 2 ? `${k} ${day(v[0])} → ${day(v[1])}` : typeof v === "string" || typeof v === "number" ? `${k} ${day(v)}` : "",
+      )
+      .filter(Boolean)
+      .join(" · ");
+  }
+  return "";
 }
 
 export function BacktestView() {
@@ -161,13 +105,21 @@ export function BacktestView() {
   const [view, setView] = useState<"chart" | "table">("chart");
   const c = BACKTEST_COLORS[theme];
 
+  // the replay is published separately from the forecast: keep checking while it's pending
+  useEffect(() => {
+    if (bt.status !== "missing") return;
+    const id = setInterval(() => revalidate(artifactUrl("backtest.json")), 60_000);
+    return () => clearInterval(id);
+  }, [bt.status]);
+
   const metricKeys = useMemo(() => {
     if (bt.status !== "ready") return [];
     const keys = new Set([...Object.keys(bt.data.metrics.A ?? {}), ...Object.keys(bt.data.metrics.B ?? {})]);
+    // a metric undefined for both configurations (e.g. FAR with 0 forecast episodes) gets no tile
     const numeric = [...keys].filter((k) => typeof (bt.data.metrics.A?.[k] ?? bt.data.metrics.B?.[k]) === "number");
     // known skill metrics first (in a fixed order); raw counts are shown inside the hit-rate tile
     const known = Object.keys(METRIC_LABELS).filter((k) => numeric.includes(k));
-    const other = numeric.filter((k) => !(k in METRIC_LABELS) && k !== "episodes" && k !== "hits");
+    const other = numeric.filter((k) => !(k in METRIC_LABELS) && !COUNT_KEYS.has(k) && !k.startsWith("n_"));
     return [...known, ...other];
   }, [bt]);
 
@@ -195,7 +147,12 @@ export function BacktestView() {
             <h2 id="metrics-title" className="label-mono">
               {t("backtest.metrics")}
             </h2>
-            <div className="mt-3 grid overflow-hidden rounded-lg border border-border sm:grid-cols-2 lg:grid-cols-4 [&>*]:border-border max-sm:[&>*:not(:last-child)]:border-b sm:[&>*]:border-r lg:[&>*:nth-child(4n)]:border-r-0">
+            <div
+              className={cn(
+                "mt-3 grid overflow-hidden rounded-lg border border-border bg-border gap-px sm:grid-cols-2",
+                metricKeys.length >= 5 ? "lg:grid-cols-5" : metricKeys.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4",
+              )}
+            >
               {metricKeys.map((k) => {
                 const m = METRIC_LABELS[k] ?? { label: k.replace(/_/g, " "), fmt: (v: number) => String(+v.toFixed(2)), better: "up" as const };
                 const a = bt.data.metrics.A?.[k] as number | undefined;
@@ -217,10 +174,10 @@ export function BacktestView() {
                         <p className="ml-auto font-mono text-xs text-muted-foreground">{improved ? "B better" : a === b ? "same" : "A better"}</p>
                       )}
                     </div>
-                    {k === "hit_rate" && bt.data.metrics.A?.episodes != null && (
+                    {k === "hit_rate" && (bt.data.metrics.A?.n_episodes != null || bt.data.metrics.B?.n_episodes != null) && (
                       <p className="mt-2 font-mono text-[0.68rem] text-muted-foreground">
-                        A {String(bt.data.metrics.A?.hits ?? "-")}/{String(bt.data.metrics.A.episodes)} · B {String(bt.data.metrics.B?.hits ?? "-")}/
-                        {String(bt.data.metrics.B?.episodes ?? "-")} episodes
+                        A {String(bt.data.metrics.A?.n_hits ?? "-")}/{String(bt.data.metrics.A?.n_episodes ?? "-")} · B{" "}
+                        {String(bt.data.metrics.B?.n_hits ?? "-")}/{String(bt.data.metrics.B?.n_episodes ?? "-")} {t("backtest.episodes")}
                       </p>
                     )}
                   </div>
@@ -228,7 +185,11 @@ export function BacktestView() {
               })}
             </div>
             <p className="mt-2 font-mono text-xs text-muted-foreground">
-              {t("backtest.met")}: {bt.data.met_source} · α_A {bt.data.calibration.alpha_A} · α_B {bt.data.calibration.alpha_B}
+              {windowText(bt.data.window) && <>{windowText(bt.data.window)} · </>}α_A {fmtAlpha(bt.data.calibration?.alpha_A)} · α_B{" "}
+              {fmtAlpha(bt.data.calibration?.alpha_B)}
+            </p>
+            <p className="mt-1 max-w-4xl text-xs leading-relaxed text-muted-foreground">
+              {t("backtest.met")}: {bt.data.met_source}
             </p>
           </section>
 
@@ -262,9 +223,11 @@ export function BacktestView() {
           </section>
 
           {bt.data.notes && (
-            <p className="mt-6 rounded-md border border-border bg-muted/50 px-4 py-3 text-sm">
-              {Array.isArray(bt.data.notes) ? bt.data.notes.join(" ") : bt.data.notes}
-            </p>
+            <div className="mt-6 max-w-4xl space-y-2 rounded-md border border-border bg-muted/50 px-4 py-3 text-sm leading-relaxed">
+              {(Array.isArray(bt.data.notes) ? bt.data.notes : [bt.data.notes]).map((n, i) => (
+                <p key={i}>{n}</p>
+              ))}
+            </div>
           )}
         </>
       )}

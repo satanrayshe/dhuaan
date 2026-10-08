@@ -173,6 +173,6 @@ def run(
     res = simulate(fires, met, receptors, population_grid, t0, members=members, seed=seed,
                    afternoon_mode=afternoon_mode, district_of=district_of, params=params,
                    afternoon_ratio=afternoon_ratio)
-    arts = build_artifacts(res)
+    arts = build_artifacts(res, met)
     arts["_summary"]["runtime_s"] = round(time.perf_counter() - t_wall, 2)
     return arts

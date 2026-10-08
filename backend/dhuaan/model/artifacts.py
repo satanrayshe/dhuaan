@@ -40,7 +40,21 @@ def first_crossing(series: np.ndarray, thr: float, start: int = HOURS_BEFORE) ->
     return np.where(hit, s.argmax(axis=-1) + start, -1)
 
 
-def build_artifacts(res: ModelResult) -> dict[str, Any]:
+def domain_mean_blh(met: Any, t0: Any, p: Any) -> list[int] | None:
+    """97 hourly domain-mean boundary-layer heights (m, rounded), index 0 = t0-24 h; None on failure."""
+    try:
+        from .met import MetInterp
+        mi = MetInterp(met, t0, p)
+        out = []
+        for k in range(N_HOURS):
+            b = mi.fields_at((k - HOURS_BEFORE) * 3600.0)[:, 2]
+            out.append(int(round(float(np.mean(b)))))
+        return out
+    except Exception:  # optional extra for the web scrubber; never fail the run over it
+        return None
+
+
+def build_artifacts(res: ModelResult, met: Any = None) -> dict[str, Any]:
     p = res.params
     t0 = res.t0
     t0s = iso(t0)
@@ -64,6 +78,10 @@ def build_artifacts(res: ModelResult) -> dict[str, Any]:
         "t0_utc": t0s, "hours": N_HOURS, "scale": _r(scale, 4),
         "frames": [encode_frame(grid_med[k], scale) for k in range(N_HOURS)],
     }
+    if met is not None:
+        blh = domain_mean_blh(met, t0, p)
+        if blh is not None:
+            grid["blh_m"] = blh
 
     # ---- places ----
     rm = res.rec_members.astype(np.float64)                             # (M, 97, Nr)
@@ -156,7 +174,8 @@ def build_artifacts(res: ModelResult) -> dict[str, Any]:
         })
 
     trips = {"t0_utc": t0s, "step_minutes": p.trip_step_min,
-             "trips": [{"cluster_id": cids[k], "path": path, "ts": ts} for k, path, ts in res.trips]}
+             "trips": [{"cluster_id": cids[k], "path": [[_r(x, p.trip_dp), _r(y, p.trip_dp)] for x, y in path], "ts": ts}
+                       for k, path, ts in res.trips[: p.max_trips]]}
 
     arts: dict[str, Any] = {
         "fires.geojson": {"type": "FeatureCollection", "features": feats},

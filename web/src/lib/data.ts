@@ -68,6 +68,16 @@ function load(url: string) {
     .finally(() => notify(url));
 }
 
+/** Re-fetch in the background, keeping the current state until the answer arrives (polling). */
+export function revalidate(url: string) {
+  fetchJson<unknown>(url, { cache: "no-cache" })
+    .then((data) => {
+      entries.set(url, { status: "ready", data });
+      notify(url);
+    })
+    .catch(() => {});
+}
+
 /** Re-fetch a resource (used by retry buttons). */
 export function reload(url: string) {
   entries.delete(url);

@@ -95,6 +95,8 @@ export interface GridFile {
   scale: number;
   /** base64 uint8 (ny*nx row-major, row 0 = south); value = round(255 * min(1, smoke/scale)) */
   frames: string[];
+  /** extension: 97 hourly domain-mean boundary-layer heights (m), index 0 = t0 - 24 h */
+  blh_m?: number[];
 }
 
 // 5. receptors_index.json
@@ -181,8 +183,11 @@ export interface Meta {
 // 8. advisories/<school_id>.json
 export type OutdoorAdvice = "ok" | "limit" | "indoors";
 export interface AdvisoryHour {
-  hour_ist: number;
+  /** CONTRACTS says an hour; the advisory engine writes "07:00" */
+  hour_ist: number | string;
   est_pm25: number;
+  est_pm25_low?: number;
+  est_pm25_high?: number;
   category: NaqiCategory;
   outdoor: OutdoorAdvice;
 }

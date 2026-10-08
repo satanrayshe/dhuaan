@@ -77,9 +77,9 @@ export function isNightIst(ms: number): boolean {
 }
 
 /**
- * Relative boundary-layer depth 0..1 for an instant. The artifacts do not carry BLH,
- * so the band under the scrubber uses the climatological diurnal cycle the model is
- * driven by (shallow at night, deep in the early afternoon). Labelled as such in the UI.
+ * Relative boundary-layer depth 0..1 for an instant: the fallback when grid.json has no
+ * `blh_m` (older runs, fixtures). A typical diurnal cycle (shallow at night, deep in the
+ * early afternoon), labelled as such in the UI.
  */
 export function mixingDepth(ms: number): number {
   const h = istHourOf(ms);

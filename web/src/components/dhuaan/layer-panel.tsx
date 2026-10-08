@@ -17,6 +17,7 @@ function Row({
   checked,
   onChange,
   legend,
+  disabled,
 }: {
   id: string;
   label: string;
@@ -24,17 +25,22 @@ function Row({
   checked: boolean;
   onChange: (v: boolean) => void;
   legend?: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <div className="py-2">
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor={id} className="flex min-w-0 cursor-pointer items-center gap-2 text-sm">
+        <label htmlFor={id} className={cn("flex min-w-0 items-center gap-2 text-sm", disabled ? "text-muted-foreground" : "cursor-pointer")}>
           {legend}
           <span className="truncate">{label}</span>
         </label>
-        <Switch id={id} checked={checked} onCheckedChange={onChange} />
+        <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} aria-describedby={note ? `${id}-note` : undefined} />
       </div>
-      {note && <p className="mt-0.5 pl-6 text-[0.7rem] leading-snug text-muted-foreground">{note}</p>}
+      {note && (
+        <p id={`${id}-note`} className="mt-0.5 pl-6 text-[0.7rem] leading-snug text-muted-foreground">
+          {note}
+        </p>
+      )}
     </div>
   );
 }
@@ -63,6 +69,7 @@ export function LayerPanel({
   layers,
   setLayers,
   hasEvening,
+  eveningNote,
   compare,
   setCompare,
   className,
@@ -71,6 +78,8 @@ export function LayerPanel({
   layers: MapLayersState;
   setLayers: (l: MapLayersState) => void;
   hasEvening: boolean;
+  /** shown instead of the layer when this run has no evening detections */
+  eveningNote?: string;
   compare: boolean;
   setCompare: (v: boolean) => void;
   className?: string;
@@ -90,9 +99,16 @@ export function LayerPanel({
       </Button>
     );
 
-  const rows: { k: keyof MapLayersState; key: DictKey; legend: React.ReactNode; note?: string; show: boolean }[] = [
+  const rows: { k: keyof MapLayersState; key: DictKey; legend: React.ReactNode; note?: string; show: boolean; disabled?: boolean }[] = [
     { k: "fires", key: "layers.fires", legend: fireDot, show: true },
-    { k: "missed", key: "layers.missed", legend: ring, note: t("layers.missedNote"), show: hasEvening },
+    {
+      k: "missed",
+      key: "layers.missed",
+      legend: ring,
+      note: hasEvening ? t("layers.missedNote") : eveningNote,
+      show: hasEvening || !!eveningNote,
+      disabled: !hasEvening,
+    },
     { k: "trails", key: "layers.trails", legend: swatch(4), show: true },
     { k: "field", key: "layers.field", legend: swatch(2), show: true },
     { k: "places", key: "layers.places", legend: <span className="size-2.5 shrink-0 rounded-full border-[1.5px] border-foreground bg-background" aria-hidden />, show: true },
@@ -116,7 +132,16 @@ export function LayerPanel({
         {rows
           .filter((r) => r.show)
           .map((r) => (
-            <Row key={r.k} id={`layer-${r.k}`} label={t(r.key)} note={r.note} checked={layers[r.k]} onChange={set(r.k)} legend={r.legend} />
+            <Row
+              key={r.k}
+              id={`layer-${r.k}`}
+              label={t(r.key)}
+              note={r.note}
+              checked={r.disabled ? false : layers[r.k]}
+              disabled={r.disabled}
+              onChange={set(r.k)}
+              legend={r.legend}
+            />
           ))}
         {hasEvening && (
           <Row id="layer-compare" label={t("layers.compare")} checked={compare} onChange={setCompare} legend={<span className="h-3 w-2.5 shrink-0 border-r-2 border-foreground" aria-hidden />} />
