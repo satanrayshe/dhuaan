@@ -1,0 +1,17 @@
+.env
+*.env
+!.env.example
+keys.env
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+backend/out/
+backend/cache/
+.aws-sam/
+infra/layers/build/
+node_modules/
+web/.next/
+web/out/
+*.zip
+.DS_Store
