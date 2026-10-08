@@ -1,0 +1,4 @@
+"location_id","sensors_id","location","datetime","lat","lon","parameter","units","value"
+235,12235609,"Anand Vihar, New Delhi - DPCC","2025-11-05T00:45:00+05:30","28.646835","77.316032","pm10","µg/m³","279.0"
+235,12235610,"Anand Vihar, New Delhi - DPCC","2025-11-05T01:00:00+05:30","28.646835","77.316032","pm25","µg/m³","180.5"
+235,12235610,"Anand Vihar, New Delhi - DPCC","2025-11-05T00:45:00+05:30","28.646835","77.316032","pm25","µg/m³","175.0"

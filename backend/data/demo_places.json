@@ -1,0 +1,72 @@
+{
+  "school": {
+    "id": "osm-w1090680897",
+    "name": "Government Senior Secondary Boys School, Bhawanigarh",
+    "kind": "school",
+    "district": "Sangrur",
+    "state": "Punjab",
+    "lat": 30.26661,
+    "lon": 76.04008,
+    "population": null,
+    "distance_km_from_bhawanigarh": 0.07,
+    "note": "real OpenStreetMap school; the principal persona is fictional"
+  },
+  "ward": {
+    "id": "dlw-21",
+    "name": "Rohini (ward 21, pre-2022)",
+    "kind": "ward",
+    "district": "North",
+    "state": "Delhi",
+    "lat": 28.73458,
+    "lon": 77.11387,
+    "population": null,
+    "note": "pre-2022 Delhi ward (datameet)"
+  },
+  "town": {
+    "id": "gn-1260107",
+    "name": "Patiala",
+    "kind": "city",
+    "district": "Patiala",
+    "state": "Punjab",
+    "lat": 30.33625,
+    "lon": 76.3922,
+    "population": 446246,
+    "note": "GeoNames"
+  },
+  "places": [
+    {
+      "id": "osm-w1090680897",
+      "name": "Government Senior Secondary Boys School, Bhawanigarh",
+      "kind": "school",
+      "district": "Sangrur",
+      "state": "Punjab",
+      "lat": 30.26661,
+      "lon": 76.04008,
+      "population": null,
+      "distance_km_from_bhawanigarh": 0.07,
+      "note": "real OpenStreetMap school; the principal persona is fictional"
+    },
+    {
+      "id": "dlw-21",
+      "name": "Rohini (ward 21, pre-2022)",
+      "kind": "ward",
+      "district": "North",
+      "state": "Delhi",
+      "lat": 28.73458,
+      "lon": 77.11387,
+      "population": null,
+      "note": "pre-2022 Delhi ward (datameet)"
+    },
+    {
+      "id": "gn-1260107",
+      "name": "Patiala",
+      "kind": "city",
+      "district": "Patiala",
+      "state": "Punjab",
+      "lat": 30.33625,
+      "lon": 76.3922,
+      "population": 446246,
+      "note": "GeoNames"
+    }
+  ]
+}

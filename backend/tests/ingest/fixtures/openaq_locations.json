@@ -1,0 +1,9 @@
+{"meta":{"found":3},"results":[
+{"id":10831,"name":"Rohini, Delhi - DPCC","provider":{"name":"CPCB"},"isMonitor":true,"coordinates":{"latitude":28.73253,"longitude":77.11992},"datetimeLast":{"utc":"2026-10-07T14:30:00Z"},
+ "sensors":[{"id":1,"parameter":{"name":"pm10"}},{"id":12235092,"parameter":{"name":"pm25"}},{"id":99,"parameter":{"name":"pm25"}}]},
+{"id":5544,"name":"Model Town, Patiala - PPCB","provider":{"name":"CPCB"},"isMonitor":true,"coordinates":{"latitude":30.34939,"longitude":76.36664},"datetimeLast":{"utc":"2026-10-07T14:15:00Z"},
+ "sensors":[{"id":7,"parameter":{"name":"pm25"}}]},
+{"id":1,"name":"Far away","provider":{"name":"X"},"isMonitor":false,"coordinates":{"latitude":12.0,"longitude":77.0},"datetimeLast":{"utc":"2026-10-07T14:15:00Z"},
+ "sensors":[{"id":8,"parameter":{"name":"pm25"}}]},
+{"id":2,"name":"No pm25","provider":{"name":"X"},"isMonitor":false,"coordinates":{"latitude":30.0,"longitude":76.0},"datetimeLast":{"utc":"2026-10-07T14:15:00Z"},
+ "sensors":[{"id":9,"parameter":{"name":"o3"}}]}]}

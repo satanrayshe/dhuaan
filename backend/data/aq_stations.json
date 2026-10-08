@@ -1,0 +1,4746 @@
+{
+"source": "OpenAQ v3 /locations (bbox = DOMAIN, parameter pm25)",
+"generated_utc": "2026-10-08T10:44:00Z",
+"licence": "per-provider; CPCB/DPCC/state boards via OpenAQ; see SOURCES.md",
+"stations": [
+{
+"id": 13,
+"name": "Delhi Technological University, Delhi - CPCB",
+"lat": 28.744,
+"lon": 77.12,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+13864
+],
+"last_utc": "2018-02-22T04:00:00Z"
+},
+{
+"id": 15,
+"name": "IGI Airport",
+"lat": 28.56,
+"lon": 77.094,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+30
+],
+"last_utc": null
+},
+{
+"id": 16,
+"name": "Civil Lines",
+"lat": 28.6787,
+"lon": 77.2262,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34
+],
+"last_utc": null
+},
+{
+"id": 17,
+"name": "R K Puram, Delhi - DPCC",
+"lat": 28.56326,
+"lon": 77.18694,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+35,
+12234787
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 50,
+"name": "Punjabi Bagh, Delhi - DPCC",
+"lat": 28.67404,
+"lon": 77.13102,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+396,
+12234796
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 103,
+"name": "Income Tax Office, Delhi - CPCB",
+"lat": 28.6235,
+"lon": 77.2494,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+13861
+],
+"last_utc": "2018-02-22T03:45:00Z"
+},
+{
+"id": 235,
+"name": "Anand Vihar, New Delhi - DPCC",
+"lat": 28.64683,
+"lon": 77.31603,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+384,
+12235610
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 236,
+"name": "Mandir Marg, Delhi - DPCC",
+"lat": 28.6341,
+"lon": 77.2005,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+388
+],
+"last_utc": "2018-02-21T21:15:00Z"
+},
+{
+"id": 301,
+"name": "Vikas Sadan, Gurugram - HSPCB",
+"lat": 28.45012,
+"lon": 77.02631,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1166,
+14258988
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 346,
+"name": "MD University, Rohtak - HSPCB",
+"lat": 28.87603,
+"lon": 76.61946,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14306
+],
+"last_utc": "2018-02-22T03:45:00Z"
+},
+{
+"id": 431,
+"name": "IHBAS, Delhi - CPCB",
+"lat": 28.6821,
+"lon": 77.305,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+13868
+],
+"last_utc": "2018-02-22T02:45:00Z"
+},
+{
+"id": 2503,
+"name": "Shadipur, Delhi - CPCB",
+"lat": 28.6517,
+"lon": 77.1581,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+13860
+],
+"last_utc": "2018-02-22T02:45:00Z"
+},
+{
+"id": 2583,
+"name": "Sector-6, Panchkula - HSPCB",
+"lat": 30.70578,
+"lon": 76.85318,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+5343,
+12328443
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 2587,
+"name": "Sector16A, Faridabad - HSPCB",
+"lat": 28.41012,
+"lon": 77.31378,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+13900
+],
+"last_utc": "2018-02-22T03:25:00Z"
+},
+{
+"id": 2597,
+"name": "US Diplomatic Post: New Delhi",
+"lat": 28.5981,
+"lon": 77.18907,
+"provider": "StateAir NewDelhi",
+"is_monitor": true,
+"pm25_sensor_ids": [
+5398
+],
+"last_utc": "2016-11-09T16:30:00Z"
+},
+{
+"id": 5404,
+"name": "Pusa, Delhi - IMD",
+"lat": 28.63965,
+"lon": 77.14626,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14087,
+12234702
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5509,
+"name": "Anand Vihar, Delhi - DPCC",
+"lat": 28.64762,
+"lon": 77.31581,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14521
+],
+"last_utc": "2022-10-31T00:30:00Z"
+},
+{
+"id": 5540,
+"name": "Punjabi Bagh, Delhi - DPCC",
+"lat": 28.66709,
+"lon": 77.13012,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14617
+],
+"last_utc": "2018-05-13T11:30:00Z"
+},
+{
+"id": 5541,
+"name": "Burari Crossing, New Delhi - IMD",
+"lat": 28.72565,
+"lon": 77.20116,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14912,
+12234684
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5542,
+"name": "Civil Line, Jalandhar - PPCB",
+"lat": 31.32191,
+"lon": 75.57891,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15192,
+12235151
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5544,
+"name": "Model Town, Patiala - PPCB",
+"lat": 30.34939,
+"lon": 76.36664,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15243,
+12235142
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5551,
+"name": "Golden Temple, Amritsar - PPCB",
+"lat": 31.62,
+"lon": 74.87651,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15088,
+12235443
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5552,
+"name": "MD University, Rohtak - HSPCB",
+"lat": 28.87008,
+"lon": 76.6205,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14660
+],
+"last_utc": "2020-01-01T11:00:00Z"
+},
+{
+"id": 5569,
+"name": "Punjab Agricultural University, Ludhiana - PPCB",
+"lat": 30.9028,
+"lon": 75.8086,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14826,
+12235426
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5570,
+"name": "Aya Nagar, New Delhi - IMD",
+"lat": 28.47426,
+"lon": 77.13161,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14717,
+12234708
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5581,
+"name": "Pusa, New Delhi - IMD",
+"lat": 28.6103,
+"lon": 77.09969,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14853
+],
+"last_utc": "2018-05-14T02:00:00Z"
+},
+{
+"id": 5586,
+"name": "Sirifort, Delhi - CPCB",
+"lat": 28.55042,
+"lon": 77.21594,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12234769
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5588,
+"name": "RIICO Ind. Area III, Bhiwadi - RSPCB",
+"lat": 28.19491,
+"lon": 76.8623,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12234832
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5598,
+"name": "Sector - 125, Noida, UP - UPPCB",
+"lat": 28.54476,
+"lon": 77.32313,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12235187
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5601,
+"name": "Lajpat Nagar, Moradabad - UPPCB",
+"lat": 28.82534,
+"lon": 78.7213,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15207
+],
+"last_utc": "2022-01-13T05:45:00Z"
+},
+{
+"id": 5610,
+"name": "North Campus, DU, Delhi - IMD",
+"lat": 28.65738,
+"lon": 77.15854,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14860,
+12234690
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5613,
+"name": "ITO, New Delhi - CPCB",
+"lat": 28.62862,
+"lon": 77.24106,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14878,
+12234753
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5616,
+"name": "Sector - 62, Noida, UP - IMD",
+"lat": 28.62455,
+"lon": 77.35771,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12234720
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5617,
+"name": "Sector- 16A, Faridabad - HSPCB",
+"lat": 28.40884,
+"lon": 77.30991,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14930
+],
+"last_utc": "2022-10-31T02:00:00Z"
+},
+{
+"id": 5622,
+"name": "NSIT Dwarka, Delhi - CPCB",
+"lat": 28.60909,
+"lon": 77.03254,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14922,
+12234744
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5625,
+"name": "RIMT University, Mandi Gobindgarh - PPCB",
+"lat": 30.64996,
+"lon": 76.33144,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14945,
+12235434
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5626,
+"name": "DTU, New Delhi - CPCB",
+"lat": 28.75005,
+"lon": 77.11126,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14985,
+12234760
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5627,
+"name": "CRRI Mathura Road, New Delhi - IMD",
+"lat": 28.5512,
+"lon": 77.27357,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14935,
+12234678
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5630,
+"name": "Shadipur, Delhi - CPCB",
+"lat": 28.65148,
+"lon": 77.14731,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14959,
+12234726
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5634,
+"name": "Lodhi Road, New Delhi - IMD",
+"lat": 28.59182,
+"lon": 77.22731,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+14984,
+12234714
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5639,
+"name": "R K Puram, New Delhi - DPCC",
+"lat": 28.56461,
+"lon": 77.16701,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15071
+],
+"last_utc": "2018-05-12T04:45:00Z"
+},
+{
+"id": 5641,
+"name": "Mandir Marg, New Delhi - DPCC",
+"lat": 28.63727,
+"lon": 77.20056,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15014
+],
+"last_utc": "2018-05-12T04:30:00Z"
+},
+{
+"id": 5650,
+"name": "IGI Airport (T3), Delhi - IMD",
+"lat": 28.56278,
+"lon": 77.11801,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12234696
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5665,
+"name": "Vasundhara, Ghaziabad - UPPCB",
+"lat": 28.66033,
+"lon": 77.35726,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15239,
+12235160
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 5742,
+"name": "Patparganj, Delhi - DPCC",
+"lat": 28.63105,
+"lon": 77.28462,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15629
+],
+"last_utc": "2018-05-13T11:30:00Z"
+},
+{
+"id": 5743,
+"name": "Rohini, Delhi - DPCC",
+"lat": 28.74071,
+"lon": 77.05775,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15618
+],
+"last_utc": "2018-05-12T06:30:00Z"
+},
+{
+"id": 5744,
+"name": "Dr. Karni Singh Shooting Range, Delhi - DPCC",
+"lat": 28.49973,
+"lon": 77.26491,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15589
+],
+"last_utc": "2018-05-12T04:45:00Z"
+},
+{
+"id": 5753,
+"name": "Vivek Vihar, Delhi - DPCC",
+"lat": 28.66878,
+"lon": 77.3131,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15604
+],
+"last_utc": "2018-05-12T06:00:00Z"
+},
+{
+"id": 5754,
+"name": "Jawaharlal Nehru Stadium, Delhi - DPCC",
+"lat": 28.58285,
+"lon": 77.23218,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15620
+],
+"last_utc": "2018-05-12T06:30:00Z"
+},
+{
+"id": 5755,
+"name": "Major Dhyan Chand National Stadium, Delhi - DPCC",
+"lat": 28.6125,
+"lon": 77.2352,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15551
+],
+"last_utc": "2018-05-12T04:30:00Z"
+},
+{
+"id": 5759,
+"name": "Sonia Vihar, Delhi - DPCC",
+"lat": 28.67795,
+"lon": 77.29868,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15595
+],
+"last_utc": "2018-05-12T05:00:00Z"
+},
+{
+"id": 5760,
+"name": "Dwarka-Sector 8, Delhi - DPCC",
+"lat": 28.52068,
+"lon": 76.80239,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15570
+],
+"last_utc": "2018-05-12T05:00:00Z"
+},
+{
+"id": 5761,
+"name": "Jahangirpuri, Delhi - DPCC",
+"lat": 28.72584,
+"lon": 77.16056,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15621
+],
+"last_utc": "2018-05-12T06:30:00Z"
+},
+{
+"id": 5762,
+"name": "Ashok Vihar, Delhi - DPCC",
+"lat": 28.69572,
+"lon": 77.18129,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15602
+],
+"last_utc": "2018-05-12T06:00:00Z"
+},
+{
+"id": 5763,
+"name": "Narela, Delhi - DPCC",
+"lat": 28.84469,
+"lon": 77.03327,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15606
+],
+"last_utc": "2018-05-12T06:00:00Z"
+},
+{
+"id": 5765,
+"name": "Okhla Phase-2, Delhi - DPCC",
+"lat": 28.53664,
+"lon": 77.26646,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15627
+],
+"last_utc": "2018-05-13T10:00:00Z"
+},
+{
+"id": 5766,
+"name": "Nehru Nagar, Delhi - DPCC",
+"lat": 28.56395,
+"lon": 77.25879,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+15626
+],
+"last_utc": "2018-05-13T10:00:00Z"
+},
+{
+"id": 6314,
+"name": "NISE Gwal Pahari, Gurugram - IMD",
+"lat": 28.42289,
+"lon": 76.8497,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+17564
+],
+"last_utc": "2018-11-16T04:00:00Z"
+},
+{
+"id": 6356,
+"name": "Pusa, Delhi - DPCC",
+"lat": 28.63965,
+"lon": 77.14626,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12235321
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6357,
+"name": "Punjabi Bagh, Delhi - DPCC",
+"lat": 28.67405,
+"lon": 77.13102,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+17776
+],
+"last_utc": "2022-10-16T14:15:00Z"
+},
+{
+"id": 6358,
+"name": "Mandir Marg, New Delhi - DPCC",
+"lat": 28.63643,
+"lon": 77.20107,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+17770,
+12234778
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6359,
+"name": "IHBAS, Dilshad Garden,New Delhi - CPCB",
+"lat": 28.68117,
+"lon": 77.30252,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+17790,
+12234735
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6442,
+"name": "Ratanpura, Rupnagar - Ambuja Cements",
+"lat": 31.03255,
+"lon": 76.5623,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+18101,
+12291454
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6923,
+"name": "New Mandi, Muzaffarnagar - UPPCB",
+"lat": 29.47235,
+"lon": 77.7194,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19881,
+12235222
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6924,
+"name": "Indirapuram, Ghaziabad - UPPCB",
+"lat": 28.64623,
+"lon": 77.35807,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19884,
+12235779
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6929,
+"name": "Major Dhyan Chand National Stadium, Delhi - DPCC",
+"lat": 28.61128,
+"lon": 77.23774,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19900,
+12235047
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6930,
+"name": "Gobind Pura, Yamuna Nagar - HSPCB",
+"lat": 30.14806,
+"lon": 77.28935,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19907,
+12961441
+],
+"last_utc": "2026-10-05T15:30:00Z"
+},
+{
+"id": 6931,
+"name": "Dwarka-Sector 8, Delhi - DPCC",
+"lat": 28.57103,
+"lon": 77.0719,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20150,
+12235020
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6932,
+"name": "Alipur, Delhi - DPCC",
+"lat": 28.81533,
+"lon": 77.15301,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19935,
+12235698
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6934,
+"name": "Dr. Karni Singh Shooting Range, Delhi - DPCC",
+"lat": 28.49857,
+"lon": 77.26484,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19919,
+12235011
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6935,
+"name": "Urban Estate-II, Hisar - HSPCB",
+"lat": 29.14056,
+"lon": 75.74494,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19946,
+14414782
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6936,
+"name": "Arya Nagar, Bahadurgarh - HSPCB",
+"lat": 28.6701,
+"lon": 76.9254,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19922,
+14233904
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6938,
+"name": "Vivek Vihar, Delhi - DPCC",
+"lat": 28.67234,
+"lon": 77.31526,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19934,
+12235133
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6939,
+"name": "Hardev Nagar, Bathinda - PPCB",
+"lat": 30.23301,
+"lon": 74.90776,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20051,
+12235213
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6940,
+"name": "Kalal Majra, Khanna - PPCB",
+"lat": 30.73606,
+"lon": 76.20969,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19965,
+12235178
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6944,
+"name": "H.B. Colony, Bhiwani - HSPCB",
+"lat": 28.80622,
+"lon": 76.1411,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19972,
+12251164
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6949,
+"name": "Municipal Corporation Office, Dharuhera -  HSPCB",
+"lat": 28.2068,
+"lon": 76.7997,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19985,
+14291091
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6951,
+"name": "Murthal, Sonipat - HSPCB",
+"lat": 29.0272,
+"lon": 77.0621,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20013,
+14258143
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6952,
+"name": "F-Block, Sirsa - HSPCB",
+"lat": 29.5364,
+"lon": 75.0158,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+19995,
+13604856
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6953,
+"name": "Sector-2 IMT, Manesar - HSPCB",
+"lat": 28.3607,
+"lon": 76.93609,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20006,
+14250045
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6957,
+"name": "Jawaharlal Nehru Stadium, Delhi - DPCC",
+"lat": 28.58028,
+"lon": 77.23383,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20020,
+12235038
+],
+"last_utc": "2026-10-07T14:00:00Z"
+},
+{
+"id": 6958,
+"name": "Sector-18, Panipat - HSPCB",
+"lat": 29.43559,
+"lon": 76.97553,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20024,
+14248667
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6960,
+"name": "Patparganj, Delhi - DPCC",
+"lat": 28.62375,
+"lon": 77.28721,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20049,
+12235101
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6963,
+"name": "Police Lines, Jind - HSPCB",
+"lat": 29.30781,
+"lon": 76.33762,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20064,
+14259006
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6964,
+"name": "Patti Mehar, Ambala - HSPCB",
+"lat": 30.37959,
+"lon": 76.77833,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20063,
+14258997
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6969,
+"name": "Huda Sector, Fatehabad - HSPCB",
+"lat": 29.50366,
+"lon": 75.46793,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20106,
+14347156
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6970,
+"name": "Shastri Nagar, Narnaul - HSPCB",
+"lat": 28.06025,
+"lon": 76.11311,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20110,
+14224812
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6971,
+"name": "Rishi Nagar, Kaithal - HSPCB",
+"lat": 29.8006,
+"lon": 76.4155,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20112,
+12353756
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6972,
+"name": "Nathu Colony, Ballabgarh - HSPCB",
+"lat": 28.34192,
+"lon": 77.3197,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20123,
+14283600
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6976,
+"name": "Jai Bhim Nagar, Meerut - UPPCB",
+"lat": 28.95359,
+"lon": 77.76229,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20257,
+12235869
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6978,
+"name": "Knowledge Park - III, Greater Noida - UPPCB",
+"lat": 28.47272,
+"lon": 77.482,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20209,
+12235196
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6979,
+"name": "New Collectorate, Baghpat - UPPCB",
+"lat": 28.9748,
+"lon": 77.21336,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20188
+],
+"last_utc": "2022-01-31T04:45:00Z"
+},
+{
+"id": 6980,
+"name": "Sector-1, Noida - UPPCB",
+"lat": 28.58925,
+"lon": 77.32196,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20206,
+12235951
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6985,
+"name": "Yamunapuram, Bulandshahr - UPPCB",
+"lat": 28.40696,
+"lon": 77.84983,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20216,
+12235205
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6986,
+"name": "Knowledge Park - V, Greater Noida - UPPCB",
+"lat": 28.55705,
+"lon": 77.45366,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20242,
+12235935
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6988,
+"name": "Sector-116, Noida - UPPCB",
+"lat": 28.56923,
+"lon": 77.39385,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12235942
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 7005,
+"name": "Loni, Ghaziabad - UPPCB",
+"lat": 28.75729,
+"lon": 77.27879,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20290,
+12235787
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 7044,
+"name": "R K Puram, Delhi - DPCC",
+"lat": 28.56326,
+"lon": 77.18694,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20411
+],
+"last_utc": "2022-10-31T00:45:00Z"
+},
+{
+"id": 7280,
+"name": "Shyam Nagar, Palwal - HSPCB",
+"lat": 28.14856,
+"lon": 77.33207,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20947,
+14249204
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 7281,
+"name": "Shyam Nagar, Palwal - HSPCB",
+"lat": 28.14856,
+"lon": 77.33207,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20962
+],
+"last_utc": "2022-10-31T01:30:00Z"
+},
+{
+"id": 7282,
+"name": "Sector-7, Kurukshetra - HSPCB",
+"lat": 29.96694,
+"lon": 76.87588,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20961,
+14234413
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 7283,
+"name": "MD University, Rohtak - HSPCB",
+"lat": 28.87793,
+"lon": 76.62082,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+20965,
+12599853
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 7720,
+"name": "Pallavpuram Phase 2, Meerut - UPPCB",
+"lat": 29.06351,
+"lon": 77.70972,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+25460,
+12236075
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 7833,
+"name": "Ganga Nagar, Meerut - UPPCB",
+"lat": 28.99926,
+"lon": 77.75904,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36680,
+12236084
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 8118,
+"name": "New Delhi",
+"lat": 28.63576,
+"lon": 77.22445,
+"provider": "AirNow",
+"is_monitor": true,
+"pm25_sensor_ids": [
+23534
+],
+"last_utc": "2026-09-24T10:30:00Z"
+},
+{
+"id": 8235,
+"name": "Jahangirpuri, Delhi - DPCC",
+"lat": 28.73282,
+"lon": 77.17063,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+23997,
+12235029
+],
+"last_utc": "2026-10-06T22:15:00Z"
+},
+{
+"id": 8239,
+"name": "Okhla Phase-2, Delhi - DPCC",
+"lat": 28.53079,
+"lon": 77.27125,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+24007,
+12235074
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 8319,
+"name": "Anand Vihar, Hapur - UPPCB",
+"lat": 28.72565,
+"lon": 77.74967,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36521,
+12235689
+],
+"last_utc": "2026-10-07T13:15:00Z"
+},
+{
+"id": 8365,
+"name": "Nehru Nagar, Delhi - DPCC",
+"lat": 28.56789,
+"lon": 77.25051,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+35010,
+12235083
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 8472,
+"name": "Bawana, Delhi - DPCC",
+"lat": 28.7762,
+"lon": 77.05107,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36391,
+12235294
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 8475,
+"name": "Sonia Vihar, Delhi - DPCC",
+"lat": 28.71051,
+"lon": 77.24949,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+35050,
+12235110
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 8664,
+"name": "US Diplomatic Post: Lahore",
+"lat": 31.56008,
+"lon": 74.33589,
+"provider": "StateAir Lahore",
+"is_monitor": true,
+"pm25_sensor_ids": [
+25135
+],
+"last_utc": "2025-03-04T12:00:00Z"
+},
+{
+"id": 8915,
+"name": "Wazirpur, Delhi - DPCC",
+"lat": 28.69979,
+"lon": 77.16545,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34731,
+12235124
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 8917,
+"name": "Ashok Vihar, Delhi - DPCC",
+"lat": 28.69538,
+"lon": 77.18166,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+26032,
+12235002
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10484,
+"name": "Sri Aurobindo Marg, Delhi - DPCC",
+"lat": 28.53135,
+"lon": 77.19016,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34772,
+12235312
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10485,
+"name": "Narela, Delhi - DPCC",
+"lat": 28.82284,
+"lon": 77.10198,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34790,
+12235056
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10486,
+"name": "Mundka, Delhi - DPCC",
+"lat": 28.68468,
+"lon": 77.07657,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34767,
+12235303
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10487,
+"name": "Anand Vihar, Delhi - DPCC",
+"lat": 28.64683,
+"lon": 77.31603,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34771
+],
+"last_utc": "2021-09-20T07:45:00Z"
+},
+{
+"id": 10488,
+"name": "Najafgarh, Delhi - DPCC",
+"lat": 28.57017,
+"lon": 76.93376,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+34774,
+12235065
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10489,
+"name": "ITO, Delhi - CPCB",
+"lat": 28.62862,
+"lon": 77.24106,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+35016
+],
+"last_utc": "2022-10-31T01:45:00Z"
+},
+{
+"id": 10695,
+"name": "Ratanpura, Rupnagar - Ambuja Cements",
+"lat": 30.03255,
+"lon": 76.5623,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+35765
+],
+"last_utc": "2021-11-23T11:45:00Z"
+},
+{
+"id": 10725,
+"name": "Mini Secretariat, Charkhi Dadri - HSPCB",
+"lat": 28.59388,
+"lon": 76.27065,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+35741,
+12236218
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10820,
+"name": "Sector 30, Faridabad - HSPCB",
+"lat": 28.4417,
+"lon": 77.3217,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12236236
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10825,
+"name": "Sector-51, Gurugram - HSPCB",
+"lat": 28.4227,
+"lon": 77.0667,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36181,
+12236259
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10831,
+"name": "Rohini, Delhi - DPCC",
+"lat": 28.73253,
+"lon": 77.11992,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36399,
+12235092
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10900,
+"name": "Teri Gram, Gurugram - HSPCB",
+"lat": 28.4275,
+"lon": 77.1465,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36539,
+12236251
+],
+"last_utc": "2026-10-07T11:30:00Z"
+},
+{
+"id": 10905,
+"name": "Rishi Nagar, Kaithal - HSPCB",
+"lat": 29.8006,
+"lon": 76.4155,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36601
+],
+"last_utc": "2022-10-31T02:00:00Z"
+},
+{
+"id": 10906,
+"name": "Murthal, Sonipat - HSPCB",
+"lat": 29.0272,
+"lon": 77.0621,
+"provider": "caaqm",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36556
+],
+"last_utc": "2022-10-16T16:00:00Z"
+},
+{
+"id": 10908,
+"name": "Sector 11, Faridabad - HSPCB",
+"lat": 28.37606,
+"lon": 77.31574,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36564,
+12236245
+],
+"last_utc": "2026-10-05T16:30:00Z"
+},
+{
+"id": 10910,
+"name": "Sector-12, Karnal - HSPCB",
+"lat": 29.6953,
+"lon": 77.0027,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36590,
+14275735
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10914,
+"name": "Sector-25, Chandigarh - CPCC",
+"lat": 30.75146,
+"lon": 76.76288,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12235976
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10919,
+"name": "Sanjay Nagar, Ghaziabad - UPPCB",
+"lat": 28.68538,
+"lon": 77.45384,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36675,
+12235770
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10920,
+"name": "New Industrial Town, Faridabad - HSPCB",
+"lat": 28.39072,
+"lon": 77.30059,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12236227
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 10921,
+"name": "NISE Gwal Pahari, Gurugram - IMD",
+"lat": 28.42268,
+"lon": 77.14894,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+36701,
+12235707
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 11603,
+"name": "Chandni Chowk, Delhi - IITM",
+"lat": 28.65676,
+"lon": 77.22723,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+39410,
+12236361
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 11607,
+"name": "Lodhi Road, Delhi - IITM",
+"lat": 28.58833,
+"lon": 77.22167,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+39433,
+12236376
+],
+"last_utc": "2025-12-27T06:00:00Z"
+},
+{
+"id": 233415,
+"name": "Sector 22, Chandigarh - CPCC",
+"lat": 30.73557,
+"lon": 76.77571,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1342953,
+12236806
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 270697,
+"name": "Employment Office, Moradabad - UPPCB",
+"lat": 28.88528,
+"lon": 78.7388,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1561913,
+12241402
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 270771,
+"name": "Buddhi Vihar, Moradabad - UPPCB",
+"lat": 28.83526,
+"lon": 78.7446,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1562187,
+12236981
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 270777,
+"name": "Jigar Colony, Moradabad - UPPCB",
+"lat": 28.85666,
+"lon": 78.77264,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1562221,
+12236990
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 270877,
+"name": "Eco Herbal Park, Moradabad - UPPCB",
+"lat": 28.84074,
+"lon": 78.69753,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1562629,
+12236999
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 278418,
+"name": "Sector-53, Chandigarh - CPCC",
+"lat": 30.71986,
+"lon": 76.73864,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1584284,
+12237008
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 301388,
+"name": "Sardar Patel Inter College, Baghpat - UPPCB",
+"lat": 28.96495,
+"lon": 77.27876,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1713367,
+12237035
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 301389,
+"name": "HIMUDA Complex Phase-1, Baddi - HPPCB",
+"lat": 30.94389,
+"lon": 76.80199,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1713366,
+12237044
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 317035,
+"name": "Doon University, Dehradun - UKPCB",
+"lat": 30.26944,
+"lon": 78.04417,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1799316,
+12237080
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 346439,
+"name": "Kalindi Kunj, Khurja - UPPCB",
+"lat": 28.23489,
+"lon": 77.8683,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+1971908,
+12237152
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 352777,
+"name": "Kashiram Nagar, Moradabad - UPPCB",
+"lat": 28.8494,
+"lon": 78.74236,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+2003326,
+12237271
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 353715,
+"name": "Transport Nagar, Moradabad - UPPCB",
+"lat": 28.80262,
+"lon": 78.75373,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+2007707,
+12237220
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 1894641,
+"name": "Lahore",
+"lat": 31.54815,
+"lon": 74.34396,
+"provider": "Clarity",
+"is_monitor": false,
+"pm25_sensor_ids": [
+7466365
+],
+"last_utc": "2026-08-31T20:03:02Z"
+},
+{
+"id": 2860223,
+"name": "GK1 (Oberoi Terrace)",
+"lat": 28.55,
+"lon": 77.24311,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+9320367
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 3024966,
+"name": "NASA GSFC Rutgers Calib. N8",
+"lat": 28.31733,
+"lon": 76.91603,
+"provider": "Clarity",
+"is_monitor": false,
+"pm25_sensor_ids": [
+10326358
+],
+"last_utc": "2026-10-08T09:55:06Z"
+},
+{
+"id": 3292849,
+"name": "Farhan Shah Labs",
+"lat": 32.42431,
+"lon": 74.52885,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+11480306
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 3409309,
+"name": "Lajpat Nagar, Moradabad - UPPCB",
+"lat": 28.82534,
+"lon": 78.7213,
+"provider": "CPCB",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13857029
+],
+"last_utc": "2025-08-14T05:30:00Z"
+},
+{
+"id": 3409403,
+"name": "MM Ground, Bikaner - RSPCB",
+"lat": 28.01879,
+"lon": 73.29266,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12237730
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3409404,
+"name": "Subash Chowk, Churu - RSPCB",
+"lat": 28.29614,
+"lon": 74.9617,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12237739
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3409408,
+"name": "Shivaji Nagar, Rishikesh - UKPCB",
+"lat": 30.07591,
+"lon": 78.28595,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12237775
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3409409,
+"name": "Govt. Girls Inter College, Kashipur - UKPCB",
+"lat": 29.21241,
+"lon": 78.96118,
+"provider": "CPCB",
+"is_monitor": false,
+"pm25_sensor_ids": [
+12242992
+],
+"last_utc": "2026-10-07T04:45:00Z"
+},
+{
+"id": 3409420,
+"name": "Housing Board, Hanumangarh - RSPCB",
+"lat": 29.61075,
+"lon": 74.28361,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12237861
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3409422,
+"name": "Indra Nagar, Jhunjhunu - RSPCB",
+"lat": 28.10899,
+"lon": 75.38658,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12237879
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3409424,
+"name": "Old City, Sri Ganganagar - RSPCB",
+"lat": 29.93162,
+"lon": 73.86451,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12237897
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3409496,
+"name": "New Moti Bagh, Delhi - MHUA",
+"lat": 28.57834,
+"lon": 77.184,
+"provider": "CPCB",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15646335
+],
+"last_utc": "2026-06-13T09:15:00Z"
+},
+{
+"id": 3409519,
+"name": "Vasundhara Nagar_UIT, Bhiwadi - RSPCB",
+"lat": 28.20727,
+"lon": 76.82927,
+"provider": "CPCB",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12238640
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 3410004,
+"name": "Amity University, Panchgaon - IITM",
+"lat": 28.3153,
+"lon": 76.9143,
+"provider": "N/A",
+"is_monitor": true,
+"pm25_sensor_ids": [
+12238725
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 4515157,
+"name": "Barki, Lahore",
+"lat": 31.45916,
+"lon": 74.53963,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13137726
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4527035,
+"name": "Civil Secretariat",
+"lat": 31.56594,
+"lon": 74.29936,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13153587
+],
+"last_utc": "2026-09-24T12:00:00Z"
+},
+{
+"id": 4527173,
+"name": "Learning Alliance Intl. DHA",
+"lat": 31.52562,
+"lon": 74.43608,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13154528
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4527306,
+"name": "FOOT & MOUTH DISEASE RESEARCH CENTRE",
+"lat": 31.53574,
+"lon": 74.43538,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13155469
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4527402,
+"name": "HBFC Society, DHA Phase 5 (Hussainy House)",
+"lat": 31.45716,
+"lon": 74.41066,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13156083
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4535267,
+"name": "Gajju Matta (Kahna)",
+"lat": 31.37738,
+"lon": 74.35057,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13163333
+],
+"last_utc": "2026-10-06T07:00:00Z"
+},
+{
+"id": 4554729,
+"name": "Sandha Road",
+"lat": 31.5623,
+"lon": 74.3027,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13182280
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4555745,
+"name": "Ravi Road",
+"lat": 31.60288,
+"lon": 74.30093,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13183459
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4557686,
+"name": "Shalimar Town",
+"lat": 31.57429,
+"lon": 74.4479,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13184347
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4565933,
+"name": "IEEE, Punjab University, LHR",
+"lat": 31.49532,
+"lon": 74.29506,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13190998
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4566427,
+"name": "Johar Town",
+"lat": 31.46006,
+"lon": 74.28067,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13191315
+],
+"last_utc": "2026-01-08T05:00:00Z"
+},
+{
+"id": 4568423,
+"name": "Model Town",
+"lat": 31.49168,
+"lon": 74.31329,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13192746
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4605119,
+"name": "College Road",
+"lat": 31.4218,
+"lon": 74.27484,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13223107
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4608421,
+"name": "Assistant Commissioner Office, Allama Iqbal",
+"lat": 31.47188,
+"lon": 74.23951,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13229197
+],
+"last_utc": "2025-08-01T10:00:00Z"
+},
+{
+"id": 4609261,
+"name": "Pajian, Raiwind",
+"lat": 31.29969,
+"lon": 74.22505,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13230342
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4609353,
+"name": "Kahna Hospital",
+"lat": 31.37102,
+"lon": 74.36487,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13230942
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4618814,
+"name": "Gulberg III",
+"lat": 31.50805,
+"lon": 74.33754,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13238783
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4629400,
+"name": "PHA, Sialkot",
+"lat": 32.50557,
+"lon": 74.53607,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13247149
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4629401,
+"name": "SCCI",
+"lat": 32.50792,
+"lon": 74.53796,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13247154
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4630451,
+"name": "Dc Office Sialkot",
+"lat": 32.50529,
+"lon": 74.53295,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13248051
+],
+"last_utc": "2025-08-04T09:00:00Z"
+},
+{
+"id": 4663956,
+"name": "Santushti Apartments, Vasant Kunj",
+"lat": 28.5266,
+"lon": 77.1493,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13273790
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4698865,
+"name": "Cantonment",
+"lat": 31.53942,
+"lon": 74.41379,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13300980
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4699919,
+"name": "Pak Arab",
+"lat": 31.41839,
+"lon": 74.34528,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14152835
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4700982,
+"name": "Samanabad",
+"lat": 31.54198,
+"lon": 74.29806,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13302769
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4708999,
+"name": "WWF",
+"lat": 32.45988,
+"lon": 74.51309,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13308623
+],
+"last_utc": "2026-09-22T12:00:00Z"
+},
+{
+"id": 4710567,
+"name": "Regional Ombudsman Office",
+"lat": 32.48209,
+"lon": 74.52664,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13310091
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4712030,
+"name": "PSGMEA",
+"lat": 32.48737,
+"lon": 74.51244,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13310654
+],
+"last_utc": "2026-09-30T04:00:00Z"
+},
+{
+"id": 4712608,
+"name": "Craftive  Apparels, Defence Road",
+"lat": 32.49447,
+"lon": 74.49898,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13311519
+],
+"last_utc": "2025-06-27T01:00:00Z"
+},
+{
+"id": 4712609,
+"name": "Air Check",
+"lat": 28.62306,
+"lon": 77.23417,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15289075
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4721112,
+"name": "Agriculture  Office Emnabad Road",
+"lat": 32.46556,
+"lon": 74.52396,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13318038
+],
+"last_utc": "2026-09-11T10:00:00Z"
+},
+{
+"id": 4721113,
+"name": "SWMC",
+"lat": 32.51651,
+"lon": 74.51071,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13318043
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4722655,
+"name": "Divisional Forest office Kotli Araian",
+"lat": 32.59938,
+"lon": 74.47959,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13319197
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4723667,
+"name": "Sialkot Cantt",
+"lat": 32.54477,
+"lon": 74.56954,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13319770
+],
+"last_utc": "2026-10-08T06:00:00Z"
+},
+{
+"id": 4725232,
+"name": "AC  Sambrial",
+"lat": 32.47786,
+"lon": 74.33736,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13320880
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4757305,
+"name": "Forman Christian College & Chartered University",
+"lat": 31.52115,
+"lon": 74.33395,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13341452
+],
+"last_utc": "2026-10-08T04:00:00Z"
+},
+{
+"id": 4791416,
+"name": "Allama iqbal hospital",
+"lat": 32.50369,
+"lon": 74.54736,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13368149
+],
+"last_utc": "2026-10-07T04:00:00Z"
+},
+{
+"id": 4792427,
+"name": "Grand Asian University",
+"lat": 32.43754,
+"lon": 74.57798,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13368759
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4792975,
+"name": "Union Council Sohwala",
+"lat": 32.45629,
+"lon": 74.40747,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14152890
+],
+"last_utc": "2026-06-04T14:00:00Z"
+},
+{
+"id": 4801603,
+"name": "Ac Office Daska",
+"lat": 32.33176,
+"lon": 74.35049,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13375890
+],
+"last_utc": "2026-09-14T08:00:00Z"
+},
+{
+"id": 4803208,
+"name": "University Of Sialkot",
+"lat": 32.46479,
+"lon": 74.51413,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13377689
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4803720,
+"name": "Sialkot Medical College",
+"lat": 32.42966,
+"lon": 74.47675,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13378016
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4834565,
+"name": "Naimat colony",
+"lat": 31.41069,
+"lon": 73.12276,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13404306
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4834608,
+"name": "GC Women University",
+"lat": 31.41805,
+"lon": 73.1205,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13404616
+],
+"last_utc": "2025-06-23T07:00:00Z"
+},
+{
+"id": 4837112,
+"name": "Elite college management science satellite town",
+"lat": 32.16696,
+"lon": 74.2021,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13406414
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4837114,
+"name": "FDA-01",
+"lat": 31.41949,
+"lon": 73.09359,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13406424
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4837115,
+"name": "Gift University",
+"lat": 32.20581,
+"lon": 74.19266,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13406429
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4837116,
+"name": "PHA Office",
+"lat": 31.42893,
+"lon": 73.08995,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14152945
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4837165,
+"name": "PHA , Gulshan Iqbal Park",
+"lat": 32.18872,
+"lon": 74.18003,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13406744
+],
+"last_utc": "2026-09-14T10:00:00Z"
+},
+{
+"id": 4837166,
+"name": "Amin town",
+"lat": 31.44492,
+"lon": 73.12673,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13406749
+],
+"last_utc": "2026-07-11T11:00:00Z"
+},
+{
+"id": 4838124,
+"name": "Faisalabad Chamber of commerce",
+"lat": 31.44577,
+"lon": 73.14266,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13407064
+],
+"last_utc": "2025-06-23T18:00:00Z"
+},
+{
+"id": 4845646,
+"name": "Wasa office Model Town",
+"lat": 32.1705,
+"lon": 74.178,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13413535
+],
+"last_utc": "2026-09-23T01:00:00Z"
+},
+{
+"id": 4845647,
+"name": "K-Block Gulistan colony",
+"lat": 31.43736,
+"lon": 73.10685,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13413540
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4846142,
+"name": "Bureau Of Statistics, Punjab",
+"lat": 32.17295,
+"lon": 74.18815,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13414771
+],
+"last_utc": "2026-09-01T09:00:00Z"
+},
+{
+"id": 4846143,
+"name": "WASA OFFICE",
+"lat": 31.44949,
+"lon": 73.08397,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13414776
+],
+"last_utc": "2026-09-14T10:00:00Z"
+},
+{
+"id": 4847174,
+"name": "University Town",
+"lat": 31.49787,
+"lon": 73.08318,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13414786
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4847175,
+"name": "FDA-02",
+"lat": 31.50891,
+"lon": 73.07458,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13414791
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4847176,
+"name": "GDA OFFICE",
+"lat": 32.17382,
+"lon": 74.18244,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13414796
+],
+"last_utc": "2026-09-03T10:00:00Z"
+},
+{
+"id": 4847674,
+"name": "WASA Head Office Grw",
+"lat": 32.13526,
+"lon": 74.20738,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13415096
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4848174,
+"name": "GC university",
+"lat": 31.41622,
+"lon": 73.06798,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13415384
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4848175,
+"name": "Commisioner Office",
+"lat": 32.17463,
+"lon": 74.19506,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13415389
+],
+"last_utc": "2026-10-08T07:00:00Z"
+},
+{
+"id": 4849914,
+"name": "Dc Office",
+"lat": 32.16663,
+"lon": 74.19461,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13418005
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4852891,
+"name": "University of Education",
+"lat": 31.39636,
+"lon": 73.06871,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13423775
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4854007,
+"name": "Ayub Agriculture Research Institute",
+"lat": 31.40698,
+"lon": 73.05388,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13425262
+],
+"last_utc": "2026-09-22T08:00:00Z"
+},
+{
+"id": 4854008,
+"name": "Punjab Food Authority",
+"lat": 31.43672,
+"lon": 73.03552,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13425267
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4854009,
+"name": "Allama Iqbal Open University Grw",
+"lat": 32.1353,
+"lon": 74.20612,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13425272
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4854513,
+"name": "IAS Grw",
+"lat": 32.1016,
+"lon": 74.20259,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13425575
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4854514,
+"name": "Riphah International University",
+"lat": 31.38127,
+"lon": 73.12783,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13426457
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4855550,
+"name": "university of punjab grw",
+"lat": 32.19097,
+"lon": 74.15265,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13426452
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 4855551,
+"name": "MC Office Grw",
+"lat": 32.14737,
+"lon": 74.19251,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13426462
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4865063,
+"name": "University of Agriculture",
+"lat": 31.43452,
+"lon": 73.07072,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13434404
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4866055,
+"name": "Faisalabad Chamber of Commerce",
+"lat": 31.44599,
+"lon": 73.14291,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13435006
+],
+"last_utc": "2026-09-18T10:00:00Z"
+},
+{
+"id": 4867094,
+"name": "NFC Institute of Engineering",
+"lat": 31.40823,
+"lon": 73.1205,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13435868
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4875553,
+"name": "Imdad Town, Manawala",
+"lat": 31.46174,
+"lon": 73.1286,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14153010
+],
+"last_utc": "2026-08-06T07:00:00Z"
+},
+{
+"id": 4876581,
+"name": "GC Women University",
+"lat": 31.41808,
+"lon": 73.12049,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13443447
+],
+"last_utc": "2026-08-08T03:00:00Z"
+},
+{
+"id": 4877120,
+"name": "people Colony, Small d Ground",
+"lat": 31.41484,
+"lon": 73.10411,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13444328
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4908792,
+"name": "DC Office, Kasur",
+"lat": 31.11548,
+"lon": 74.46762,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13472384
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 4997881,
+"name": "Mc Office Pasrur",
+"lat": 32.26521,
+"lon": 74.65505,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14152895
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 5371017,
+"name": "Thokar Niaz Baig",
+"lat": 31.47314,
+"lon": 74.23982,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+13817570
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 5803519,
+"name": "Social Walfare Sialkot",
+"lat": 32.49374,
+"lon": 74.5322,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14129446
+],
+"last_utc": "2026-09-28T03:00:00Z"
+},
+{
+"id": 5884439,
+"name": "Ugoki Union Council",
+"lat": 32.48006,
+"lon": 74.4513,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14191896
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6093552,
+"name": "Test Device",
+"lat": 31.4853,
+"lon": 74.34133,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14363855
+],
+"last_utc": "2025-10-14T10:00:00Z"
+},
+{
+"id": 6098269,
+"name": "WWF-03 PU EpicAir",
+"lat": 31.40259,
+"lon": 73.08485,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14398129
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6098490,
+"name": "WWF-04 PU EpicAir",
+"lat": 31.49561,
+"lon": 73.07382,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14400322
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6098527,
+"name": "WWF-01 PU EpicAir",
+"lat": 31.44313,
+"lon": 73.12815,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14400044
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6101815,
+"name": "WWF-02 PU EpicAir",
+"lat": 31.50108,
+"lon": 73.21787,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14424342
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6101816,
+"name": "WWF-05 PU EpicAir",
+"lat": 31.44731,
+"lon": 73.094,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14424347
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6105800,
+"name": "Sector 1, Noida extension",
+"lat": 28.58349,
+"lon": 77.43171,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14453757
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6106468,
+"name": "WWF-06 PU EpicAir",
+"lat": 31.41607,
+"lon": 73.09168,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14458706
+],
+"last_utc": "2026-10-08T07:00:00Z"
+},
+{
+"id": 6114241,
+"name": "WWF-10 PU EpicAir",
+"lat": 31.41868,
+"lon": 73.08427,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14514739
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6119272,
+"name": "Sector - 5, Vasundhara, Ghaziabad, Uttar Pradesh",
+"lat": 28.6584,
+"lon": 77.37805,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14551755
+],
+"last_utc": "2026-03-26T05:00:00Z"
+},
+{
+"id": 6122104,
+"name": "WWF-07 PU EpicAir",
+"lat": 31.59067,
+"lon": 73.17259,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14573151
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6122105,
+"name": "WWF-08 PU EpicAir",
+"lat": 31.49719,
+"lon": 73.27105,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14573156
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6122106,
+"name": "WWF-09 PU EpicAir",
+"lat": 31.38939,
+"lon": 73.02624,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14573161
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6125489,
+"name": "Uptitude Cloud Pvt Ltd - Sector 62, GGN",
+"lat": 28.40241,
+"lon": 77.08477,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14598776
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6125629,
+"name": "ARC, Lahore",
+"lat": 31.52206,
+"lon": 74.31494,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14599816
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6135287,
+"name": "Hatim's AirVisual AQI Moniter - Chitti Sheikhan",
+"lat": 32.53851,
+"lon": 74.48416,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671462
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135289,
+"name": "Bedian Thethar Rd LHE",
+"lat": 31.4139,
+"lon": 74.4581,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671464
+],
+"last_utc": "2026-09-30T17:00:00Z"
+},
+{
+"id": 6135290,
+"name": "Bahuman-Pindi Bhattian",
+"lat": 31.87792,
+"lon": 73.37706,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671465
+],
+"last_utc": "2026-06-16T13:00:00Z"
+},
+{
+"id": 6135293,
+"name": "B Block, Phase 5, DHA",
+"lat": 31.4646,
+"lon": 74.4204,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671468
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135295,
+"name": "Pakistan Engineering Services (Pvt) Ltd.",
+"lat": 31.4671,
+"lon": 74.4169,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671470
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135296,
+"name": "Sufi City",
+"lat": 32.5889,
+"lon": 73.5123,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671471
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135299,
+"name": "Yani Home",
+"lat": 31.4788,
+"lon": 74.4726,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671474
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135301,
+"name": "Grand Charter School",
+"lat": 31.4721,
+"lon": 74.3192,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671476
+],
+"last_utc": "2026-08-05T09:00:00Z"
+},
+{
+"id": 6135303,
+"name": "Gujranwala SFL",
+"lat": 32.137,
+"lon": 74.1781,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671478
+],
+"last_utc": "2026-10-08T03:00:00Z"
+},
+{
+"id": 6135305,
+"name": "NPPMCL-BALLOKI",
+"lat": 31.039,
+"lon": 73.9297,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671480
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135306,
+"name": "Askari 10",
+"lat": 31.5353,
+"lon": 74.4172,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671481
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135309,
+"name": "Scarsdale International School",
+"lat": 31.4637,
+"lon": 74.3749,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671484
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135313,
+"name": "Ghazi Road Interchange",
+"lat": 31.4894,
+"lon": 74.41767,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671488
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135315,
+"name": "WWF-Pakistan Sialkot",
+"lat": 32.4644,
+"lon": 74.5132,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671490
+],
+"last_utc": "2026-03-16T09:00:00Z"
+},
+{
+"id": 6135316,
+"name": "FF Pakistan",
+"lat": 31.4714,
+"lon": 74.2879,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671491
+],
+"last_utc": "2026-03-04T23:00:00Z"
+},
+{
+"id": 6135318,
+"name": "WWF-PAKISTAN",
+"lat": 31.4853,
+"lon": 74.3415,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671493
+],
+"last_utc": "2026-07-31T11:00:00Z"
+},
+{
+"id": 6135319,
+"name": "Revenue Employees Coop Housing Society",
+"lat": 31.4485,
+"lon": 74.288,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671494
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135320,
+"name": "Model Town A LHE",
+"lat": 31.4784,
+"lon": 74.3238,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671495
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135323,
+"name": "Gurumangat Rd B LHE",
+"lat": 31.5047,
+"lon": 74.358,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671498
+],
+"last_utc": "2026-10-08T07:00:00Z"
+},
+{
+"id": 6135324,
+"name": "Shadman Market B LHE",
+"lat": 31.5406,
+"lon": 74.331,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671499
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135326,
+"name": "Ferozepur Rd A LHE",
+"lat": 31.4766,
+"lon": 74.344,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671501
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135328,
+"name": "Honda Gateway",
+"lat": 31.4515,
+"lon": 74.2098,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671503
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135329,
+"name": "LAS Lahore",
+"lat": 31.5466,
+"lon": 74.3538,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671504
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135330,
+"name": "University of Central Punjab",
+"lat": 31.4469,
+"lon": 74.2677,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671505
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135333,
+"name": "Trinity School Lahore",
+"lat": 31.4746,
+"lon": 74.2786,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671508
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135336,
+"name": "Syed Maratib Ali Road",
+"lat": 31.52877,
+"lon": 74.34544,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671511
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135340,
+"name": "Tufail Road near Rahat Bakery",
+"lat": 31.5298,
+"lon": 74.3776,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671515
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135343,
+"name": "Powerzone head office",
+"lat": 31.393,
+"lon": 74.2408,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671518
+],
+"last_utc": "2026-04-28T00:00:00Z"
+},
+{
+"id": 6135344,
+"name": "Kickstart MM Alam",
+"lat": 31.5051,
+"lon": 74.3486,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671519
+],
+"last_utc": "2026-10-06T18:00:00Z"
+},
+{
+"id": 6135348,
+"name": "HC - Askari 10",
+"lat": 31.5307,
+"lon": 74.4115,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671523
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135349,
+"name": "Diamond Paint industries PVT LTD.",
+"lat": 31.4598,
+"lon": 74.329,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671524
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135350,
+"name": "NPPMCL",
+"lat": 31.5182,
+"lon": 74.3508,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671525
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135351,
+"name": "Hiking & Mountaineering Club GCU Lahore",
+"lat": 31.5741,
+"lon": 74.308,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671526
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135353,
+"name": "The University of Lahore",
+"lat": 31.3912,
+"lon": 74.2414,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671528
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135356,
+"name": "W.R",
+"lat": 31.4761,
+"lon": 74.405,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671531
+],
+"last_utc": "2026-05-07T14:00:00Z"
+},
+{
+"id": 6135357,
+"name": "VTS",
+"lat": 31.5083,
+"lon": 74.321,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671532
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135360,
+"name": "Allama Iqbal Town B LHE",
+"lat": 31.5169,
+"lon": 74.2849,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671535
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135364,
+"name": "CERP Office",
+"lat": 31.5236,
+"lon": 74.3524,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671539
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135366,
+"name": "Phase8-DHA",
+"lat": 31.52903,
+"lon": 74.43813,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671541
+],
+"last_utc": "2026-08-08T05:00:00Z"
+},
+{
+"id": 6135368,
+"name": "FF Pakistan - 1",
+"lat": 31.4551,
+"lon": 74.437,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671543
+],
+"last_utc": "2026-08-26T02:00:00Z"
+},
+{
+"id": 6135370,
+"name": "Burki Rd B LHE",
+"lat": 31.5332,
+"lon": 74.4504,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671545
+],
+"last_utc": "2026-04-14T05:00:00Z"
+},
+{
+"id": 6135373,
+"name": "Climate Finance Pakistan (PakAirQuality)",
+"lat": 31.5378,
+"lon": 74.3441,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671548
+],
+"last_utc": "2025-12-09T08:00:00Z"
+},
+{
+"id": 6135374,
+"name": "Near Ada Plot, Raiwind Road",
+"lat": 31.3766,
+"lon": 74.2379,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671549
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135377,
+"name": "Johar Town B LHE",
+"lat": 31.47,
+"lon": 74.2611,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14671552
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135421,
+"name": "Model Town B LHE",
+"lat": 31.4824,
+"lon": 74.308,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14677802
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135423,
+"name": "Muncipal Corporation, Sialkot",
+"lat": 32.4946,
+"lon": 74.54196,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14673707
+],
+"last_utc": "2025-11-25T01:00:00Z"
+},
+{
+"id": 6135424,
+"name": "Ac Office Pasrur",
+"lat": 32.26521,
+"lon": 74.65505,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14923460
+],
+"last_utc": "2026-09-17T05:00:00Z"
+},
+{
+"id": 6135429,
+"name": "WWF-05 PU EpicAir",
+"lat": 31.44731,
+"lon": 73.094,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14681897
+],
+"last_utc": "2026-10-08T02:00:00Z"
+},
+{
+"id": 6135430,
+"name": "university of punjab grw",
+"lat": 32.19097,
+"lon": 74.15265,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14680874
+],
+"last_utc": "2026-10-07T15:00:00Z"
+},
+{
+"id": 6135446,
+"name": "University Of Sialkot",
+"lat": 32.46479,
+"lon": 74.51413,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14795550
+],
+"last_utc": "2026-09-19T11:00:00Z"
+},
+{
+"id": 6135447,
+"name": "IAS Grw",
+"lat": 32.1016,
+"lon": 74.20259,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14756434
+],
+"last_utc": "2026-10-08T04:00:00Z"
+},
+{
+"id": 6135452,
+"name": "Gift University",
+"lat": 32.20581,
+"lon": 74.19266,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14744852
+],
+"last_utc": "2026-10-08T06:00:00Z"
+},
+{
+"id": 6135455,
+"name": "Ugoki Union Council",
+"lat": 32.48006,
+"lon": 74.4513,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14795551
+],
+"last_utc": "2026-10-08T08:00:00Z"
+},
+{
+"id": 6135456,
+"name": "Riphah International University",
+"lat": 31.38127,
+"lon": 73.12783,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14719907
+],
+"last_utc": "2026-10-08T04:00:00Z"
+},
+{
+"id": 6135457,
+"name": "GENERATION Pvt ltd",
+"lat": 31.4081,
+"lon": 74.3584,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14675087
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135458,
+"name": "Valancia Town Lahore",
+"lat": 31.4096,
+"lon": 74.2617,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14723649
+],
+"last_utc": "2026-06-13T14:00:00Z"
+},
+{
+"id": 6135460,
+"name": "Social Walfare Sialkot",
+"lat": 32.49374,
+"lon": 74.5322,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14673711
+],
+"last_utc": "2026-09-28T00:00:00Z"
+},
+{
+"id": 6135465,
+"name": "Wwf",
+"lat": 31.44313,
+"lon": 73.12815,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14673712
+],
+"last_utc": "2025-11-25T01:00:00Z"
+},
+{
+"id": 6135466,
+"name": "The Bank of Punjab, Head Office, BOP Tower, Gulberg III.",
+"lat": 31.50805,
+"lon": 74.33754,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686625
+],
+"last_utc": "2025-11-24T14:00:00Z"
+},
+{
+"id": 6135469,
+"name": "Divisional Forest office Kotli Araian",
+"lat": 32.59938,
+"lon": 74.47959,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686626
+],
+"last_utc": "2026-10-08T08:00:00Z"
+},
+{
+"id": 6135471,
+"name": "Ac Office Daska",
+"lat": 32.33176,
+"lon": 74.35049,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686627
+],
+"last_utc": "2026-07-06T04:00:00Z"
+},
+{
+"id": 6135473,
+"name": "BAM,  Civil Secretariat",
+"lat": 31.56594,
+"lon": 74.29936,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686628
+],
+"last_utc": "2025-12-23T08:00:00Z"
+},
+{
+"id": 6135476,
+"name": "AC OFFICE NISHTAR, GAJUMATA",
+"lat": 31.37738,
+"lon": 74.35057,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686630
+],
+"last_utc": "2025-11-23T19:00:00Z"
+},
+{
+"id": 6135489,
+"name": "Mahar Street Feroze Wattwan",
+"lat": 31.5891,
+"lon": 73.8118,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14696761
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6135492,
+"name": "WWF-04 IQ Air",
+"lat": 31.49562,
+"lon": 73.07382,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14673715
+],
+"last_utc": "2025-11-25T01:00:00Z"
+},
+{
+"id": 6135493,
+"name": "Samanabad",
+"lat": 31.54198,
+"lon": 74.29806,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686631
+],
+"last_utc": "2026-10-08T08:00:00Z"
+},
+{
+"id": 6135496,
+"name": "SOS Johar Town LHR",
+"lat": 31.4544,
+"lon": 74.2825,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14806380
+],
+"last_utc": "2025-12-10T12:00:00Z"
+},
+{
+"id": 6135501,
+"name": "WWF-03 IQ Air",
+"lat": 31.40259,
+"lon": 73.08486,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14673716
+],
+"last_utc": "2025-11-20T01:00:00Z"
+},
+{
+"id": 6135507,
+"name": "Model Town, CD Ground",
+"lat": 31.49168,
+"lon": 74.31329,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686635
+],
+"last_utc": "2026-10-08T08:00:00Z"
+},
+{
+"id": 6135511,
+"name": "University of Education",
+"lat": 31.39636,
+"lon": 73.06871,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14738103
+],
+"last_utc": "2026-10-08T08:00:00Z"
+},
+{
+"id": 6135513,
+"name": "Allama iqbal hospital",
+"lat": 32.50369,
+"lon": 74.54736,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14711055
+],
+"last_utc": "2026-10-07T03:00:00Z"
+},
+{
+"id": 6135521,
+"name": "Agriculture  Office Emnabad Road",
+"lat": 32.46556,
+"lon": 74.52396,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14727422
+],
+"last_utc": "2026-05-06T12:00:00Z"
+},
+{
+"id": 6135523,
+"name": "WWF",
+"lat": 32.45988,
+"lon": 74.51309,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686638
+],
+"last_utc": "2026-09-22T12:00:00Z"
+},
+{
+"id": 6135528,
+"name": "Abdullah Khokhar, House Johar Town",
+"lat": 31.46006,
+"lon": 74.28067,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14686639
+],
+"last_utc": "2025-12-25T04:00:00Z"
+},
+{
+"id": 6135530,
+"name": "WWF-06 PU EpicAir",
+"lat": 31.49714,
+"lon": 73.27121,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14815358
+],
+"last_utc": "2025-12-09T20:00:00Z"
+},
+{
+"id": 6135533,
+"name": "University of Management and Technology",
+"lat": 31.4515,
+"lon": 74.2943,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14828965
+],
+"last_utc": "2026-09-13T11:00:00Z"
+},
+{
+"id": 6138140,
+"name": "Govt Boys High School, Narowal",
+"lat": 32.09323,
+"lon": 74.87165,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14690933
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6138207,
+"name": "Govt Boys High School, Zafarwal",
+"lat": 32.34242,
+"lon": 74.90578,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14691425
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6145551,
+"name": "Anand Lok",
+"lat": 28.5587,
+"lon": 77.21886,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14745878
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6148686,
+"name": "IIT Delhi, Delhi - IITM",
+"lat": 28.54246,
+"lon": 77.19165,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+14769474
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6203210,
+"name": "Talab Tillo Jammu",
+"lat": 32.74011,
+"lon": 74.83178,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15175974
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6231999,
+"name": "Gandhi Nagar",
+"lat": 32.70158,
+"lon": 74.85911,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15385944
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6236626,
+"name": "Bahria Town",
+"lat": 31.37852,
+"lon": 74.18394,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15420347
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6254594,
+"name": "Talkatora Garden, Delhi - DPCC",
+"lat": 28.62181,
+"lon": 77.19446,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15554208
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6254663,
+"name": "JNU, Delhi - DPCC",
+"lat": 28.54072,
+"lon": 77.16854,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15554704
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6254664,
+"name": "NSUT Jaffarpur, Delhi - DPCC",
+"lat": 28.594,
+"lon": 76.90942,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15554716
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6254665,
+"name": "Commonwealth Sports Complex, Delhi - DPCC",
+"lat": 28.61583,
+"lon": 77.27199,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15554728
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6254666,
+"name": "IGNOU_Maidan Garhi, Delhi - DPCC",
+"lat": 28.49362,
+"lon": 77.20116,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15554740
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6257818,
+"name": "Cantonment Area, Delhi - DPCC",
+"lat": 28.59417,
+"lon": 77.1251,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15578291
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6297968,
+"name": "Gandhi Nagar",
+"lat": 32.7014,
+"lon": 74.8596,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15877266
+],
+"last_utc": "2026-04-06T08:00:00Z"
+},
+{
+"id": 6299494,
+"name": "Prashant Garden, Khora - UPPCB",
+"lat": 28.61119,
+"lon": 77.34206,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15888918
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6299603,
+"name": "SRM University, Modinagar - UPPCB",
+"lat": 28.79817,
+"lon": 77.54024,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15889770
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6299678,
+"name": "Ved Vihar-Loni, Ghaziabad - UPPCB",
+"lat": 28.73915,
+"lon": 77.27367,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15890341
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6311324,
+"name": "Govindpuram, Ghaziabad - UPPCB",
+"lat": 28.69453,
+"lon": 77.4947,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15978433
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6311325,
+"name": "MIET College, Meerut - UPPCB",
+"lat": 28.97268,
+"lon": 77.64102,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+15978445
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6318813,
+"name": "Upper Mall Road LHR",
+"lat": 31.5418,
+"lon": 74.3541,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034745
+],
+"last_utc": "2026-05-06T05:00:00Z"
+},
+{
+"id": 6318816,
+"name": "Burki Rd Paragon B LHE",
+"lat": 31.5332,
+"lon": 74.4504,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034748
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318817,
+"name": "DHA Phase 6 B LHE",
+"lat": 31.4698,
+"lon": 74.4471,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034749
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318819,
+"name": "Faisalabad People’s Colony B",
+"lat": 31.4109,
+"lon": 73.1039,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034751
+],
+"last_utc": "2026-06-12T06:00:00Z"
+},
+{
+"id": 6318820,
+"name": "Gujrat GT Road B",
+"lat": 32.5149,
+"lon": 74.0946,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034752
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318821,
+"name": "Arifwala B",
+"lat": 30.2582,
+"lon": 73.0581,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034753
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318823,
+"name": "Faisalabad Gatwala Canal Rd A",
+"lat": 31.4624,
+"lon": 73.1797,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034755
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318825,
+"name": "Sargodha Defence View Society A",
+"lat": 32.033,
+"lon": 72.6979,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034757
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318826,
+"name": "Model Town Link Rd B LHE",
+"lat": 31.4638,
+"lon": 74.3154,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034758
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318829,
+"name": "Kasur B",
+"lat": 31.1216,
+"lon": 74.472,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034761
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318830,
+"name": "Burewala Nehar Bunglow Rd B",
+"lat": 30.1751,
+"lon": 72.6966,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034762
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318831,
+"name": "Sahiwal Arra Tulla Rd B",
+"lat": 30.6846,
+"lon": 73.086,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034763
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318835,
+"name": "Sialkot A",
+"lat": 32.548,
+"lon": 74.422,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034767
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318840,
+"name": "Sialkot Cantt B",
+"lat": 32.5126,
+"lon": 74.5587,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034772
+],
+"last_utc": "2026-06-18T06:00:00Z"
+},
+{
+"id": 6318841,
+"name": "Okara Canal View B",
+"lat": 30.8267,
+"lon": 73.4366,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034773
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318842,
+"name": "Muslim Town LHE B",
+"lat": 31.5123,
+"lon": 74.3074,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034774
+],
+"last_utc": "2026-09-19T06:00:00Z"
+},
+{
+"id": 6318843,
+"name": "Gujranwala Cantt B",
+"lat": 32.2451,
+"lon": 74.1572,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034775
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6318846,
+"name": "Gujrat Model Town B",
+"lat": 32.6174,
+"lon": 74.0784,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034778
+],
+"last_utc": "2026-10-06T21:00:00Z"
+},
+{
+"id": 6318850,
+"name": "Faisalabad Raza Garden B",
+"lat": 31.4539,
+"lon": 73.1599,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16034782
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6346770,
+"name": "Sialkot Aziz Garden B",
+"lat": 32.558,
+"lon": 74.5516,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242899
+],
+"last_utc": "2026-07-20T09:00:00Z"
+},
+{
+"id": 6346771,
+"name": "TCS Sargodha Collage Campus",
+"lat": 32.0552,
+"lon": 72.6911,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242900
+],
+"last_utc": "2026-05-15T07:00:00Z"
+},
+{
+"id": 6346777,
+"name": "Faisalabad Civil Lines B",
+"lat": 31.4324,
+"lon": 73.0811,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242906
+],
+"last_utc": "2026-09-21T06:00:00Z"
+},
+{
+"id": 6346781,
+"name": "Icchra Maqbool Rd LHE",
+"lat": 31.5274,
+"lon": 74.3113,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242910
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6346783,
+"name": "Bahria Town B LHE",
+"lat": 31.37,
+"lon": 74.1702,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242912
+],
+"last_utc": "2026-10-06T20:00:00Z"
+},
+{
+"id": 6346785,
+"name": "Tajpura",
+"lat": 31.5584,
+"lon": 74.3998,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242914
+],
+"last_utc": "2026-10-06T16:00:00Z"
+},
+{
+"id": 6346786,
+"name": "TCS Gujrawala",
+"lat": 32.2038,
+"lon": 74.1889,
+"provider": "Hawanama",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16242915
+],
+"last_utc": "2026-10-08T09:00:00Z"
+},
+{
+"id": 6401376,
+"name": "Channi Himmat",
+"lat": 32.68978,
+"lon": 74.88602,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16606024
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6435505,
+"name": "New Tehsil, Shamli - UPPCB",
+"lat": 29.46037,
+"lon": 77.34103,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16858118
+],
+"last_utc": "2026-10-07T08:45:00Z"
+},
+{
+"id": 6452286,
+"name": "Vijaypur",
+"lat": 32.56693,
+"lon": 75.01987,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+16979604
+],
+"last_utc": "2026-10-08T10:00:00Z"
+},
+{
+"id": 6458520,
+"name": "Wave City, Ghaziabad - UPPCB",
+"lat": 28.64667,
+"lon": 77.48905,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+17025422
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6458521,
+"name": "Rajanpur, Gajraula - UPPCB",
+"lat": 28.82911,
+"lon": 78.2488,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+17025430
+],
+"last_utc": "2026-10-07T14:30:00Z"
+},
+{
+"id": 6472254,
+"name": "Rehmanpura",
+"lat": 31.52367,
+"lon": 74.31944,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+17125528
+],
+"last_utc": "2026-08-03T09:00:00Z"
+},
+{
+"id": 6487074,
+"name": "Nagar Palika Parishad, Baraut - UPPCB",
+"lat": 29.09956,
+"lon": 77.26235,
+"provider": "N/A",
+"is_monitor": false,
+"pm25_sensor_ids": [
+17234114
+],
+"last_utc": "2026-10-07T08:30:00Z"
+},
+{
+"id": 6509914,
+"name": "DHA Phase 8 Lahore",
+"lat": 31.5005,
+"lon": 74.43195,
+"provider": "AirGradient",
+"is_monitor": false,
+"pm25_sensor_ids": [
+17401736
+],
+"last_utc": "2026-10-01T08:00:00Z"
+}
+]
+}
