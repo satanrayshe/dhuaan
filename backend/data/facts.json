@@ -1,0 +1,320 @@
+{
+ "afternoon_share_2025": 0.9298,
+ "n_detections": 33074,
+ "n_late": 30752,
+ "definition": "Share of 2025 Punjab GK2A detections (Oct-Nov, 12:00-18:59 IST, all confidence flags) whose IST hour is >= 16:00",
+ "afternoon_share_2025_conf23": 0.9619,
+ "n_detections_conf23": 19392,
+ "source": "GK2A-AMI hourly fire detections for Punjab and Haryana (Jethva 2026, NASA GSFC / Morgan State Univ.), Zenodo doi:10.5281/zenodo.20084790, CC BY 4.0",
+ "generated_utc": "2026-10-08T11:39:48Z",
+ "afternoon_ratio": {
+  "file": "afternoon_ratio.json",
+  "season": "2025-10-01..2025-11-30",
+  "method": "r_d = (G_d + m*R)/(V_d + m), G = GK2A flag>=2 detections at >=16:00 IST, V = FIRMS VIIRS+MODIS detections (static hotspots masked, 1357 masked), R = pooled G/V, m = 30, capped to [0.25, 4.0]. Count ratio (4 km vs 375 m/1 km pixels), not an energy ratio. Only Punjab and Haryana districts (GK2A coverage); others use _default.",
+  "n_gk2a": 21672,
+  "n_polar": 19404,
+  "districts": [
+   {
+    "district": "Ambala",
+    "gk2a_late": 30,
+    "polar": 63,
+    "raw": 0.476,
+    "ratio": 0.683
+   },
+   {
+    "district": "Amritsar",
+    "gk2a_late": 173,
+    "polar": 1064,
+    "raw": 0.163,
+    "ratio": 0.25
+   },
+   {
+    "district": "Barnala",
+    "gk2a_late": 1163,
+    "polar": 207,
+    "raw": 5.618,
+    "ratio": 4.0
+   },
+   {
+    "district": "Bathinda",
+    "gk2a_late": 2069,
+    "polar": 1136,
+    "raw": 1.821,
+    "ratio": 1.803
+   },
+   {
+    "district": "Bhiwani",
+    "gk2a_late": 383,
+    "polar": 88,
+    "raw": 4.352,
+    "ratio": 3.53
+   },
+   {
+    "district": "Faridabad",
+    "gk2a_late": 22,
+    "polar": 156,
+    "raw": 0.141,
+    "ratio": 0.298
+   },
+   {
+    "district": "Faridkot",
+    "gk2a_late": 1274,
+    "polar": 375,
+    "raw": 3.397,
+    "ratio": 3.228
+   },
+   {
+    "district": "Fatehabad",
+    "gk2a_late": 766,
+    "polar": 374,
+    "raw": 2.048,
+    "ratio": 1.979
+   },
+   {
+    "district": "Fatehgarh Sahib",
+    "gk2a_late": 32,
+    "polar": 202,
+    "raw": 0.158,
+    "ratio": 0.282
+   },
+   {
+    "district": "Fazilka",
+    "gk2a_late": 3321,
+    "polar": 1384,
+    "raw": 2.4,
+    "ratio": 2.372
+   },
+   {
+    "district": "Firozpur",
+    "gk2a_late": 1728,
+    "polar": 1245,
+    "raw": 1.388,
+    "ratio": 1.382
+   },
+   {
+    "district": "Gurdaspur",
+    "gk2a_late": 50,
+    "polar": 336,
+    "raw": 0.149,
+    "ratio": 0.25
+   },
+   {
+    "district": "Gurgaon",
+    "gk2a_late": 10,
+    "polar": 24,
+    "raw": 0.417,
+    "ratio": 0.806
+   },
+   {
+    "district": "Hisar",
+    "gk2a_late": 523,
+    "polar": 461,
+    "raw": 1.134,
+    "ratio": 1.133
+   },
+   {
+    "district": "Hoshiarpur",
+    "gk2a_late": 127,
+    "polar": 101,
+    "raw": 1.257,
+    "ratio": 1.225
+   },
+   {
+    "district": "Jalandhar",
+    "gk2a_late": 139,
+    "polar": 391,
+    "raw": 0.355,
+    "ratio": 0.41
+   },
+   {
+    "district": "Jhajjar",
+    "gk2a_late": 58,
+    "polar": 159,
+    "raw": 0.365,
+    "ratio": 0.484
+   },
+   {
+    "district": "Jind",
+    "gk2a_late": 172,
+    "polar": 652,
+    "raw": 0.264,
+    "ratio": 0.301
+   },
+   {
+    "district": "Kaithal",
+    "gk2a_late": 61,
+    "polar": 257,
+    "raw": 0.237,
+    "ratio": 0.329
+   },
+   {
+    "district": "Kapurthala",
+    "gk2a_late": 103,
+    "polar": 502,
+    "raw": 0.205,
+    "ratio": 0.257
+   },
+   {
+    "district": "Karnal",
+    "gk2a_late": 38,
+    "polar": 94,
+    "raw": 0.404,
+    "ratio": 0.577
+   },
+   {
+    "district": "Kurukshetra",
+    "gk2a_late": 33,
+    "polar": 88,
+    "raw": 0.375,
+    "ratio": 0.564
+   },
+   {
+    "district": "Ludhiana",
+    "gk2a_late": 199,
+    "polar": 790,
+    "raw": 0.252,
+    "ratio": 0.284
+   },
+   {
+    "district": "Mahendragarh",
+    "gk2a_late": 98,
+    "polar": 16,
+    "raw": 6.125,
+    "ratio": 2.859
+   },
+   {
+    "district": "Mansa",
+    "gk2a_late": 1454,
+    "polar": 804,
+    "raw": 1.808,
+    "ratio": 1.784
+   },
+   {
+    "district": "Mewat",
+    "gk2a_late": 29,
+    "polar": 1,
+    "raw": 29.0,
+    "ratio": 2.016
+   },
+   {
+    "district": "Moga",
+    "gk2a_late": 979,
+    "polar": 955,
+    "raw": 1.025,
+    "ratio": 1.028
+   },
+   {
+    "district": "Muktsar",
+    "gk2a_late": 2052,
+    "polar": 1131,
+    "raw": 1.814,
+    "ratio": 1.796
+   },
+   {
+    "district": "Palwal",
+    "gk2a_late": 19,
+    "polar": 32,
+    "raw": 0.594,
+    "ratio": 0.847
+   },
+   {
+    "district": "Panchkula",
+    "gk2a_late": 28,
+    "polar": 20,
+    "raw": 1.4,
+    "ratio": 1.23
+   },
+   {
+    "district": "Panipat",
+    "gk2a_late": 20,
+    "polar": 67,
+    "raw": 0.299,
+    "ratio": 0.552
+   },
+   {
+    "district": "Pathankot",
+    "gk2a_late": 22,
+    "polar": 18,
+    "raw": 1.222,
+    "ratio": 1.156
+   },
+   {
+    "district": "Patiala",
+    "gk2a_late": 622,
+    "polar": 739,
+    "raw": 0.842,
+    "ratio": 0.852
+   },
+   {
+    "district": "Rewari",
+    "gk2a_late": 27,
+    "polar": 14,
+    "raw": 1.929,
+    "ratio": 1.375
+   },
+   {
+    "district": "Rohtak",
+    "gk2a_late": 39,
+    "polar": 237,
+    "raw": 0.165,
+    "ratio": 0.272
+   },
+   {
+    "district": "Rupnagar",
+    "gk2a_late": 15,
+    "polar": 19,
+    "raw": 0.789,
+    "ratio": 0.99
+   },
+   {
+    "district": "Sahibzada Ajit Singh Nagar",
+    "gk2a_late": 17,
+    "polar": 135,
+    "raw": 0.126,
+    "ratio": 0.306
+   },
+   {
+    "district": "Sangrur",
+    "gk2a_late": 2263,
+    "polar": 1980,
+    "raw": 1.143,
+    "ratio": 1.143
+   },
+   {
+    "district": "Shahid Bhagat Singh Nagar",
+    "gk2a_late": 93,
+    "polar": 109,
+    "raw": 0.853,
+    "ratio": 0.91
+   },
+   {
+    "district": "Sirsa",
+    "gk2a_late": 620,
+    "polar": 336,
+    "raw": 1.845,
+    "ratio": 1.786
+   },
+   {
+    "district": "Sonipat",
+    "gk2a_late": 28,
+    "polar": 230,
+    "raw": 0.122,
+    "ratio": 0.25
+   },
+   {
+    "district": "Tarn Taran",
+    "gk2a_late": 752,
+    "polar": 2360,
+    "raw": 0.319,
+    "ratio": 0.329
+   },
+   {
+    "district": "Yamunanagar",
+    "gk2a_late": 21,
+    "polar": 52,
+    "raw": 0.404,
+    "ratio": 0.665
+   }
+  ]
+ }
+}

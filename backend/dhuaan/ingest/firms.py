@@ -12,7 +12,7 @@ import logging
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Iterable
 
-from dhuaan.config import DOMAIN, settings
+from dhuaan.config import DATA_DIR, DOMAIN, settings
 from dhuaan.ingest.common import fetch, in_domain, source_status
 from dhuaan.model.types import Fire
 
@@ -103,18 +103,80 @@ def fetch_source(source: str, days: int = 2, day: date | None = None, use_cache:
     return parse_csv(body.decode("utf-8", errors="replace"), source)
 
 
-def fetch_recent(days: int = 2, sources: Iterable[str] = NRT_SOURCES,
-                 use_cache: bool | None = None) -> tuple[list[Fire], list[dict[str, Any]]]:
-    """All NRT sources for the last `days` days. Returns (fires, meta.sources entries). Never raises per source."""
+# ---------- static-hotspot mask (industrial / kiln / flare / landfill sources) ----------
+
+STATIC_HOTSPOTS_FILE = DATA_DIR / "static_hotspots.json"
+MASK_RADIUS_KM = 1.0
+_MASK_CELL = 0.01
+_hotspot_cache: dict[str, list[tuple[float, float]]] = {}
+
+
+def load_static_hotspots(path: Any = None) -> list[tuple[float, float]]:
+    """[(lat, lon)] cell centres from static_hotspots.json (built by dhuaan.backtest.hotspots); [] if absent."""
+    p = str(path or STATIC_HOTSPOTS_FILE)
+    if p not in _hotspot_cache:
+        try:
+            import json
+            with open(p, encoding="utf-8") as fh:
+                doc = json.load(fh)
+            _hotspot_cache[p] = [(float(h["lat"]), float(h["lon"])) for h in doc.get("hotspots", [])]
+        except (OSError, ValueError, KeyError, TypeError):
+            _hotspot_cache[p] = []
+    return _hotspot_cache[p]
+
+
+def mask_static(fires: Iterable[Fire], hotspots: list[tuple[float, float]] | None = None,
+                radius_km: float = MASK_RADIUS_KM) -> tuple[list[Fire], list[Fire]]:
+    """Split fires into (kept, masked). A polar-orbiter detection within radius_km of a static hotspot is masked;
+    other sensors (coarse geostationary pixels) pass through untouched."""
+    import math
+    from dhuaan.model.types import POLAR_SENSORS
+    hs = load_static_hotspots() if hotspots is None else hotspots
+    fires = list(fires)
+    if not hs:
+        return fires, []
+    index: dict[tuple[int, int], list[tuple[float, float]]] = {}
+    for la, lo in hs:
+        index.setdefault((math.floor(la / _MASK_CELL), math.floor(lo / _MASK_CELL)), []).append((la, lo))
+    reach = int(math.ceil(radius_km / (111.0 * _MASK_CELL * 0.8))) + 1
+    kept, masked = [], []
+    for f in fires:
+        hit = False
+        if f.sensor in POLAR_SENSORS:
+            ci, cj = math.floor(f.lat / _MASK_CELL), math.floor(f.lon / _MASK_CELL)
+            kx = 111.32 * math.cos(math.radians(f.lat))
+            for di in range(-reach, reach + 1):
+                for dj in range(-reach, reach + 1):
+                    for la, lo in index.get((ci + di, cj + dj), ()):
+                        if math.hypot((f.lat - la) * 110.57, (f.lon - lo) * kx) <= radius_km:
+                            hit = True
+                            break
+                    if hit:
+                        break
+                if hit:
+                    break
+        (masked if hit else kept).append(f)
+    return kept, masked
+
+
+def fetch_recent(days: int = 2, sources: Iterable[str] = NRT_SOURCES, use_cache: bool | None = None,
+                 mask: bool = True) -> tuple[list[Fire], list[dict[str, Any]]]:
+    """All NRT sources for the last `days` days. Returns (fires, meta.sources entries). Never raises per source.
+
+    With mask=True, detections within MASK_RADIUS_KM of a static hotspot (static_hotspots.json) are dropped;
+    each source's `count` is after masking and its note says how many were masked."""
     fires: list[Fire] = []
     statuses: list[dict[str, Any]] = []
     for src in sources:
         try:
             got = fetch_source(src, days, use_cache=use_cache)
+            note = f"area API, last {days} d"
+            if mask:
+                got, dropped = mask_static(got)
+                note += f"; {len(dropped)} masked as static hotspots (<= {MASK_RADIUS_KM:g} km)"
             fires.extend(got)
             latest = max((f.time_utc for f in got), default=None)
-            statuses.append(source_status(f"FIRMS {src}", ok=True, count=len(got), latest_obs=latest,
-                                          note=f"area API, last {days} d"))
+            statuses.append(source_status(f"FIRMS {src}", ok=True, count=len(got), latest_obs=latest, note=note))
         except Exception as e:  # one sensor failing must not sink the run
             log.warning("FIRMS %s failed: %s", src, e)
             statuses.append(source_status(f"FIRMS {src}", ok=False, note=str(e)[:200]))
