@@ -1,0 +1,224 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), var(--font-noto-deva), var(--font-noto-guru), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), var(--font-noto-deva), var(--font-noto-guru), ui-monospace, monospace;
+  --font-heading: var(--font-sans);
+  --color-surface-map: var(--surface-map);
+  --color-smoke: var(--smoke);
+  --color-smoke-soft: var(--smoke-soft);
+  --color-fire: var(--fire);
+  --color-panel: var(--panel);
+  --color-panel-border: var(--panel-border);
+  --color-grid-line: var(--grid-line);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Light: bright data-portal look. White surfaces, ink text, warm neutral lines. */
+  --background: #ffffff;
+  --foreground: #15171a;
+  --card: #ffffff;
+  --card-foreground: #15171a;
+  --popover: #ffffff;
+  --popover-foreground: #15171a;
+  --primary: #15171a;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f3f0;
+  --secondary-foreground: #15171a;
+  --muted: #f5f5f2;
+  --muted-foreground: #5b5e66;
+  --accent: #f0efea;
+  --accent-foreground: #15171a;
+  --destructive: #c92a2a;
+  --border: #e4e3de;
+  --input: #dcdbd5;
+  --ring: #15171a;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+  --radius: 0.75rem;
+  --sidebar: #fafaf8;
+  --sidebar-foreground: #15171a;
+  --sidebar-primary: #15171a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0efea;
+  --sidebar-accent-foreground: #15171a;
+  --sidebar-border: #e4e3de;
+  --sidebar-ring: #15171a;
+  /* data tokens (validated, see src/lib/colors.ts) */
+  --surface-map: #fafaf8;
+  --smoke: #a1681d;
+  --smoke-soft: #f6ead2;
+  --fire: #d6400c;
+  --panel: rgb(255 255 255 / 0.94);
+  --panel-border: #e4e3de;
+  --night: rgb(21 23 26 / 0.07);
+  --grid-line: #ecebe6;
+}
+
+.dark {
+  /* Dark: "mission control for smoke". Near-black, warm-white text, hard lines, low radii. */
+  --background: #0b0c0e;
+  --foreground: #efece4;
+  --card: #111316;
+  --card-foreground: #efece4;
+  --popover: #15171b;
+  --popover-foreground: #efece4;
+  --primary: #efece4;
+  --primary-foreground: #0b0c0e;
+  --secondary: #1a1d21;
+  --secondary-foreground: #efece4;
+  --muted: #16181c;
+  --muted-foreground: #9d9a91;
+  --accent: #1c1f24;
+  --accent-foreground: #efece4;
+  --destructive: #ff6b6b;
+  --border: #262a30;
+  --input: #2c3037;
+  --ring: #efece4;
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
+  --radius: 0.3rem;
+  --sidebar: #0f1113;
+  --sidebar-foreground: #efece4;
+  --sidebar-primary: #efece4;
+  --sidebar-primary-foreground: #0b0c0e;
+  --sidebar-accent: #1c1f24;
+  --sidebar-accent-foreground: #efece4;
+  --sidebar-border: #262a30;
+  --sidebar-ring: #efece4;
+  --surface-map: #0f1113;
+  --smoke: #e5b447;
+  --smoke-soft: #2a2213;
+  --fire: #ff6a33;
+  --panel: rgb(14 16 19 / 0.92);
+  --panel-border: #262a30;
+  --night: rgb(0 0 0 / 0.45);
+  --grid-line: #1d2025;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    /* every number in the product is tabular */
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
+  .maplibregl-ctrl-attrib {
+    @apply bg-background! text-muted-foreground! border-border! rounded-md! border! shadow-sm!;
+  }
+  .maplibregl-ctrl-attrib a {
+    @apply text-muted-foreground!;
+  }
+  .maplibregl-ctrl-attrib a:hover {
+    @apply text-foreground!;
+  }
+  .maplibregl-ctrl-attrib-button {
+    @apply bg-transparent! dark:invert;
+  }
+}
+
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@utility num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* smoke-beam: a restrained travelling edge for the agent "thinking" state */
+@keyframes beam-travel {
+  from { background-position: 0% 0; }
+  to { background-position: 200% 0; }
+}
+@utility beam-line {
+  background: linear-gradient(90deg, transparent 0%, var(--smoke) 45%, transparent 90%) 0 0 / 50% 100% repeat-x;
+  animation: beam-travel 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; padding: 2rem; color: #000; background: #fff; }
+  .no-print { display: none !important; }
+}
