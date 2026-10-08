@@ -179,7 +179,9 @@ def publish(store: Any, run_id: str, t0: datetime, fires: list[Fire], met: MetFi
         "model_summary": summary,
     }
     items = list(arts.items())
-    _write_all(store, [(f"runs/{run_id}/{k}", v) for k, v in items] + [(f"runs/{run_id}/meta.json", meta)])
+    # Archive only the run-level files under runs/; the ~3k per-place files go to latest/ only (keeps S3 PUTs low on the Free plan).
+    archived = [(f"runs/{run_id}/{k}", v) for k, v in items if not k.startswith("places/")]
+    _write_all(store, archived + [(f"runs/{run_id}/meta.json", meta)])
     _write_all(store, [(f"latest/{k}", v) for k, v in items])
     store.put_json("latest/meta.json", meta)  # last: its presence means latest/ is complete
     meta["_n_artifacts"] = len(items) + 1

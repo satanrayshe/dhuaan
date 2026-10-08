@@ -100,7 +100,7 @@ class Receptor:
 ## Environment (.env at repo root; Lambda reads SSM `/dhuaan/*`)
 `FIRMS_MAP_KEY, OPENAQ_API_KEY, GEMINI_API_KEY, DATA_GOV_IN_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, LSASAF_USERNAME, LSASAF_PASSWORD`, plus non-secret settings:
 - `MODEL_PROVIDER=gemini|bedrock`
-- `GEMINI_MODEL=gemini-2.5-flash`
+- `GEMINI_MODEL=gemini-flash-lite-latest`
 - `BEDROCK_MODEL_ID=global.amazon.nova-2-lite-v1:0`
 - `AWS_REGION=ap-south-1`
 - `ARTIFACT_STORE=local|s3`

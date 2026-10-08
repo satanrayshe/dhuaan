@@ -49,7 +49,7 @@ class Settings:
     lsasaf_username: str = field(default_factory=lambda: os.environ.get("LSASAF_USERNAME", ""))
     lsasaf_password: str = field(default_factory=lambda: os.environ.get("LSASAF_PASSWORD", ""))
     model_provider: str = field(default_factory=lambda: os.environ.get("MODEL_PROVIDER", "gemini"))
-    gemini_model: str = field(default_factory=lambda: os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"))
+    gemini_model: str = field(default_factory=lambda: os.environ.get("GEMINI_MODEL", "gemini-flash-lite-latest"))
     bedrock_model_id: str = field(default_factory=lambda: os.environ.get("BEDROCK_MODEL_ID", "global.amazon.nova-2-lite-v1:0"))
     aws_region: str = field(default_factory=lambda: os.environ.get("AWS_REGION", "ap-south-1"))
     artifact_store: str = field(default_factory=lambda: os.environ.get("ARTIFACT_STORE", "local"))
