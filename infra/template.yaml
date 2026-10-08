@@ -1,0 +1,538 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Dhuaan - stubble-smoke forecast, attribution and school advisories for North India.
+  Scheduler -> Step Functions (Ingest -> Model -> Advise -> Notify) -> S3 artifacts served by CloudFront;
+  one Lambda Function URL for the agent + places API. Sized for the AWS Free plan (no VPC/NAT/containers).
+
+Parameters:
+  PipelineRateHours:
+    Type: Number
+    Default: 3
+    MinValue: 2
+    MaxValue: 24
+    Description: >
+      Run the full pipeline every N hours (3 during judging, 6 after submission).
+      Min 2 keeps Step Functions under the 4,000 free state transitions/month.
+  ScheduleState:
+    Type: String
+    Default: ENABLED
+    AllowedValues: [ENABLED, DISABLED]
+    Description: Turn both schedules off without deleting anything.
+  AllowedOrigin:
+    Type: String
+    Default: "*"
+    Description: Web origin allowed to call the Function URL (e.g. https://main.d123.amplifyapp.com).
+  ModelProvider:
+    Type: String
+    Default: gemini
+    AllowedValues: [gemini, bedrock]
+  GeminiModel:
+    Type: String
+    Default: gemini-2.5-flash
+  BedrockModelId:
+    Type: String
+    Default: global.amazon.nova-2-lite-v1:0
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [x86_64]
+    CodeUri: .stage/app
+    MemorySize: 1024
+    Timeout: 60
+    Environment:
+      Variables:
+        ARTIFACT_STORE: s3
+        ARTIFACT_BUCKET: !Ref ArtifactsBucket
+        TABLE_NAME: !Ref Table
+        MODEL_PROVIDER: !Ref ModelProvider
+        GEMINI_MODEL: !Ref GeminiModel
+        BEDROCK_MODEL_ID: !Ref BedrockModelId
+        SSM_PREFIX: /dhuaan/
+        ALLOWED_ORIGIN: !Ref AllowedOrigin
+        DATA_BASE_URL: !Sub "https://${Cdn.DomainName}"
+    Tags:
+      project: dhuaan
+
+Resources:
+  # ---------------------------------------------------------------- storage
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [GET, HEAD]
+            AllowedOrigins: ["*"]
+            AllowedHeaders: ["*"]
+            MaxAge: 3600
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-old-runs
+            Status: Enabled
+            Prefix: runs/
+            ExpirationInDays: 30
+          - Id: expire-raw
+            Status: Enabled
+            Prefix: raw/
+            ExpirationInDays: 14
+          - Id: abort-multipart
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+
+  ArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactsBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: CloudFrontOACRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${ArtifactsBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Cdn}"
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt ArtifactsBucket.Arn
+              - !Sub "${ArtifactsBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+
+  Table:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: pk, AttributeType: S }
+        - { AttributeName: sk, AttributeType: S }
+      KeySchema:
+        - { AttributeName: pk, KeyType: HASH }
+        - { AttributeName: sk, KeyType: RANGE }
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # ---------------------------------------------------------------- CDN
+  CdnOac:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AWS::StackName}-artifacts-oac"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CdnCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub "${AWS::StackName}-honour-cache-control"
+        Comment: Origin Cache-Control wins (latest/ = 300 s, runs/ = 1 day); 5 min when absent.
+        MinTTL: 0
+        DefaultTTL: 300
+        MaxTTL: 31536000
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          CookiesConfig: { CookieBehavior: none }
+          HeadersConfig: { HeaderBehavior: none }
+          QueryStringsConfig: { QueryStringBehavior: none }
+
+  CdnHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub "${AWS::StackName}-cors-any"
+        CorsConfig:
+          AccessControlAllowCredentials: false
+          AccessControlAllowHeaders: { Items: ["*"] }
+          AccessControlAllowMethods: { Items: [GET, HEAD, OPTIONS] }
+          AccessControlAllowOrigins: { Items: ["*"] }
+          AccessControlMaxAgeSec: 3600
+          OriginOverride: true
+        SecurityHeadersConfig:
+          ContentTypeOptions: { Override: true }
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            IncludeSubdomains: false
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+
+  # Only touches /site/* (the S3 fallback for the web app): /site/ -> /site/index.html, /site/x -> /site/x.html
+  CdnSiteIndexFn:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub "${AWS::StackName}-site-index"
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Directory index rewrite for the static-site fallback under /site
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var r = event.request, u = r.uri;
+          if (u === '/site') { u = '/site/'; }
+          if (u.indexOf('/site/') === 0) {
+            if (u.charAt(u.length - 1) === '/') { r.uri = u + 'index.html'; }
+            else if (u.split('/').pop().indexOf('.') === -1) { r.uri = u + '.html'; }
+          }
+          return r;
+        }
+
+  Cdn:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: Dhuaan artifacts (latest/, runs/, advisories) + optional static site (site/)
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_200   # includes India edge locations
+        Origins:
+          - Id: artifacts
+            DomainName: !GetAtt ArtifactsBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt CdnOac.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: artifacts
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD, OPTIONS]
+          Compress: true
+          CachePolicyId: !Ref CdnCachePolicy
+          ResponseHeadersPolicyId: !Ref CdnHeadersPolicy
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt CdnSiteIndexFn.FunctionMetadata.FunctionARN
+
+  # ---------------------------------------------------------------- logs (14-day retention)
+  IngestLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties: { LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-ingest", RetentionInDays: 14 }
+  ModelLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties: { LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-model", RetentionInDays: 14 }
+  AdviseLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties: { LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-advise", RetentionInDays: 14 }
+  NotifyLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties: { LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-notify", RetentionInDays: 14 }
+  ApiLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties: { LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-api", RetentionInDays: 14 }
+
+  # ---------------------------------------------------------------- layers
+  DepsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${AWS::StackName}-deps"
+      Description: numpy, h5py, requests, python-dotenv (built by infra/build_layers.py)
+      ContentUri: layers/build/deps
+      CompatibleRuntimes: [python3.12]
+      CompatibleArchitectures: [x86_64]
+      RetentionPolicy: Delete
+
+  AgentLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${AWS::StackName}-agent"
+      Description: strands-agents[gemini] + deps, without boto3/botocore (needs DepsLayer too)
+      ContentUri: layers/build/agent
+      CompatibleRuntimes: [python3.12]
+      CompatibleArchitectures: [x86_64]
+      RetentionPolicy: Delete
+
+  # ---------------------------------------------------------------- functions
+  IngestFn:
+    Type: AWS::Serverless::Function
+    DependsOn: IngestLogs
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-ingest"
+      Description: FIRMS + Open-Meteo + LSA SAF + OpenAQ ingest
+      Handler: dhuaan.pipeline.handlers.ingest_handler
+      Timeout: 900
+      MemorySize: 1024
+      Layers: [!Ref DepsLayer]
+      Policies:
+        - S3CrudPolicy: { BucketName: !Ref ArtifactsBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref Table }
+        - SSMParameterReadPolicy: { ParameterName: dhuaan/* }
+        - Statement:
+            - Sid: DecryptSecureStringsViaSsm
+              Effect: Allow
+              Action: kms:Decrypt
+              Resource: !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+              Condition:
+                StringEquals:
+                  kms:ViaService: !Sub "ssm.${AWS::Region}.amazonaws.com"
+
+  ModelFn:
+    Type: AWS::Serverless::Function
+    DependsOn: ModelLogs
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-model"
+      Description: HYSPLIT-lite Lagrangian smoke ensemble
+      Handler: dhuaan.pipeline.handlers.model_handler
+      Timeout: 900
+      MemorySize: 3008
+      Layers: [!Ref DepsLayer]
+      Policies:
+        - S3CrudPolicy: { BucketName: !Ref ArtifactsBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref Table }
+        - SSMParameterReadPolicy: { ParameterName: dhuaan/* }
+        - Statement:
+            - Sid: DecryptSecureStringsViaSsm
+              Effect: Allow
+              Action: kms:Decrypt
+              Resource: !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+              Condition:
+                StringEquals:
+                  kms:ViaService: !Sub "ssm.${AWS::Region}.amazonaws.com"
+
+  AdviseFn:
+    Type: AWS::Serverless::Function
+    DependsOn: AdviseLogs
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-advise"
+      Description: Strands agent - school advisories (en/hi/pa)
+      Handler: dhuaan.pipeline.handlers.advise_handler
+      Timeout: 300
+      MemorySize: 1024
+      Layers: [!Ref DepsLayer, !Ref AgentLayer]
+      Policies:
+        - S3CrudPolicy: { BucketName: !Ref ArtifactsBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref Table }
+        - SSMParameterReadPolicy: { ParameterName: dhuaan/* }
+        - Statement:
+            - Sid: DecryptSecureStringsViaSsm
+              Effect: Allow
+              Action: kms:Decrypt
+              Resource: !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+              Condition:
+                StringEquals:
+                  kms:ViaService: !Sub "ssm.${AWS::Region}.amazonaws.com"
+            - Sid: BedrockInvoke   # Converse/ConverseStream are authorised by these two actions
+              Effect: Allow
+              Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
+                - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/*"
+
+  NotifyFn:
+    Type: AWS::Serverless::Function
+    DependsOn: NotifyLogs
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-notify"
+      Description: Telegram alert for the latest run
+      Handler: dhuaan.pipeline.handlers.notify_handler
+      Timeout: 60
+      MemorySize: 256
+      Layers: [!Ref DepsLayer]
+      Policies:
+        - S3ReadPolicy: { BucketName: !Ref ArtifactsBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref Table }
+        - SSMParameterReadPolicy: { ParameterName: dhuaan/* }
+        - Statement:
+            - Sid: DecryptSecureStringsViaSsm
+              Effect: Allow
+              Action: kms:Decrypt
+              Resource: !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+              Condition:
+                StringEquals:
+                  kms:ViaService: !Sub "ssm.${AWS::Region}.amazonaws.com"
+
+  ApiFn:
+    Type: AWS::Serverless::Function
+    DependsOn: ApiLogs
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-api"
+      Description: Agent chat + places API (Function URL, no API Gateway 30 s limit)
+      Handler: dhuaan.api.handler.handler
+      Timeout: 60
+      MemorySize: 1024
+      Layers: [!Ref DepsLayer, !Ref AgentLayer]
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins: [!Ref AllowedOrigin]
+          AllowMethods: [GET, POST]
+          AllowHeaders: [content-type]
+          MaxAge: 600
+      Policies:
+        - S3CrudPolicy: { BucketName: !Ref ArtifactsBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref Table }
+        - SSMParameterReadPolicy: { ParameterName: dhuaan/* }
+        - Statement:
+            - Sid: DecryptSecureStringsViaSsm
+              Effect: Allow
+              Action: kms:Decrypt
+              Resource: !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+              Condition:
+                StringEquals:
+                  kms:ViaService: !Sub "ssm.${AWS::Region}.amazonaws.com"
+            - Sid: BedrockInvoke
+              Effect: Allow
+              Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
+                - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/*"
+
+  # (SAM adds both lambda:InvokeFunctionUrl and the Oct-2025 lambda:InvokeFunction+InvokedViaFunctionUrl
+  #  permissions for AuthType NONE, so the URL is public without extra resources.)
+
+  # ---------------------------------------------------------------- orchestration
+  Pipeline:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-pipeline"
+      Type: STANDARD
+      DefinitionUri: statemachine/pipeline.asl.json
+      DefinitionSubstitutions:
+        IngestFnArn: !GetAtt IngestFn.Arn
+        ModelFnArn: !GetAtt ModelFn.Arn
+        AdviseFnArn: !GetAtt AdviseFn.Arn
+        NotifyFnArn: !GetAtt NotifyFn.Arn
+      Policies:
+        - LambdaInvokePolicy: { FunctionName: !Ref IngestFn }
+        - LambdaInvokePolicy: { FunctionName: !Ref ModelFn }
+        - LambdaInvokePolicy: { FunctionName: !Ref AdviseFn }
+        - LambdaInvokePolicy: { FunctionName: !Ref NotifyFn }
+      Events:
+        PipelineSchedule:
+          Type: ScheduleV2
+          Properties:
+            Name: !Sub "${AWS::StackName}-pipeline-every-${PipelineRateHours}h"
+            Description: Full pipeline (Ingest -> Model -> Advise -> Notify)
+            ScheduleExpression: !Sub "rate(${PipelineRateHours} hours)"
+            State: !Ref ScheduleState
+            Input: '{"mode": "full", "trigger": "schedule"}'
+            FlexibleTimeWindow: { Mode: "OFF" }
+            RetryPolicy: { MaximumRetryAttempts: 2, MaximumEventAgeInSeconds: 3600 }
+        DailyAdvisorySchedule:
+          Type: ScheduleV2
+          Properties:
+            Name: !Sub "${AWS::StackName}-advise-daily-0630-ist"
+            Description: Advise + Notify at 06:30 IST (01:00 UTC) on the latest forecast
+            ScheduleExpression: cron(0 1 * * ? *)
+            ScheduleExpressionTimezone: UTC
+            State: !Ref ScheduleState
+            Input: '{"mode": "advise", "trigger": "daily"}'
+            FlexibleTimeWindow: { Mode: "OFF" }
+            RetryPolicy: { MaximumRetryAttempts: 2, MaximumEventAgeInSeconds: 3600 }
+
+  # ---------------------------------------------------------------- observability
+  Dashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "${AWS::StackName}-ops"
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {"type": "text", "x": 0, "y": 0, "width": 24, "height": 2,
+             "properties": {"markdown": "## Dhuaan ops\nPipeline every ${PipelineRateHours} h + daily advisories 06:30 IST. Artifacts: https://${Cdn.DomainName}/latest/meta.json"}},
+            {"type": "metric", "x": 0, "y": 2, "width": 12, "height": 6,
+             "properties": {"title": "Pipeline executions", "region": "${AWS::Region}", "stat": "Sum", "period": 10800, "view": "timeSeries",
+               "metrics": [
+                 ["AWS/States", "ExecutionsStarted", "StateMachineArn", "${Pipeline}"],
+                 [".", "ExecutionsSucceeded", ".", "."],
+                 [".", "ExecutionsFailed", ".", ".", {"color": "#d62728"}],
+                 [".", "ExecutionsTimedOut", ".", "."]
+               ]}},
+            {"type": "metric", "x": 12, "y": 2, "width": 12, "height": 6,
+             "properties": {"title": "Pipeline execution time (ms)", "region": "${AWS::Region}", "stat": "Maximum", "period": 10800, "view": "timeSeries",
+               "metrics": [["AWS/States", "ExecutionTime", "StateMachineArn", "${Pipeline}"]]}},
+            {"type": "metric", "x": 0, "y": 8, "width": 12, "height": 6,
+             "properties": {"title": "Lambda duration p-max (ms)", "region": "${AWS::Region}", "stat": "Maximum", "period": 3600, "view": "timeSeries",
+               "metrics": [
+                 ["AWS/Lambda", "Duration", "FunctionName", "${IngestFn}"],
+                 ["...", "${ModelFn}"],
+                 ["...", "${AdviseFn}"],
+                 ["...", "${NotifyFn}"],
+                 ["...", "${ApiFn}"]
+               ]}},
+            {"type": "metric", "x": 12, "y": 8, "width": 12, "height": 6,
+             "properties": {"title": "Lambda errors + throttles", "region": "${AWS::Region}", "stat": "Sum", "period": 3600, "view": "timeSeries",
+               "metrics": [
+                 ["AWS/Lambda", "Errors", "FunctionName", "${IngestFn}"],
+                 ["...", "${ModelFn}"],
+                 ["...", "${AdviseFn}"],
+                 ["...", "${NotifyFn}"],
+                 ["...", "${ApiFn}"],
+                 ["AWS/Lambda", "Throttles", "FunctionName", "${ApiFn}"]
+               ]}},
+            {"type": "metric", "x": 0, "y": 14, "width": 12, "height": 6,
+             "properties": {"title": "API (Function URL) invocations", "region": "${AWS::Region}", "stat": "Sum", "period": 3600, "view": "timeSeries",
+               "metrics": [
+                 ["AWS/Lambda", "Invocations", "FunctionName", "${ApiFn}"],
+                 ["AWS/Lambda", "UrlRequestCount", "FunctionName", "${ApiFn}"],
+                 ["AWS/Lambda", "Url4xxCount", "FunctionName", "${ApiFn}"],
+                 ["AWS/Lambda", "Url5xxCount", "FunctionName", "${ApiFn}"]
+               ]}},
+            {"type": "metric", "x": 12, "y": 14, "width": 12, "height": 6,
+             "properties": {"title": "API latency (ms)", "region": "${AWS::Region}", "period": 3600, "view": "timeSeries",
+               "metrics": [
+                 ["AWS/Lambda", "Duration", "FunctionName", "${ApiFn}", {"stat": "p50"}],
+                 ["...", {"stat": "p90"}]
+               ]}}
+          ]
+        }
+
+Outputs:
+  BucketName:
+    Description: Artifacts bucket (latest/, runs/<run_id>/, advisories, site/)
+    Value: !Ref ArtifactsBucket
+  DataBaseUrl:
+    Description: CloudFront URL in front of the bucket (web reads <DataBaseUrl>/latest/...)
+    Value: !Sub "https://${Cdn.DomainName}"
+  DistributionId:
+    Description: CloudFront distribution id (for invalidations)
+    Value: !Ref Cdn
+  ApiUrl:
+    Description: Function URL for /api/* (agent + search + advisory)
+    Value: !GetAtt ApiFnUrl.FunctionUrl
+  StateMachineArn:
+    Description: Pipeline state machine (start an execution to run now)
+    Value: !Ref Pipeline
+  TableName:
+    Value: !Ref Table
+  DashboardUrl:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards/dashboard/${Dashboard}"

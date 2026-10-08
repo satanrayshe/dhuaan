@@ -1,0 +1,24 @@
+# sam build && sam deploy   (run from infra/; deploy.ps1 / deploy.sh wrap this)
+version = 0.1
+
+[default.global.parameters]
+stack_name = "dhuaan"
+region = "ap-south-1"
+
+[default.build.parameters]
+cached = false
+parallel = false
+
+[default.validate.parameters]
+lint = true
+
+[default.deploy.parameters]
+stack_name = "dhuaan"
+region = "ap-south-1"
+capabilities = "CAPABILITY_IAM"
+resolve_s3 = true
+s3_prefix = "dhuaan"
+confirm_changeset = false
+fail_on_empty_changeset = false
+tags = "project=\"dhuaan\""
+# parameter_overrides = "PipelineRateHours=3 AllowedOrigin=https://main.<appid>.amplifyapp.com ModelProvider=gemini"

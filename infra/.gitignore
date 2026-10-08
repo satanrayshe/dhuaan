@@ -1,0 +1,4 @@
+.stage/
+.aws-sam/
+layers/build/
+*.zip

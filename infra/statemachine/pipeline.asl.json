@@ -1,0 +1,87 @@
+{
+  "Comment": "Dhuaan pipeline: Ingest -> Model -> Advise -> Notify. Input {\"mode\": \"advise\"} skips straight to Advise (daily 06:30 IST run).",
+  "StartAt": "Route",
+  "States": {
+    "Route": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            { "Variable": "$.mode", "IsPresent": true },
+            { "Variable": "$.mode", "StringEquals": "advise" }
+          ],
+          "Next": "Advise"
+        }
+      ],
+      "Default": "Ingest"
+    },
+    "Ingest": {
+      "Type": "Task",
+      "Comment": "FIRMS + Open-Meteo + LSA SAF + OpenAQ -> S3 raw",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": { "FunctionName": "${IngestFnArn}", "Payload.$": "$" },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 960,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5, "MaxAttempts": 5, "BackoffRate": 2, "MaxDelaySeconds": 120, "JitterStrategy": "FULL"
+        },
+        { "ErrorEquals": ["States.ALL"], "IntervalSeconds": 60, "MaxAttempts": 2, "BackoffRate": 3 }
+      ],
+      "Next": "Model"
+    },
+    "Model": {
+      "Type": "Task",
+      "Comment": "5-member Lagrangian ensemble -> S3 latest/ + runs/<run_id>/",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": { "FunctionName": "${ModelFnArn}", "Payload.$": "$" },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 960,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5, "MaxAttempts": 5, "BackoffRate": 2, "MaxDelaySeconds": 120, "JitterStrategy": "FULL"
+        },
+        { "ErrorEquals": ["States.ALL"], "IntervalSeconds": 30, "MaxAttempts": 1, "BackoffRate": 2 }
+      ],
+      "Next": "Advise"
+    },
+    "Advise": {
+      "Type": "Task",
+      "Comment": "Strands agent: school advisories (en/hi/pa) -> S3 advisories/ + DynamoDB",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": { "FunctionName": "${AdviseFnArn}", "Payload.$": "$" },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 330,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5, "MaxAttempts": 5, "BackoffRate": 2, "MaxDelaySeconds": 120, "JitterStrategy": "FULL"
+        },
+        { "ErrorEquals": ["States.ALL"], "IntervalSeconds": 30, "MaxAttempts": 2, "BackoffRate": 2 }
+      ],
+      "Next": "Notify"
+    },
+    "Notify": {
+      "Type": "Task",
+      "Comment": "Optional: Telegram alert. Failure never fails the run.",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": { "FunctionName": "${NotifyFnArn}", "Payload.$": "$" },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 90,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5, "MaxAttempts": 3, "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.notify_error", "Next": "NotifySkipped" }
+      ],
+      "Next": "Done"
+    },
+    "NotifySkipped": { "Type": "Pass", "Comment": "Notify failed; the forecast is still published.", "Next": "Done" },
+    "Done": { "Type": "Succeed" }
+  }
+}
