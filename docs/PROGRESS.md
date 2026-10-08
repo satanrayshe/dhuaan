@@ -16,7 +16,27 @@
 - Flash-lite garbles Gurmukhi (it mixes in other scripts), so a strict script check now falls back to hand-written HI/PA templates.
 - Telegram notify works: a real advisory was delivered to Shrey's chat.
 
-## In progress
+## Phase 2 results (committed and pushed 17:47 IST)
+- Pre-registered backtest, held out 6–20 Nov 2025:
+  - Hit rate: A 0/91, B 1/91.
+  - Pearson r: A 0.13, B 0.23.
+  - At Delhi stations B beats A (Rohini 0.40 → 0.45, Punjabi Bagh 0.42 → 0.49).
+  - The pooled alpha is dragged down by the Punjab stations (Delhi alone would want about 7–9). Reported honestly.
+- Headline fact: 93.0% of 33,074 Punjab GK2A detections (Oct–Nov 2025, 12–18 IST) fall at ≥16:00 IST (backend/data/facts.json).
+- Static hotspot mask: 96 cells (refineries, power plant, landfill); 30 live detections masked.
+- Web runs on real data. trips.json is now 0.7 MB gzip, real BLH band, India-only district filter (Pakistani fires cause about 80% of modelled exposure in this run).
+- Private GitHub repo: github.com/satanrayshe/dhuaan (push after every milestone).
+
+## In progress (phase 3, workflow `wf_eadeab3b-19f`, launched about 17:50 IST)
+- Fixes:
+  - failing pipeline test
+  - Gemini fallback chain (2.5 models retired)
+  - EXPLORATORY regional calibration (fit-period only) plus live regional alphas
+  - measured baseline ≤36 h in school plans
+  - CONTRACTS/SOURCES updates and web polish
+- Docs: README, docs/WRITEUP.md, docs/BLOG.md, docs/VIDEO.md, docs/method.md, docs/architecture.svg, LICENSE.
+
+## Older in-progress notes
 - Phase 2 workflow `wf_48070889-0b6`:
   - (a) backtest on 11 Nov 2025 (A vs B with GK2A afternoon fires), alpha calibration, afternoon_ratio.json, static industrial hotspot mask
   - (b) web on real data, India-only district filter, real BLH band, smaller trips.json, visual QA in light and dark
