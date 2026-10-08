@@ -5,7 +5,8 @@
 
 ## Status
 - [x] 15:44 IST: repo created, `.env` (gitignored), backend uv venv (numpy, h5py, strands[gemini]), contracts written
-- [ ] Phase 1 (parallel): model · ingest/geo/pipeline · infra · agent/api · web
+- [x] ~16:00 IST: config.py + store.py committed
+- [ ] Phase 1 (parallel workflow run `wf_ea342ab3-b01`, launched ~16:05 IST): model · ingest/geo/pipeline · infra · agent/api · web. If it was interrupted, resume with Workflow({scriptPath: "<session workflows dir>/dhuaan-phase1-build-wf_ea342ab3-b01.js", resumeFromRunId: "wf_ea342ab3-b01"}), or inspect which component folders are complete and rebuild only the missing ones.
 - [ ] Phase 2: integration with real data, backtest, advisories, polish
 - [ ] Deploy: **blocked until Shrey runs `aws login`** (the root session expired 8 Oct). Bedrock is blocked on the new account (support case open), so the agent uses Gemini.
 
