@@ -21,4 +21,4 @@ s3_prefix = "dhuaan"
 confirm_changeset = false
 fail_on_empty_changeset = false
 tags = "project=\"dhuaan\""
-# parameter_overrides = "PipelineRateHours=3 AllowedOrigin=https://main.<appid>.amplifyapp.com ModelProvider=gemini"
+parameter_overrides = "PipelineRateHours=3 AllowedOrigin=https://main.d24aeuy7flk340.amplifyapp.com ModelProvider=gemini"

@@ -15,7 +15,7 @@ ENV_FILE = REPO / "web" / ".env.production"
 
 
 def env_production(out: dict[str, str]) -> str:
-    data = out["DataBaseUrl"].rstrip("/") + "/latest"
+    data = out["DataBaseUrl"].rstrip("/")  # the web app appends /latest/<artifact> itself
     api = out["ApiUrl"].rstrip("/")
     return (
         "# Written by infra/outputs.py from the CloudFormation stack outputs. No secrets.\n"

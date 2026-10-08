@@ -9,7 +9,7 @@
 
 | | |
 |---|---|
-| Live site (no login) | **TODO:** `https://main.<appid>.amplifyapp.com` |
+| Live site (no login) | https://main.d24aeuy7flk340.amplifyapp.com |
 | Demo video (2:55) | **TODO:** YouTube link |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) |
 | Method | [docs/method.md](docs/method.md) |
