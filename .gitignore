@@ -15,3 +15,4 @@ web/.next/
 web/out/
 *.zip
 .DS_Store
+web/public/data/latest/
