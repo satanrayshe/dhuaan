@@ -1,55 +1,39 @@
 # Dhuaan progress log (resume from here)
 
-**Event:** Environmental Hacks. The clock opened **Thu 8 Oct 2026, 11:04 IST** (WeMakeDevs email). Submissions close Sun 11 Oct (exact time unpublished; target submitting by 16:00 IST).
-**Plans:** `../prep/` (00-PLAYBOOK, 01-project-spec, 02-design-spec, 03-demo-video-script, 04-data-sources, 06-submission-guide). **Contracts:** `docs/CONTRACTS.md`.
+**Event:** Environmental Hacks. The clock opened **Thu 8 Oct 2026, 11:04 IST**. Submissions close Sun 11 Oct (exact time unpublished; target submitting by 16:00 IST).
+**Plans:** `../prep/` (00-PLAYBOOK, 01-project-spec, 02-design-spec, 03-demo-video-script, 04-data-sources, 06-submission-guide). **Contracts:** `docs/CONTRACTS.md`. **Repo:** github.com/satanrayshe/dhuaan (private, in sync).
 
-## Done (Thu 8 Oct)
-- 15:44 IST: repo created, `.env` gitignored, uv venv, contracts, config.py + store.py
-- Phase 1 (workflow, about 46 min, 5 agents), committed per component:
-  - model: 32 physics tests; 490 clusters × 5 members in about 17 s
-  - ingest/geo/pipeline: FIRMS, Open-Meteo, LSA SAF, OpenAQ, districts, 3.5k receptors, HRSL population
-  - agent/api: Strands, 7 tools, rules, grounding, advisories, Function URL API
-  - infra: SAM template, layers (112 MB), deploy scripts, Amplify/S3 web deploy
-  - web: Next.js 16, shadcn, mapcn, deck.gl, 6 routes, light + dark
-- First live run 20261008T1100Z: 433 fires → 306 clusters, 20 s end to end. Top exposure comes from **Pakistani Punjab (Kasur/Pakpattan) → Firozpur/Fazilka**.
-- Gemini: gemini-2.5-flash is retired for this key, so we use `gemini-flash-lite-latest` (set in .env).
-- Flash-lite garbles Gurmukhi (it mixes in other scripts), so a strict script check now falls back to hand-written HI/PA templates.
-- Telegram notify works: a real advisory was delivered to Shrey's chat.
+## State at Thu 8 Oct, 18:10 IST: built, tested locally, not deployed
+- **Backend:** 191 pytest passing (`cd backend && uv run pytest -q`).
+  - Live pipeline: `uv run python -m dhuaan.pipeline.run_local --members 5 --afternoon-mode observed`. About 20 s for 447 FIRMS fires (static hotspots masked), 320 clusters, Open-Meteo 540-pt grid, LSA SAF hourly, OpenAQ.
+  - Model: Lagrangian, 5-member ensemble, attribution, exposure, trips, grid with blh_m.
+  - Agent: Strands + Gemini (`gemini-flash-lite-latest` plus a live fallback chain), 7 tools, deterministic school rules, grounding check, trilingual advisories with a strict script check and HI/PA template fallback. Telegram notify works (sent to Shrey's chat).
+  - API: Function URL handler plus local dev server `uv run python -m dhuaan.api.local` (:8787).
+  - Backtest (`uv run python -m dhuaan.backtest.run [--reuse]`):
+    - Pre-registered: hit rate A 0/91, B 1/91; r 0.13 / 0.23.
+    - Exploratory regional calibration (clearly labelled; Delhi alpha 6.8 vs Punjab 0.149).
+  - Facts: 93.0% of Punjab GK2A afternoon detections are at ≥16:00 IST.
+- **Web:** `cd web && npm run data:sync && npm run build`. Next.js 16 static export with shadcn + mapcn + deck.gl, light (OpenAQ-inspired) + dark. Routes: `/`, `/place`, `/schools`, `/district`, `/backtest`, `/how-it-works`. Build and lint are clean.
+- **Infra:** `infra/deploy.ps1 [-Web] [-S3] [-Origin <url>]` (SAM, layers 112 MB, Step Functions, Scheduler, CloudFront, DynamoDB, SSM, dashboard, Amplify deploy). Not yet deployed.
+- **Docs:** README (TODO placeholders for the live URL, video, blog and hero image), docs/WRITEUP.md, docs/BLOG.md, docs/VIDEO.md, docs/method.md, docs/architecture.svg, LICENSE (MIT).
 
-## Phase 2 results (committed and pushed 17:47 IST)
-- Pre-registered backtest, held out 6–20 Nov 2025:
-  - Hit rate: A 0/91, B 1/91.
-  - Pearson r: A 0.13, B 0.23.
-  - At Delhi stations B beats A (Rohini 0.40 → 0.45, Punjabi Bagh 0.42 → 0.49).
-  - The pooled alpha is dragged down by the Punjab stations (Delhi alone would want about 7–9). Reported honestly.
-- Headline fact: 93.0% of 33,074 Punjab GK2A detections (Oct–Nov 2025, 12–18 IST) fall at ≥16:00 IST (backend/data/facts.json).
-- Static hotspot mask: 96 cells (refineries, power plant, landfill); 30 live detections masked.
-- Web runs on real data. trips.json is now 0.7 MB gzip, real BLH band, India-only district filter (Pakistani fires cause about 80% of modelled exposure in this run).
-- Private GitHub repo: github.com/satanrayshe/dhuaan (push after every milestone).
+## Next (in order)
+1. **Shrey:** `! aws login --region ap-south-1`.
+2. Deploy: `.\infra\deploy.ps1 -Web`. If Amplify is blocked on the Free plan, use `-Web -S3`.
+3. Smoke-test /api/health, start the state machine once, re-deploy with `-Origin <web url>` to lock CORS, then check the site in a private window.
+4. Fill the README TODOs (live URL), capture docs/img/hero.png, and re-read the per-run numbers in docs/VIDEO.md.
+5. **Shrey:** record the video (docs/VIDEO.md), voiceover, upload to YouTube (unlisted), publish the blog (docs/BLOG.md) on Builder Center as @shreysati.
+6. **Shrey decides:** make the repo public, then submit (prep/06-submission-guide.md).
 
-## In progress (phase 3, workflow `wf_eadeab3b-19f`, launched about 17:50 IST)
-- Fixes:
-  - failing pipeline test
-  - Gemini fallback chain (2.5 models retired)
-  - EXPLORATORY regional calibration (fit-period only) plus live regional alphas
-  - measured baseline ≤36 h in school plans
-  - CONTRACTS/SOURCES updates and web polish
-- Docs: README, docs/WRITEUP.md, docs/BLOG.md, docs/VIDEO.md, docs/method.md, docs/architecture.svg, LICENSE.
+## Needs Shrey
+- `aws login` (the CLI session expired).
+- Bedrock is blocked on the new account (support case "Bedrock allowlisting"); the agent runs on Gemini. If AWS approves it, switch with `-Provider bedrock`.
+- Verify the pitch numbers marked in README/WRITEUP: the 2025 Punjab fire counts (CityAirNews).
+- Make the repo public (decision).
+- Record the voiceover and publish the blog (only he can).
 
-## Older in-progress notes
-- Phase 2 workflow `wf_48070889-0b6`:
-  - (a) backtest on 11 Nov 2025 (A vs B with GK2A afternoon fires), alpha calibration, afternoon_ratio.json, static industrial hotspot mask
-  - (b) web on real data, India-only district filter, real BLH band, smaller trips.json, visual QA in light and dark
-  - To resume: Workflow({scriptPath: "<session workflows dir>/dhuaan-phase2-wf_48070889-0b6.js", resumeFromRunId: "wf_48070889-0b6"}).
-
-## Next
-1. Commit phase 2 per component; re-run the pipeline; regenerate advisories.
-2. Docs: README (hero GIF, architecture, AWS services table, method, backtest, limitations, credits, AI tools), docs/WRITEUP.md, docs/BLOG.md, video shot list updated to the real features.
-3. **Deploy (needs Shrey):** `! aws login --region ap-south-1`, then `.\infra\deploy.ps1 -Web`. Then smoke-test /api/health, run the state machine once, and lock CORS with `-Origin`.
-4. Create the GitHub repo under satanrayshe (private until Shrey says to make it public), then push.
-5. Record footage per prep/03-demo-video-script.md.
-
-## Blockers / needs Shrey
-- `aws login` (the CLI session expired) for any deploy.
-- Bedrock is blocked on the new account (support case "Bedrock allowlisting" open), so the agent runs on Gemini.
-- Decision: making the GitHub repo public.
+## Known limitations (stated in the docs)
+- Weak pre-registered skill. The Delhi regional alpha mostly absorbs non-fire pollution.
+- No LSA SAF afternoon detections yet this early in the season.
+- Bijnor detections are not caught by the static mask.
+- The web schools fallback plan doesn't apply the baseline smoke-delta fix (the backend advisory does).
