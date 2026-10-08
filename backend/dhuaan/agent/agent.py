@@ -172,23 +172,9 @@ def ask(question: str, place_id: str | None = None, lang: str = "en", *,
         if hit:
             return {**hit, "cached": True}
     factory = model_factory or (lambda mid: models.build_model(model_id=mid))
-    out, model_id, last_err = None, None, None
-    for model_id in models.candidates():
-        try:
-            out = _run(question, place_id, lang, factory, model_id)
-            break
-        except LLMBudgetExceeded:
-            raise
-        except Exception as e:
-            kind = models.classify_error(e)
-            if kind is None:
-                raise
-            if kind == "unavailable":
-                models.mark_unavailable(model_id)
-            log.warning("model %s %s; trying the next one", model_id, kind)
-            last_err = e
-    if out is None:
-        raise last_err or RuntimeError("no model available")
+    out, model_id = models.call_with_fallback(
+        lambda mid: _run(question, place_id, lang, factory, mid),
+        on_error=lambda mid, kind: log.warning("model %s %s; retrying or trying the next one", mid, kind))
     result = {"answer": out["answer"], "lang": lang, "tool_trace": out["trace"], "grounding": out["grounding"],
               "model": models.model_label(model_id=model_id), "cached": False,
               "retried": out["retried"], "model_calls": out["model_calls"]}

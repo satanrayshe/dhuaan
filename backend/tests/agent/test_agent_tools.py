@@ -86,7 +86,8 @@ def test_air_quality_now_with_openaq(store, monkeypatch):
     assert r["measured_ist"] == "2026-10-08 07:30 IST" and r["stale"] is False
     # the fresh observation becomes the plan baseline
     plan = tools.get_school_day_plan("town_khanna", "2026-10-08")
-    assert plan["baseline_pm25"] == 97.6 and "observed" in plan["baseline_basis"]
+    assert plan["baseline_pm25"] == 97.6 and plan["baseline_basis"] == "measured 1 h ago at Ludhiana PAU, 12 km"
+    assert plan["baseline_source"] == "measured" and plan["baseline_age_h"] == 1
     tools._obs_cache.clear()
 
 

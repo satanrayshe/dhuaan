@@ -223,6 +223,7 @@ ${t("map.borderSub")}` } : null;
                 eveningNote={eveningNote}
                 compare={compare}
                 setCompare={setCompare}
+                reducedMotion={reducedMotion}
               />
             </div>
 

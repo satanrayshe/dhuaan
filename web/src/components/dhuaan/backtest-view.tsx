@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BACKTEST_COLORS } from "@/lib/colors";
 import { artifactUrl, revalidate, useBacktest } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
-import type { Lang } from "@/lib/types";
+import type { BacktestMetrics, ExploratoryRegional, Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useThemeName } from "./bits";
 
@@ -73,8 +73,124 @@ const LIMITS: Record<Lang, string[]> = {
   ],
 };
 
-/** raw counts shown inside the hit-rate tile, not as tiles of their own */
-const COUNT_KEYS = new Set(["n_episodes", "n_hits", "episodes", "hits", "n_false_alarms", "n_stations", "n_hours"]);
+/** raw counts are shown inside the hit-rate tile, never as tiles of their own */
+const COUNT_KEYS = new Set([
+  "n_episodes", "n_hits", "episodes", "hits", "n_false_alarms", "n_forecast_episodes", "n_lead_episodes", "n_stations", "n_hours",
+  "share_hours_obs_ge60", "share_hours_pred_ge60",
+]);
+
+type MetricPair = { A?: BacktestMetrics; B?: BacktestMetrics };
+
+function metricKeysOf(metrics: MetricPair): string[] {
+  const keys = new Set([...Object.keys(metrics.A ?? {}), ...Object.keys(metrics.B ?? {})]);
+  // a metric undefined for both configurations (e.g. FAR with 0 forecast episodes) gets no tile
+  const numeric = [...keys].filter((k) => typeof (metrics.A?.[k] ?? metrics.B?.[k]) === "number");
+  const known = Object.keys(METRIC_LABELS).filter((k) => numeric.includes(k));
+  const other = numeric.filter((k) => !(k in METRIC_LABELS) && !COUNT_KEYS.has(k) && !k.startsWith("n_") && !k.startsWith("_"));
+  return [...known, ...other];
+}
+
+const cnt = (m: BacktestMetrics | undefined, k: string) => String(m?.[k] ?? "-");
+
+function MetricTiles({ metrics, compact = false }: { metrics: MetricPair; compact?: boolean }) {
+  const { t } = useI18n();
+  const keys = metricKeysOf(metrics);
+  return (
+    <div
+      className={cn(
+        "mt-3 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2",
+        keys.length >= 5 ? "lg:grid-cols-5" : keys.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4",
+      )}
+    >
+      {keys.map((k) => {
+        const m = METRIC_LABELS[k] ?? { label: k.replace(/_/g, " "), fmt: (v: number) => String(+v.toFixed(2)), better: "up" as const };
+        const a = metrics.A?.[k] as number | undefined;
+        const b = metrics.B?.[k] as number | undefined;
+        const improved = a != null && b != null && (m.better === "up" ? b > a : b < a);
+        return (
+          <div key={k} className={cn("bg-background", compact ? "p-3" : "p-4")}>
+            <p className="text-xs text-muted-foreground">{m.label}</p>
+            <div className="mt-2 flex items-baseline gap-4">
+              <div>
+                <p className="font-mono text-[0.68rem] text-muted-foreground">A</p>
+                <p className={cn("font-semibold tracking-tight", compact ? "text-lg" : "text-xl")}>{a != null ? m.fmt(a) : "-"}</p>
+              </div>
+              <div>
+                <p className="font-mono text-[0.68rem] text-muted-foreground">B</p>
+                <p className={cn("font-semibold tracking-tight", compact ? "text-lg" : "text-xl")}>{b != null ? m.fmt(b) : "-"}</p>
+              </div>
+              {a != null && b != null && (
+                <p className="ml-auto font-mono text-xs text-muted-foreground">{improved ? "B better" : a === b ? "same" : "A better"}</p>
+              )}
+            </div>
+            {k === "hit_rate" && (metrics.A?.n_episodes != null || metrics.B?.n_episodes != null) && (
+              <div className="mt-2 space-y-0.5 font-mono text-[0.68rem] text-muted-foreground">
+                <p>
+                  A {cnt(metrics.A, "n_hits")}/{cnt(metrics.A, "n_episodes")} · B {cnt(metrics.B, "n_hits")}/{cnt(metrics.B, "n_episodes")}{" "}
+                  {t("backtest.episodes")}
+                </p>
+                {(metrics.A?.n_forecast_episodes != null || metrics.B?.n_forecast_episodes != null) && (
+                  <p>
+                    A {cnt(metrics.A, "n_forecast_episodes")} · B {cnt(metrics.B, "n_forecast_episodes")} {t("backtest.forecastEpisodes")}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const REGION_NAME: Record<string, string> = { delhi_ncr: "Delhi/NCR", punjab_haryana: "Punjab/Haryana" };
+
+function ExploratorySection({ ex }: { ex: ExploratoryRegional }) {
+  const { t } = useI18n();
+  const regions = Object.keys(ex.alphas?.B ?? ex.alphas?.A ?? {});
+  return (
+    <section aria-labelledby="expl-title" className="mt-12 rounded-lg border border-dashed border-border p-4 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="expl-title" className="text-lg font-semibold">
+          {t("backtest.explTitle")}
+        </h2>
+        <span className="rounded-sm border border-border px-2 py-0.5 font-mono text-[0.7rem] text-muted-foreground">
+          {ex.label || t("backtest.explBadge")}
+        </span>
+      </div>
+      <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{t("backtest.explBody")}</p>
+      <p className="mt-3 font-mono text-xs text-muted-foreground">
+        {regions
+          .map((r) => {
+            const n = ex.n_stations?.[r];
+            return (REGION_NAME[r] ?? r) + (n != null ? " (" + n + " st.)" : "") + ": α_A " + fmtAlpha(ex.alphas.A?.[r]) + " · α_B " + fmtAlpha(ex.alphas.B?.[r]);
+          })
+          .join("  |  ")}
+      </p>
+      <MetricTiles metrics={ex.metrics} compact />
+      {ex.by_region && (
+        <div className="mt-6">
+          <h3 className="label-mono">{t("backtest.byRegion")}</h3>
+          <div className="mt-1 space-y-4">
+            {Object.entries(ex.by_region).map(([r, m]) => (
+              <div key={r}>
+                <p className="mt-2 text-sm font-medium">{REGION_NAME[r] ?? r}</p>
+                <MetricTiles metrics={m} compact />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {ex.notes?.length > 0 && (
+        <div className="mt-6 max-w-4xl space-y-2 text-sm leading-relaxed text-muted-foreground">
+          {ex.notes.map((n, i) => (
+            <p key={i}>{n}</p>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
 const fmtAlpha = (v: unknown) => (typeof v === "number" ? (+v.toPrecision(3)).toString() : "-");
 
@@ -112,17 +228,6 @@ export function BacktestView() {
     return () => clearInterval(id);
   }, [bt.status]);
 
-  const metricKeys = useMemo(() => {
-    if (bt.status !== "ready") return [];
-    const keys = new Set([...Object.keys(bt.data.metrics.A ?? {}), ...Object.keys(bt.data.metrics.B ?? {})]);
-    // a metric undefined for both configurations (e.g. FAR with 0 forecast episodes) gets no tile
-    const numeric = [...keys].filter((k) => typeof (bt.data.metrics.A?.[k] ?? bt.data.metrics.B?.[k]) === "number");
-    // known skill metrics first (in a fixed order); raw counts are shown inside the hit-rate tile
-    const known = Object.keys(METRIC_LABELS).filter((k) => numeric.includes(k));
-    const other = numeric.filter((k) => !(k in METRIC_LABELS) && !COUNT_KEYS.has(k) && !k.startsWith("n_"));
-    return [...known, ...other];
-  }, [bt]);
-
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-12">
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -144,46 +249,13 @@ export function BacktestView() {
       {bt.status === "ready" && (
         <>
           <section aria-labelledby="metrics-title" className="mt-10">
-            <h2 id="metrics-title" className="label-mono">
-              {t("backtest.metrics")}
-            </h2>
-            <div
-              className={cn(
-                "mt-3 grid overflow-hidden rounded-lg border border-border bg-border gap-px sm:grid-cols-2",
-                metricKeys.length >= 5 ? "lg:grid-cols-5" : metricKeys.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4",
-              )}
-            >
-              {metricKeys.map((k) => {
-                const m = METRIC_LABELS[k] ?? { label: k.replace(/_/g, " "), fmt: (v: number) => String(+v.toFixed(2)), better: "up" as const };
-                const a = bt.data.metrics.A?.[k] as number | undefined;
-                const b = bt.data.metrics.B?.[k] as number | undefined;
-                const improved = a != null && b != null && (m.better === "up" ? b > a : b < a);
-                return (
-                  <div key={k} className="bg-background p-4">
-                    <p className="text-xs text-muted-foreground">{m.label}</p>
-                    <div className="mt-2 flex items-baseline gap-4">
-                      <div>
-                        <p className="font-mono text-[0.68rem] text-muted-foreground">A</p>
-                        <p className="text-xl font-semibold tracking-tight">{a != null ? m.fmt(a) : "-"}</p>
-                      </div>
-                      <div>
-                        <p className="font-mono text-[0.68rem] text-muted-foreground">B</p>
-                        <p className="text-xl font-semibold tracking-tight">{b != null ? m.fmt(b) : "-"}</p>
-                      </div>
-                      {a != null && b != null && (
-                        <p className="ml-auto font-mono text-xs text-muted-foreground">{improved ? "B better" : a === b ? "same" : "A better"}</p>
-                      )}
-                    </div>
-                    {k === "hit_rate" && (bt.data.metrics.A?.n_episodes != null || bt.data.metrics.B?.n_episodes != null) && (
-                      <p className="mt-2 font-mono text-[0.68rem] text-muted-foreground">
-                        A {String(bt.data.metrics.A?.n_hits ?? "-")}/{String(bt.data.metrics.A?.n_episodes ?? "-")} · B{" "}
-                        {String(bt.data.metrics.B?.n_hits ?? "-")}/{String(bt.data.metrics.B?.n_episodes ?? "-")} {t("backtest.episodes")}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="metrics-title" className="label-mono">
+                {t("backtest.metrics")}
+              </h2>
+              <span className="font-mono text-[0.7rem] text-muted-foreground">{t("backtest.prereg")}</span>
             </div>
+            <MetricTiles metrics={bt.data.metrics} />
             <p className="mt-2 font-mono text-xs text-muted-foreground">
               {windowText(bt.data.window) && <>{windowText(bt.data.window)} · </>}α_A {fmtAlpha(bt.data.calibration?.alpha_A)} · α_B{" "}
               {fmtAlpha(bt.data.calibration?.alpha_B)}
@@ -229,6 +301,7 @@ export function BacktestView() {
               ))}
             </div>
           )}
+          {bt.data.exploratory_regional && <ExploratorySection ex={bt.data.exploratory_regional} />}
         </>
       )}
 

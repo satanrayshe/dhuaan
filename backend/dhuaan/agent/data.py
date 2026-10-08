@@ -66,6 +66,15 @@ def alpha() -> float:
         return 1.0
 
 
+def alpha_for(place: dict | None) -> float:
+    """Region-appropriate alpha for a place (meta.alpha_by_region via dhuaan.geo.regions), else the pooled alpha."""
+    from dhuaan.geo.regions import alpha_for as _af
+    try:
+        return _af(meta(), (place or {}).get("district"), (place or {}).get("state"))
+    except (TypeError, ValueError):
+        return alpha()
+
+
 def index() -> list[dict]:
     idx = _get("latest/receptors_index.json") or {}
     return idx.get("places", []) if isinstance(idx, dict) else []

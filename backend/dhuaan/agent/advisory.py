@@ -18,6 +18,7 @@ from typing import Any, Callable, Iterable
 from dhuaan.agent import grounding, models, prompts, rules, tools
 from dhuaan.agent.timeutil import iso_utc, ist_str, now_utc
 from dhuaan.config import DATA_DIR, settings
+from dhuaan.geo import regions
 
 log = logging.getLogger(__name__)
 
@@ -42,38 +43,39 @@ _TAIL = {
 TEMPLATES = {
     "en": {
         "indoors": "Smoke advisory for {name}, {date}: farm-fire smoke is forecast to make the air {cat} during school hours, "
-                   "worst around {hour} IST (estimated PM2.5 {worst} µg/m³, range {lo}-{hi}). Assembly, PE and recess will be "
+                   "worst around {hour} IST (est. smoke PM2.5 {worst} µg/m³{rng}, provisional calibration). Assembly, PE and recess will be "
                    "held indoors and windows kept closed. Children with asthma should carry their usual medicines. ",
         "limit": "Smoke advisory for {name}, {date}: farm-fire smoke may make the air {cat} during school hours, worst around "
-                 "{hour} IST (estimated PM2.5 {worst} µg/m³, range {lo}-{hi}). There will be no strenuous outdoor PE, assembly "
+                 "{hour} IST (est. smoke PM2.5 {worst} µg/m³{rng}, provisional calibration). There will be no strenuous outdoor PE, assembly "
                  "will be short, and children with asthma or heart or lung conditions will stay indoors. ",
-        "ok": "Air update for {name}, {date}: no significant smoke is forecast during school hours (estimated PM2.5 up to "
-              "{worst} µg/m³, {cat}). Normal outdoor activities will continue. ",
+        "ok": "Air update for {name}, {date}: no significant smoke is forecast during school hours (est. smoke PM2.5 up to "
+              "{worst} µg/m³, {cat}; provisional calibration). Normal outdoor activities will continue. ",
         "none": "Air update for {name}, {date}: the smoke forecast does not cover this day yet. Please check again tomorrow. ",
     },
     "hi": {
         "indoors": "{name} के लिए धुएँ की सूचना, {date}: पराली के धुएँ के कारण स्कूल के समय हवा '{cat}' श्रेणी में रहने का अनुमान है, "
-                   "सबसे ज़्यादा लगभग {hour} बजे (अनुमानित PM2.5 {worst} µg/m³, दायरा {lo}-{hi})। प्रार्थना सभा, पीटी और खेल का समय "
+                   "सबसे ज़्यादा लगभग {hour} बजे (अनुमानित धुआँ PM2.5 {worst} µg/m³{rng}, अस्थायी कैलिब्रेशन)। प्रार्थना सभा, पीटी और खेल का समय "
                    "कक्षाओं के अंदर होगा और खिड़कियाँ बंद रखी जाएँगी। दमा (अस्थमा) वाले बच्चे अपनी नियमित दवा साथ रखें। ",
         "limit": "{name} के लिए धुएँ की सूचना, {date}: पराली के धुएँ से स्कूल के समय हवा '{cat}' श्रेणी तक पहुँच सकती है, सबसे ज़्यादा "
-                 "लगभग {hour} बजे (अनुमानित PM2.5 {worst} µg/m³, दायरा {lo}-{hi})। बाहर भारी पीटी या खेल नहीं होंगे, प्रार्थना सभा "
+                 "लगभग {hour} बजे (अनुमानित धुआँ PM2.5 {worst} µg/m³{rng}, अस्थायी कैलिब्रेशन)। बाहर भारी पीटी या खेल नहीं होंगे, प्रार्थना सभा "
                  "छोटी रहेगी, और दमा या दिल/फेफड़ों की बीमारी वाले बच्चे अंदर रहेंगे। ",
-        "ok": "{name} के लिए हवा की सूचना, {date}: स्कूल के समय धुएँ का कोई खास असर अपेक्षित नहीं है (अनुमानित PM2.5 अधिकतम "
-              "{worst} µg/m³, '{cat}')। बाहर की सामान्य गतिविधियाँ जारी रहेंगी। ",
+        "ok": "{name} के लिए हवा की सूचना, {date}: स्कूल के समय धुएँ का कोई खास असर अपेक्षित नहीं है (अनुमानित धुआँ PM2.5 अधिकतम "
+              "{worst} µg/m³, '{cat}'; अस्थायी कैलिब्रेशन)। बाहर की सामान्य गतिविधियाँ जारी रहेंगी। ",
         "none": "{name} के लिए हवा की सूचना, {date}: इस दिन का धुआँ पूर्वानुमान अभी उपलब्ध नहीं है। कृपया कल फिर देखें। ",
     },
     "pa": {
         "indoors": "{name} ਲਈ ਧੂੰਏਂ ਦੀ ਸੂਚਨਾ, {date}: ਪਰਾਲੀ ਦੇ ਧੂੰਏਂ ਕਾਰਨ ਸਕੂਲ ਦੇ ਸਮੇਂ ਹਵਾ '{cat}' ਸ਼੍ਰੇਣੀ ਵਿੱਚ ਰਹਿਣ ਦਾ ਅਨੁਮਾਨ ਹੈ, "
-                   "ਸਭ ਤੋਂ ਵੱਧ ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ PM2.5 {worst} µg/m³, ਦਾਇਰਾ {lo}-{hi})। ਸਵੇਰ ਦੀ ਸਭਾ, ਪੀਟੀ ਅਤੇ ਛੁੱਟੀ ਦਾ ਸਮਾਂ "
+                   "ਸਭ ਤੋਂ ਵੱਧ ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ ਧੂੰਆਂ PM2.5 {worst} µg/m³{rng}, ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਸਵੇਰ ਦੀ ਸਭਾ, ਪੀਟੀ ਅਤੇ ਛੁੱਟੀ ਦਾ ਸਮਾਂ "
                    "ਕਮਰਿਆਂ ਦੇ ਅੰਦਰ ਹੋਵੇਗਾ ਅਤੇ ਖਿੜਕੀਆਂ ਬੰਦ ਰੱਖੀਆਂ ਜਾਣਗੀਆਂ। ਦਮੇ ਵਾਲੇ ਬੱਚੇ ਆਪਣੀ ਨਿਯਮਤ ਦਵਾਈ ਨਾਲ ਰੱਖਣ। ",
         "limit": "{name} ਲਈ ਧੂੰਏਂ ਦੀ ਸੂਚਨਾ, {date}: ਪਰਾਲੀ ਦੇ ਧੂੰਏਂ ਨਾਲ ਸਕੂਲ ਦੇ ਸਮੇਂ ਹਵਾ '{cat}' ਸ਼੍ਰੇਣੀ ਤੱਕ ਪਹੁੰਚ ਸਕਦੀ ਹੈ, ਸਭ ਤੋਂ ਵੱਧ "
-                 "ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ PM2.5 {worst} µg/m³, ਦਾਇਰਾ {lo}-{hi})। ਬਾਹਰ ਕੋਈ ਭਾਰੀ ਪੀਟੀ ਜਾਂ ਖੇਡ ਨਹੀਂ ਹੋਵੇਗੀ, ਸਭਾ ਛੋਟੀ "
+                 "ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ ਧੂੰਆਂ PM2.5 {worst} µg/m³{rng}, ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਬਾਹਰ ਕੋਈ ਭਾਰੀ ਪੀਟੀ ਜਾਂ ਖੇਡ ਨਹੀਂ ਹੋਵੇਗੀ, ਸਭਾ ਛੋਟੀ "
                  "ਰੱਖੀ ਜਾਵੇਗੀ, ਅਤੇ ਦਮੇ ਜਾਂ ਦਿਲ/ਫੇਫੜਿਆਂ ਦੀ ਬਿਮਾਰੀ ਵਾਲੇ ਬੱਚੇ ਅੰਦਰ ਰਹਿਣਗੇ। ",
-        "ok": "{name} ਲਈ ਹਵਾ ਦੀ ਸੂਚਨਾ, {date}: ਸਕੂਲ ਦੇ ਸਮੇਂ ਧੂੰਏਂ ਦਾ ਕੋਈ ਖ਼ਾਸ ਅਸਰ ਨਹੀਂ ਹੋਣ ਦਾ ਅਨੁਮਾਨ ਹੈ (ਅਨੁਮਾਨਿਤ PM2.5 ਵੱਧ ਤੋਂ ਵੱਧ "
-              "{worst} µg/m³, '{cat}')। ਬਾਹਰ ਦੀਆਂ ਆਮ ਗਤੀਵਿਧੀਆਂ ਜਾਰੀ ਰਹਿਣਗੀਆਂ। ",
+        "ok": "{name} ਲਈ ਹਵਾ ਦੀ ਸੂਚਨਾ, {date}: ਸਕੂਲ ਦੇ ਸਮੇਂ ਧੂੰਏਂ ਦਾ ਕੋਈ ਖ਼ਾਸ ਅਸਰ ਨਹੀਂ ਹੋਣ ਦਾ ਅਨੁਮਾਨ ਹੈ (ਅਨੁਮਾਨਿਤ ਧੂੰਆਂ PM2.5 ਵੱਧ ਤੋਂ ਵੱਧ "
+              "{worst} µg/m³, '{cat}'; ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਬਾਹਰ ਦੀਆਂ ਆਮ ਗਤੀਵਿਧੀਆਂ ਜਾਰੀ ਰਹਿਣਗੀਆਂ। ",
         "none": "{name} ਲਈ ਹਵਾ ਦੀ ਸੂਚਨਾ, {date}: ਇਸ ਦਿਨ ਦਾ ਧੂੰਆਂ ਪੂਰਵ-ਅਨੁਮਾਨ ਅਜੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਕੱਲ੍ਹ ਦੁਬਾਰਾ ਦੇਖੋ। ",
     },
 }
+_RANGE = {"en": ", range {lo}-{hi}", "hi": ", दायरा {lo}-{hi}", "pa": ", ਦਾਇਰਾ {lo}-{hi}"}
 _SCRIPT = {"hi": re.compile(r"[ऀ-ॿ]"), "pa": re.compile(r"[਀-੿]")}
 LLMCall = Callable[[str, str], str]  # (system_prompt, user_text) -> text
 FALLBACK_SCHOOLS = 10  # when no subscriptions/demo file: first N schools in the index
@@ -84,13 +86,20 @@ def facts_for(plan: dict) -> dict:
     """The only facts a notice may use (also the grounding reference)."""
     sm = plan.get("summary", {})
     d = date.fromisoformat(plan["date_ist"])
-    f = {"school": plan.get("name"), "date_ist": plan["date_ist"], "day": d.day, "month": d.month, "year": d.year,
+    f = {"school": plan.get("name"), "date_ist": plan["date_ist"], "date_text": f"{d.day} {MONTHS['en'][d.month - 1]} {d.year}",
+         "day": d.day, "month": d.month, "year": d.year,
          "school_hours_ist": plan.get("school_hours_ist"), "level": sm.get("overall_outdoor") or "none"}
     if sm.get("worst_est_pm25") is not None:
         lo, hi = sm.get("worst_est_pm25_band") or [None, None]
-        f.update({"worst_hour_ist": sm["worst_hour_ist"], "worst_est_pm25": sm["worst_est_pm25"], "range_low": lo,
-                  "range_high": hi, "category": sm["worst_category"], "restricted_hours_ist": sm.get("restricted_hours_ist"),
+        f.update({"worst_hour_ist": sm["worst_hour_ist"], "worst_est_pm25": sm["worst_est_pm25"],
+                  "est_label": rules.EST_LABEL, "category": sm["worst_category"], "restricted_hours_ist": sm.get("restricted_hours_ist"),
                   "official_guidance": sm.get("guidance"), "cpcb_health_statement": sm.get("health_statement")})
+        if lo is not None and hi is not None and lo != hi:  # a degenerate band (60-60) is not a range: omit it
+            f.update({"range_low": lo, "range_high": hi})
+        known = [r["est_pm25"] for r in plan.get("plan", []) if r.get("est_pm25") is not None]
+        if known and min(known) == max(known):  # nothing peaks: "worst hour 07:00" would mislead
+            f["same_all_school_hours"] = True
+        f["baseline"] = plan.get("baseline_basis")
     return f
 
 
@@ -99,9 +108,11 @@ def template_notice(lang: str, plan: dict) -> str:
     level = f["level"] if f.get("worst_est_pm25") is not None else "none"
     d = date.fromisoformat(f["date_ist"])
     date_s = f"{d.day} {MONTHS[lang][d.month - 1]} {d.year}"
+    lo, hi = f.get("range_low"), f.get("range_high")
+    rng = _RANGE[lang].format(lo=lo, hi=hi) if lo is not None and hi is not None else ""  # never "range 60-60"
     text = TEMPLATES[lang][level].format(
         name=f["school"], date=date_s, cat=CAT[lang].get(f.get("category") or "", ""), hour=f.get("worst_hour_ist"),
-        worst=f.get("worst_est_pm25"), lo=f.get("range_low"), hi=f.get("range_high"))
+        worst=f.get("worst_est_pm25"), rng=rng)
     return text + _TAIL[lang]
 
 
@@ -122,23 +133,14 @@ def _strands_llm(model_factory: Callable[[str | None], Any] | None = None) -> LL
     from dhuaan.agent.agent import TraceRecorder, _call
 
     def call(system: str, user: str) -> str:
-        last: BaseException | None = None
-        for mid in models.candidates():
+        def one(mid: str | None) -> str:
             model = (model_factory or (lambda m: models.build_model(model_id=m, max_tokens=900)))(mid)
             agent = Agent(model=model, tools=[], system_prompt=system, callback_handler=None)
             TraceRecorder().attach(agent)  # counts against the LLM budget
-            try:
-                text = _call(agent, user)
-                call.used = mid  # type: ignore[attr-defined]
-                return text
-            except Exception as e:
-                kind = models.classify_error(e)
-                if kind is None:
-                    raise
-                if kind == "unavailable":
-                    models.mark_unavailable(mid)
-                last = e
-        raise last or RuntimeError("no model available")
+            return _call(agent, user)
+        text, mid = models.call_with_fallback(one)
+        call.used = mid  # type: ignore[attr-defined]
+        return text
     return call
 
 
@@ -216,6 +218,35 @@ def school_ids_default(store: Any) -> list[str]:
     return list(dict.fromkeys(ids))
 
 
+def demo_place_ids() -> list[str]:
+    """Every place in data/demo_places.json (school, ward, town, ...), for baselines.json."""
+    p = DATA_DIR / "demo_places.json"
+    try:
+        return _ids_from(json.loads(p.read_text(encoding="utf-8")), False) if p.exists() else []
+    except (ValueError, OSError):
+        return []
+
+
+def write_baselines(store: Any, run_id: str, place_ids: Iterable[str], known: dict[str, dict] | None = None) -> dict:
+    """latest/baselines.json: {run_id, generated_utc, max_age_h, places: {id: baseline_info + alpha/region}}.
+    The web shows the baseline text ("measured 21 h ago at Patiala, 33 km") on the place card."""
+    meta = store.get_json("latest/meta.json") or {}
+    out: dict[str, dict] = dict(known or {})
+    for pid in dict.fromkeys(place_ids):
+        if pid in out:
+            continue
+        place = store.get_json(f"latest/places/{pid}.json")
+        if not place:
+            continue
+        b = rules.baseline_info(tools.observed_near(place["lat"], place["lon"]))
+        out[pid] = {**b, "alpha": regions.alpha_for(meta, place.get("district"), place.get("state")),
+                    "alpha_region": regions.region_of(place.get("district"), place.get("state"))}
+    doc = {"run_id": run_id, "generated_utc": iso_utc(now_utc()), "max_age_h": rules.OBS_MAX_AGE_H,
+           "default_pm25": rules.DEFAULT_BASELINE, "places": out}
+    store.put_json("latest/baselines.json", doc)
+    return doc
+
+
 def _llm_enabled() -> bool:
     if os.environ.get("DHUAAN_ADVISORY_LLM", "1") == "0":
         return False
@@ -230,20 +261,23 @@ def generate_all(store: Any, run_id: str, school_ids: Iterable[str] | None = Non
          False/None = templates only, or a callable (system, user) -> text (tests).
     """
     meta = store.get_json("latest/meta.json") or {}
-    alpha = float(meta.get("alpha", 1.0))
     if llm is True:
         llm = _strands_llm() if _llm_enabled() else None
     elif llm is False:
         llm = None
     ids = list(school_ids) if school_ids is not None else school_ids_default(store)
     written: list[str] = []
+    baselines: dict[str, dict] = {}
     for sid in ids:
         place = store.get_json(f"latest/places/{sid}.json")
         if not place:
             log.warning("advisory: no places/%s.json, skipped", sid)
             continue
         obs = tools.observed_near(place["lat"], place["lon"])
+        alpha = regions.alpha_for(meta, place.get("district"), place.get("state"))
         plan = rules.school_day_plan(place, alpha, obs, date_ist)
+        baselines[sid] = {**rules.baseline_info(obs), "alpha": alpha,
+                          "alpha_region": regions.region_of(place.get("district"), place.get("state"))}
         notice, g, source = build_notices(plan, llm if len(written) < LLM_MAX_SCHOOLS else None)
         used_llm = any(v == "llm" for v in source.values())
         art = {
@@ -251,6 +285,9 @@ def generate_all(store: Any, run_id: str, school_ids: Iterable[str] | None = Non
             "plan": [{k: r[k] for k in ("hour_ist", "est_pm25", "est_pm25_low", "est_pm25_high", "category", "outdoor")}
                      for r in plan["plan"]],
             "summary": plan["summary"], "baseline_basis": plan["baseline_basis"],
+            **{k: plan[k] for k in ("baseline_pm25", "baseline_source", "baseline_age_h", "baseline_station",
+                                    "baseline_distance_km", "alpha", "est_label")},
+            "alpha_region": regions.region_of(place.get("district"), place.get("state")),
             "notice": notice, "notice_source": source, "grounding": g,
             "model": models.model_label(model_id=getattr(llm, "used", None)) if used_llm else "template",
             "run_id": run_id, "generated_utc": iso_utc(now_utc()), "run_t0_ist": ist_str(meta.get("t0_utc")),
@@ -259,6 +296,10 @@ def generate_all(store: Any, run_id: str, school_ids: Iterable[str] | None = Non
         store.put_json(f"latest/advisories/{sid}.json", art)
         store.put_json(f"runs/{run_id}/advisories/{sid}.json", art)
         written.append(sid)
+    try:
+        write_baselines(store, run_id, demo_place_ids(), baselines)
+    except Exception as e:  # baselines are a display nicety; never fail the advisory step for them
+        log.warning("baselines.json not written: %s", type(e).__name__)
     return written
 
 

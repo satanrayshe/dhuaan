@@ -10,6 +10,7 @@ import { naqiFromPm25 } from "@/lib/colors";
 import { useI18n } from "@/lib/i18n";
 import { playback } from "@/lib/playback";
 import { H_MIN, HOUR_MS, istDayTime, istHourOf, isNightIst, toMs } from "@/lib/time";
+import { alphaFor } from "@/lib/regions";
 import type { Meta, PlaceDetail } from "@/lib/types";
 import { NaqiChip, SectionLabel } from "./bits";
 
@@ -39,7 +40,7 @@ export function ForecastChart({
   const { t, lang } = useI18n();
   const [view, setView] = useState<"chart" | "table">("chart");
   const calibrated = !!meta?.calibrated;
-  const k = calibrated ? meta!.alpha : 1;
+  const k = calibrated ? alphaFor(meta, place.district, place.state) : 1;
   const unit = calibrated ? "µg/m³" : "";
   const t0ms = toMs(place.t0_utc);
 

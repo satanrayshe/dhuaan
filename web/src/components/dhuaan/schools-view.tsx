@@ -9,10 +9,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NAQI_COLORS, naqiFromPm25 } from "@/lib/colors";
-import { API_BASE, useAdvisoryArtifact, useMeta, usePlace, useReceptors, useResource } from "@/lib/data";
+import { API_BASE, useAdvisoryArtifact, useBaselines, useMeta, usePlace, useReceptors, useResource } from "@/lib/data";
 import { useI18n, type DictKey } from "@/lib/i18n";
 import { HOUR_MS, IST_OFFSET_MS, istDate, toMs } from "@/lib/time";
-import type { Advisory, AdvisoryHour, Lang, Meta, OutdoorAdvice, PlaceDetail } from "@/lib/types";
+import { alphaFor } from "@/lib/regions";
+import type { Advisory, AdvisoryHour, BaselineInfo, Lang, Meta, OutdoorAdvice, PlaceDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { GroundingBadge } from "./ask-panel";
 import { NaqiChip, useThemeName } from "./bits";
@@ -36,20 +37,30 @@ function outdoorFor(pm: number): OutdoorAdvice {
   return pm <= 60 ? "ok" : pm <= 120 ? "limit" : "indoors";
 }
 
-/** Browser fallback: same deterministic rules as the advisory engine, from the place forecast. */
-function computePlan(place: PlaceDetail, meta: Meta): { date: string; plan: AdvisoryHour[] } | null {
+/** Browser fallback: same deterministic rules as the advisory engine (est = baseline + regional alpha x smoke). */
+function computePlan(place: PlaceDetail, meta: Meta, baseline?: BaselineInfo): { date: string; plan: AdvisoryHour[] } | null {
   if (!meta.calibrated) return null;
+  const alpha = alphaFor(meta, place.district, place.state);
+  const b0 = baseline?.pm25 ?? 60;
   const t0 = toMs(place.t0_utc);
   const nowIst = Date.now() + IST_OFFSET_MS;
   const dayStart = Math.floor(nowIst / (24 * HOUR_MS)) * 24 * HOUR_MS;
   const base = nowIst < dayStart + 8 * HOUR_MS ? dayStart : dayStart + 24 * HOUR_MS;
   const plan: AdvisoryHour[] = [];
-  for (let h = 7; h <= 14; h++) {
+  for (let h = 7; h < 14; h++) {
     const utc = base - IST_OFFSET_MS + h * HOUR_MS;
     const idx = Math.round((utc - t0) / HOUR_MS) + 24;
     if (idx < 0 || idx >= place.series.length) return null;
-    const pm = Math.round(place.series[idx] * meta.alpha);
-    plan.push({ hour_ist: h, est_pm25: pm, category: naqiFromPm25(pm), outdoor: outdoorFor(pm) });
+    const est = (v: number) => Math.round(b0 + alpha * Math.max(0, v));
+    const pm = est(place.series[idx]);
+    plan.push({
+      hour_ist: `${String(h).padStart(2, "0")}:00`,
+      est_pm25: pm,
+      est_pm25_low: est(place.p10[idx] ?? place.series[idx]),
+      est_pm25_high: est(place.p90[idx] ?? place.series[idx]),
+      category: naqiFromPm25(pm),
+      outdoor: outdoorFor(pm),
+    });
   }
   return { date: new Date(base).toISOString().slice(0, 10), plan };
 }
@@ -87,12 +98,41 @@ function Timeline({ plan }: { plan: AdvisoryHour[] }) {
                 <o.Icon className="size-3.5" />
               </span>
               <span className="text-xs leading-tight font-medium">{t(o.key)}</span>
-              <span className="font-mono text-[0.7rem] whitespace-nowrap text-muted-foreground">{p.est_pm25} µg/m³</span>
+              <span className="font-mono text-[0.7rem] whitespace-nowrap text-muted-foreground" title={t("place.estPm")}>
+                {p.est_pm25} µg/m³
+              </span>
+              {p.est_pm25_low != null && p.est_pm25_high != null && p.est_pm25_low !== p.est_pm25_high && (
+                <span className="font-mono text-[0.62rem] whitespace-nowrap text-muted-foreground/80">
+                  {t("schools.range", { lo: p.est_pm25_low, hi: p.est_pm25_high })}
+                </span>
+              )}
             </div>
           </li>
         );
       })}
     </ol>
+  );
+}
+
+/** "Baseline added to the smoke estimate: measured 21 h ago at Patiala, 33 km" (advisory first, else baselines.json) */
+function BaselineLine({ advisory, baseline }: { advisory: Advisory | null; baseline?: BaselineInfo }) {
+  const { t } = useI18n();
+  const src = advisory?.baseline_source ?? baseline?.source;
+  const age = advisory?.baseline_age_h ?? baseline?.age_h;
+  const station = advisory?.baseline_station ?? baseline?.station;
+  const km = advisory?.baseline_distance_km ?? baseline?.distance_km;
+  const pm = advisory?.baseline_pm25 ?? baseline?.pm25 ?? 60;
+  let text: string;
+  if (src === "measured" && age != null && station)
+    text = km != null ? t("place.baselineMeasured", { age, station, km: Math.round(km) }) : t("place.baselineMeasuredNoKm", { age, station });
+  else if (src === "default") text = t("place.baselineNone", { pm: Math.round(pm) });
+  else if (advisory?.baseline_basis) text = advisory.baseline_basis;
+  else text = t("place.baselineNone", { pm: 60 });
+  return (
+    <p className="mt-3 text-xs text-muted-foreground">
+      <span className="font-medium text-foreground">{t("schools.baseline")}:</span> {text}
+      {src === "measured" && <> ({Math.round(pm)} µg/m³)</>}. {t("place.baselineNote", { max: 36 })}
+    </p>
   );
 }
 
@@ -156,6 +196,7 @@ export function SchoolsView() {
   const params = useSearchParams();
   const idx = useReceptors();
   const meta = useMeta();
+  const baselines = useBaselines();
   const [open, setOpen] = useState(false);
 
   const schools = useMemo(() => (idx.data?.places ?? []).filter((p) => p.kind === "school"), [idx.data]);
@@ -168,9 +209,10 @@ export function SchoolsView() {
 
   const place = usePlace(schoolId);
   const adv = useAdvisory(schoolId, lang);
+  const baseline = schoolId && baselines.status === "ready" ? baselines.data.places[schoolId] : undefined;
   const computed = useMemo(
-    () => (place.status === "ready" && meta.status === "ready" ? computePlan(place.data, meta.data) : null),
-    [place, meta],
+    () => (place.status === "ready" && meta.status === "ready" ? computePlan(place.data, meta.data, baseline) : null),
+    [place, meta, baseline],
   );
   const advisory = adv.status === "ready" ? adv.data : null;
   const plan = advisory?.plan ?? computed?.plan ?? null;
@@ -261,6 +303,7 @@ export function SchoolsView() {
                 )}
               </div>
               {!advisory && computed && <p className="mt-3 text-xs text-muted-foreground">{t("schools.computed")}</p>}
+              {plan && <BaselineLine advisory={advisory} baseline={baseline} />}
               <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{t("schools.basis")}</p>
             </section>
 

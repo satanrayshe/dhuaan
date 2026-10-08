@@ -7,10 +7,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { naqiFromPm25 } from "@/lib/colors";
-import { useMeta, usePlace } from "@/lib/data";
+import { useBaselines, useMeta, usePlace } from "@/lib/data";
 import { useI18n } from "@/lib/i18n";
 import { useHour } from "@/lib/playback";
 import { ageLabel, istDayTime, istTime, toMs } from "@/lib/time";
+import { alphaFor } from "@/lib/regions";
 import type { Meta, PlaceDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { AskPanel } from "./ask-panel";
@@ -36,7 +37,7 @@ export function ArrivalPeak({ place, meta, large = false }: { place: PlaceDetail
   const { t, lang } = useI18n();
   const t0 = toMs(place.t0_utc);
   const calibrated = !!meta?.calibrated;
-  const peakVal = calibrated ? place.peak_smoke * meta!.alpha : place.peak_smoke;
+  const peakVal = calibrated ? place.peak_smoke * alphaFor(meta, place.district, place.state) : place.peak_smoke;
   const already = place.arrival_utc != null && toMs(place.arrival_utc) <= t0 + 3600_000 && place.series[24] >= (meta?.arrival_threshold ?? 0);
   return (
     <div className={cn("grid grid-cols-2 gap-4", large && "sm:gap-8")}>
@@ -64,7 +65,9 @@ export function ArrivalPeak({ place, meta, large = false }: { place: PlaceDetail
           {calibrated ? (
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <NaqiChip category={naqiFromPm25(peakVal)} />
-              <span className="font-mono text-xs text-muted-foreground">{Math.round(peakVal)} µg/m³</span>
+              <span className="font-mono text-xs text-muted-foreground" title={t("place.estPm")}>
+                {Math.round(peakVal)} µg/m³
+              </span>
             </div>
           ) : (
             <span className="font-mono text-xs text-muted-foreground">
@@ -80,6 +83,27 @@ export function ArrivalPeak({ place, meta, large = false }: { place: PlaceDetail
 export function AqNowChip({ place }: { place: PlaceDetail }) {
   const { t } = useI18n();
   const aq = place.aq_now;
+  const bl = useBaselines();
+  const b = bl.status === "ready" ? bl.data.places[place.id] : undefined;
+  if (b) {
+    const measured = b.source === "measured" && b.station != null && b.age_h != null;
+    return (
+      <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+        <div className="min-w-0">
+          <SectionLabel>{t("place.baseline")}</SectionLabel>
+          <p className="text-xs text-muted-foreground">
+            {measured
+              ? b.distance_km != null
+                ? t("place.baselineMeasured", { age: b.age_h!, station: b.station!, km: Math.round(b.distance_km) })
+                : t("place.baselineMeasuredNoKm", { age: b.age_h!, station: b.station! })
+              : t("place.baselineNone", { pm: Math.round(b.pm25) })}
+          </p>
+          <p className="mt-0.5 text-[0.7rem] leading-snug text-muted-foreground/80">{t("place.baselineNote", { max: bl.data!.max_age_h })}</p>
+        </div>
+        {measured && <NaqiChip category={naqiFromPm25(b.pm25)} value={Math.round(b.pm25)} />}
+      </div>
+    );
+  }
   return (
     <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
       <div className="min-w-0">

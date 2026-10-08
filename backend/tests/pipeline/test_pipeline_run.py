@@ -75,8 +75,11 @@ def test_publish_writes_artifacts_and_meta(store):
     assert meta["afternoon_mode"] == "observed" and meta["alpha"] == 1.0 and meta["calibrated"] is False
     assert meta["t0_utc"] == "2026-10-08T06:00:00Z" and meta["sources"] == SOURCES
     for prefix in ("latest", "runs/20261008T0600Z"):
-        for k in ("fires.geojson", "clusters.json", "places/osm-w1.json", "meta.json"):
+        for k in ("fires.geojson", "clusters.json", "meta.json"):
             assert store.exists(f"{prefix}/{k}"), f"{prefix}/{k}"
+    # per-place files go to latest/ only (keeps S3 PUTs low); runs/ archives the run-level files
+    assert store.exists("latest/places/osm-w1.json")
+    assert not store.exists("runs/20261008T0600Z/places/osm-w1.json")
     assert not store.exists("latest/_summary")
     assert stub_model.calls[-1]["district"] == ("Sangrur", "Punjab") and stub_model.calls[-1]["pop_shape"] == (48, 66)
 
@@ -184,3 +187,20 @@ def test_notify_handler(store, monkeypatch):
     r = handlers.notify_handler({"school_id": "osm-w1", "lang": "en"})
     assert r["sent"] is True and sent["body"]["chat_id"] == "42" and "Keep assembly indoors." in sent["body"]["text"]
     assert sent["url"].endswith("/sendMessage")
+
+
+def test_regional_calibration_in_meta(store, monkeypatch):
+    monkeypatch.delenv("DHUAAN_ALPHA", raising=False)
+    store.put_json("latest/backtest.json", {
+        "calibration": {"alpha_A": 0.19, "alpha_B": 0.16},
+        "exploratory_regional": {"alphas": {"A": {"delhi_ncr": 8.9, "punjab_haryana": 0.17},
+                                            "B": {"delhi_ncr": 6.8, "punjab_haryana": 0.15}}}})
+    meta = core.publish(store, "R2", T0, FIRES, _met(), SOURCES, members=3, afternoon_mode="observed",
+                        run_model=stub_model, receptors=RECS, population=np.ones((48, 66)))
+    assert meta["alpha"] == 0.16 and meta["calibrated"] is True
+    assert meta["alpha_by_region"] == {"delhi_ncr": 6.8, "punjab_haryana": 0.15, "_default": 0.16}
+    assert "exploratory" in meta["calibration_basis"] and "provisional" in meta["calibration_basis"]
+    by, basis = core.regional_calibration(store, "none", 0.19, True)
+    assert by["delhi_ncr"] == 8.9 and by["_default"] == 0.19
+    by, basis = core.regional_calibration(store, "observed", 1.0, False)
+    assert set(by.values()) == {1.0} and "uncalibrated" in basis

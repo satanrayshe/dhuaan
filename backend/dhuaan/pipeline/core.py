@@ -136,6 +136,35 @@ def calibration(store: Any, afternoon_mode: str) -> tuple[float, bool]:
     return 1.0, False
 
 
+def regional_calibration(store: Any, afternoon_mode: str, pooled: float, calibrated: bool) -> tuple[dict, str]:
+    """(alpha_by_region {delhi_ncr, punjab_haryana, _default}, calibration_basis text).
+
+    Uses backtest.json "exploratory_regional" alphas (B when afternoon fires are used, else A) where present;
+    _default (and any missing region) is the pooled, pre-registered alpha."""
+    from dhuaan.geo.regions import DEFAULT, REGIONS
+    cfg = "B" if afternoon_mode != "none" else "A"
+    by = {r: pooled for r in REGIONS}
+    by[DEFAULT] = pooled
+    if os.environ.get("DHUAAN_ALPHA") or not calibrated:
+        why = "DHUAAN_ALPHA override" if os.environ.get("DHUAAN_ALPHA") else "uncalibrated default"
+        return by, f"single alpha {pooled:g} everywhere ({why}); provisional"
+    try:
+        ex = ((store.get_json("latest/backtest.json") or {}).get("exploratory_regional") or {})
+        al = (ex.get("alphas") or {}).get(cfg) or {}
+    except Exception as e:
+        log.warning("could not read exploratory regional calibration: %s", e)
+        al = {}
+    got = {r: float(al[r]) for r in REGIONS if al.get(r)}
+    by.update(got)
+    if not got:
+        return by, (f"pooled pre-registered backtest alpha_{cfg}={pooled:g} everywhere "
+                    "(25 Oct-5 Nov 2025 fit, 9 CPCB stations); provisional")
+    parts = ", ".join(f"{r} {by[r]:g}" for r in REGIONS)
+    return by, (f"provisional: exploratory regional alphas (not pre-registered; config {cfg}, fitted 25 Oct-5 Nov "
+                f"2025 on DPCC Delhi and PPCB Punjab stations): {parts}; elsewhere the pooled pre-registered "
+                f"alpha_{cfg}={pooled:g}")
+
+
 def _write_all(store: Any, items: list[tuple[str, Any]], workers: int = 16) -> None:
     with ThreadPoolExecutor(max_workers=workers) as ex:
         list(ex.map(lambda kv: store.put_json(kv[0], kv[1]), items))
@@ -171,10 +200,12 @@ def publish(store: Any, run_id: str, t0: datetime, fires: list[Fire], met: MetFi
     summary = arts.pop("_summary", {}) or {}
     arts.pop("meta.json", None)
     alpha, calibrated = calibration(store, afternoon_mode)
+    alpha_by_region, basis = regional_calibration(store, afternoon_mode, alpha, calibrated)
     meta = {
         "run_id": run_id, "t0_utc": iso_z(t0), "generated_utc": iso_z(now_utc()), "model_version": MODEL_VERSION,
         "members": summary.get("members", members), "afternoon_mode": summary.get("afternoon_mode", afternoon_mode),
-        "alpha": alpha, "calibrated": calibrated, "arrival_threshold": summary.get("arrival_threshold"),
+        "alpha": alpha, "alpha_by_region": alpha_by_region, "calibration_basis": basis,
+        "calibrated": calibrated, "arrival_threshold": summary.get("arrival_threshold"),
         "scale": summary.get("scale"), "domain": dict(DOMAIN), "sources": sources,
         "model_summary": summary,
     }

@@ -33,7 +33,7 @@ const meta = JSON.parse(readFileSync(join(DEST, "meta.json"), "utf8"));
 const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
 const count = (d) => (existsSync(d) ? readdirSync(d).length : 0);
 console.log(`synced run ${meta.run_id} (t0 ${meta.t0_utc}${meta.synthetic ? ", SYNTHETIC" : ""}) -> ${DEST}`);
-for (const f of ["meta.json", "fires.geojson", "clusters.json", "trips.json", "grid.json", "receptors_index.json", "backtest.json"]) {
+for (const f of ["meta.json", "fires.geojson", "clusters.json", "trips.json", "grid.json", "receptors_index.json", "backtest.json", "baselines.json"]) {
   const p = join(DEST, f);
   if (!existsSync(p)) {
     console.log(`  ${f.padEnd(22)} (absent)`);

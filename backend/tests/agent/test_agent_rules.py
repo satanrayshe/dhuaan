@@ -25,9 +25,16 @@ def test_baseline_fresh_stale_missing():
     now = datetime(2026, 10, 8, 6, 0, tzinfo=timezone.utc)
     fresh = {"pm25": 82.0, "measured_utc": "2026-10-08T04:00:00Z", "name": "Punjab Agricultural University"}
     assert rules.baseline_pm25(fresh, now)[0] == 82.0
-    assert "observed" in rules.baseline_pm25(fresh, now)[1]
-    stale = {**fresh, "measured_utc": "2026-10-07T23:00:00Z"}
+    assert rules.baseline_pm25(fresh, now)[1] == "measured 2 h ago at Punjab Agricultural University"
+    # CPCB data reach OpenAQ ~20 h late: a 21 h old reading is still the baseline, with its age and distance
+    lagged = {**fresh, "name": "Patiala", "measured_utc": "2026-10-07T09:00:00Z", "distance_km": 33.4}
+    b = rules.baseline_info(lagged, now)
+    assert b["pm25"] == 82.0 and b["source"] == "measured" and b["age_h"] == 21
+    assert b["basis"] == "measured 21 h ago at Patiala, 33 km"
+    stale = {**fresh, "measured_utc": "2026-10-06T17:00:00Z"}  # 37 h
     assert rules.baseline_pm25(stale, now)[0] == 60.0
+    assert "no recent nearby reading" in rules.baseline_pm25(stale, now)[1]
+    assert rules.baseline_info(stale, now)["source"] == "default"
     assert rules.baseline_pm25(None, now)[0] == 60.0
     assert rules.baseline_pm25({"pm25": None, "measured_utc": "2026-10-08T05:00:00Z"}, now)[0] == 60.0
 
@@ -85,3 +92,11 @@ def test_school_day_plan_uses_fresh_observation():
     obs = {"pm25": 100.0, "measured_utc": "2026-10-08T00:00:00Z", "name": "X"}
     p = rules.school_day_plan(_place([0.0] * 97), 1.0, obs, "2026-10-08", now=datetime(2026, 10, 8, 2, tzinfo=timezone.utc))
     assert {r["outdoor"] for r in p["plan"]} == {"limit"}
+
+
+def test_measured_baseline_does_not_double_count_existing_smoke():
+    from dhuaan.agent.rules import est_total
+    # baseline 150 measured while smoke index was 10; forecast smoke 12 -> only +2 smoke units added
+    assert est_total(150.0, 7.0, 12.0, smoke_ref=10.0) == 164
+    # falling smoke never pushes the estimate below the measured baseline
+    assert est_total(150.0, 7.0, 4.0, smoke_ref=10.0) == 150

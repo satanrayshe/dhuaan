@@ -71,6 +71,9 @@ def test_generate_all_writes_artifacts(store, monkeypatch):
     assert art["grounding"]["verified"] == art["grounding"]["total"] > 0
     row = art["plan"][0]
     assert set(row) >= {"hour_ist", "est_pm25", "category", "outdoor"} and row["outdoor"] in ("ok", "limit", "indoors")
+    assert art["baseline_source"] in ("measured", "default") and art["alpha_region"] == "punjab_haryana"
+    bl = store.get_json("latest/baselines.json")
+    assert bl["max_age_h"] == 36.0 and bl["places"]["sch_demo_sunrise"]["basis"] == art["baseline_basis"]
 
 
 def test_school_ids_from_data_files(store, monkeypatch, tmp_path):
@@ -82,3 +85,18 @@ def test_school_ids_from_data_files(store, monkeypatch, tmp_path):
     monkeypatch.setattr(advisory, "DATA_DIR", d)
     assert advisory.school_ids_default(store) == ["city_patiala", "sch_demo_sunrise"]
     assert advisory.generate_all(store, "r1", ["missing", "town_khanna"], llm=False) == ["town_khanna"]
+
+
+def test_degenerate_band_never_prints_a_range(store):
+    plan = _plan(store)
+    sm = plan["summary"]
+    w = sm["worst_est_pm25"]
+    sm["worst_est_pm25_band"] = [w, w]
+    f = advisory.facts_for(plan)
+    assert "range_low" not in f and "range_high" not in f
+    for lang in ("en", "hi", "pa"):
+        t = advisory.template_notice(lang, plan)
+        assert f"{w}-{w}" not in t and "range" not in t and "दायरा" not in t and "ਦਾਇਰਾ" not in t, t
+    sm["worst_est_pm25_band"] = [w - 5, w + 7]
+    assert f"range {w - 5}-{w + 7}" in advisory.template_notice("en", plan)
+    assert "provisional calibration" in advisory.template_notice("en", plan)

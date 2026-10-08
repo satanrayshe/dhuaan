@@ -170,7 +170,11 @@ export interface Meta {
   model_version: string;
   members: number;
   afternoon_mode: "none" | "estimated" | "observed";
+  /** pooled, pre-registered alpha (backward compatible) */
   alpha: number;
+  /** region-appropriate alphas; see lib/regions.ts */
+  alpha_by_region?: { delhi_ncr?: number; punjab_haryana?: number; _default?: number };
+  calibration_basis?: string;
   calibrated: boolean;
   arrival_threshold: number;
   scale: number;
@@ -183,7 +187,7 @@ export interface Meta {
 // 8. advisories/<school_id>.json
 export type OutdoorAdvice = "ok" | "limit" | "indoors";
 export interface AdvisoryHour {
-  /** CONTRACTS says an hour; the advisory engine writes "07:00" */
+  /** "HH:MM" IST (older artifacts may carry a number) */
   hour_ist: number | string;
   est_pm25: number;
   est_pm25_low?: number;
@@ -198,6 +202,34 @@ export interface Advisory {
   notice: { en: string; hi: string; pa: string };
   grounding: { verified: number; total: number };
   model: string;
+  baseline_basis?: string;
+  baseline_source?: "measured" | "default";
+  baseline_pm25?: number;
+  baseline_age_h?: number | null;
+  baseline_station?: string | null;
+  baseline_distance_km?: number | null;
+  alpha?: number;
+  alpha_region?: string;
+}
+
+// baselines.json (advisory step): the baseline behind est. PM2.5 for demo places and advised schools
+export interface BaselineInfo {
+  pm25: number;
+  source: "measured" | "default";
+  basis: string;
+  age_h: number | null;
+  station: string | null;
+  distance_km: number | null;
+  measured_utc: UtcIso | null;
+  alpha?: number;
+  alpha_region?: string;
+}
+export interface BaselinesFile {
+  run_id: string;
+  generated_utc: UtcIso;
+  max_age_h: number;
+  default_pm25: number;
+  places: Record<string, BaselineInfo>;
 }
 
 // 9. backtest.json
@@ -222,6 +254,16 @@ export interface Backtest {
   metrics: { A: BacktestMetrics; B: BacktestMetrics };
   calibration: { alpha_A: number; alpha_B: number };
   notes: string | string[];
+  exploratory_regional?: ExploratoryRegional;
+}
+export interface ExploratoryRegional {
+  label: string;
+  regions?: Record<string, string>;
+  alphas: { A: Record<string, number | null>; B: Record<string, number | null> };
+  metrics: { A: BacktestMetrics; B: BacktestMetrics };
+  by_region?: Record<string, { A?: BacktestMetrics; B?: BacktestMetrics }>;
+  n_stations?: Record<string, number>;
+  notes: string[];
 }
 
 // API

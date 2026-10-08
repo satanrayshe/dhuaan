@@ -14,6 +14,7 @@ from strands import tool
 
 from dhuaan.agent import data, rules, timeutil
 from dhuaan.agent.timeutil import IST, hours_between, ist_str, parse_utc
+from dhuaan.geo import regions
 
 log = logging.getLogger(__name__)
 RUN_STALE_H = 6.0
@@ -31,7 +32,8 @@ def _run_info() -> dict:
     t0 = parse_utc(m.get("t0_utc"))
     age = round(hours_between(t0, timeutil.now_utc()), 1) if t0 else None
     return {"run_id": m.get("run_id"), "run_t0_ist": ist_str(t0), "run_age_hours": age,
-            "stale": bool(age is None or age > RUN_STALE_H), "alpha": data.alpha(), "calibrated": bool(m.get("calibrated", False))}
+            "stale": bool(age is None or age > RUN_STALE_H), "alpha": data.alpha(), "calibrated": bool(m.get("calibrated", False)),
+            "alpha_by_region": m.get("alpha_by_region"), "calibration_basis": m.get("calibration_basis")}
 
 
 def observed_near(lat: float, lon: float) -> dict | None:
@@ -86,7 +88,7 @@ def get_smoke_forecast(place_id: str, hours: int = 72) -> dict:
     if not p:
         return _not_found(place_id)
     hours = max(1, min(int(hours), 72))
-    alpha = data.alpha()
+    alpha = data.alpha_for(p)
     t0 = parse_utc(p["t0_utc"])
     now = timeutil.now_utc()
     start = max(24, min(96, rules.series_index(t0, now.replace(minute=0, second=0, microsecond=0))))
@@ -123,9 +125,10 @@ def get_smoke_forecast(place_id: str, hours: int = 72) -> dict:
         "daily_max_est_pm25": daily,
         "series_3h": [row(i) for i in range(start, end + 1, 3)],
         "baseline_pm25": round(base, 1), "baseline_basis": basis,
+        "alpha": alpha, "alpha_region": regions.region_of(p.get("district"), p.get("state")),
         "uncertainty": "est_pm25_band is the p10-p90 spread across ensemble members; alpha is "
-                       + ("calibrated against stations" if (data.meta() or {}).get("calibrated") else "NOT yet calibrated (alpha=1.0 default), so PM2.5 values are rough"),
-        "units": "PM2.5 in ug/m3; smoke_index is relative model units",
+                       + ("a provisional calibration against stations" if (data.meta() or {}).get("calibrated") else "NOT yet calibrated (alpha=1.0 default), so PM2.5 values are rough"),
+        "units": "est. smoke PM2.5 (provisional calibration) in ug/m3; smoke_index is relative model units",
         "source": SMOKE_SOURCE, "run": _run_info(),
     }
 
@@ -220,7 +223,7 @@ def get_school_day_plan(school_id: str, date_ist: str | None = None) -> dict:
     if not p:
         return _not_found(school_id)
     try:
-        plan = rules.school_day_plan(p, data.alpha(), observed_near(p["lat"], p["lon"]), date_ist or None)
+        plan = rules.school_day_plan(p, data.alpha_for(p), observed_near(p["lat"], p["lon"]), date_ist or None)
     except ValueError:
         return {"error": "date_ist must be YYYY-MM-DD"}
     plan["run"] = _run_info()

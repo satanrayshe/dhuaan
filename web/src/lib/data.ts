@@ -6,6 +6,7 @@ import type {
   AskRequest,
   AskResponse,
   Backtest,
+  BaselinesFile,
   ClustersFile,
   FiresGeoJSON,
   GridFile,
@@ -110,6 +111,7 @@ export const usePlace = (id: string | null | undefined) =>
   useResource<PlaceDetail>(id ? artifactUrl(`places/${encodeURIComponent(id)}.json`) : null);
 export const useAdvisoryArtifact = (schoolId: string | null | undefined) =>
   useResource<Advisory>(schoolId ? artifactUrl(`advisories/${encodeURIComponent(schoolId)}.json`) : null);
+export const useBaselines = () => useResource<BaselinesFile>(artifactUrl("baselines.json"));
 export const useBacktest = () => useResource<Backtest>(artifactUrl("backtest.json"));
 export const useHealth = () => useResource<HealthResponse>(`${API_BASE}/api/health`);
 

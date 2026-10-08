@@ -74,6 +74,7 @@ export function LayerPanel({
   setCompare,
   className,
   defaultOpen = true,
+  reducedMotion = false,
 }: {
   layers: MapLayersState;
   setLayers: (l: MapLayersState) => void;
@@ -84,6 +85,8 @@ export function LayerPanel({
   setCompare: (v: boolean) => void;
   className?: string;
   defaultOpen?: boolean;
+  /** animated trails are not drawn under prefers-reduced-motion: show the switch off and disabled */
+  reducedMotion?: boolean;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(defaultOpen);
@@ -109,7 +112,7 @@ export function LayerPanel({
       show: hasEvening || !!eveningNote,
       disabled: !hasEvening,
     },
-    { k: "trails", key: "layers.trails", legend: swatch(4), show: true },
+    { k: "trails", key: "layers.trails", legend: swatch(4), show: true, disabled: reducedMotion, note: reducedMotion ? t("layers.trailsReduced") : undefined },
     { k: "field", key: "layers.field", legend: swatch(2), show: true },
     { k: "places", key: "layers.places", legend: <span className="size-2.5 shrink-0 rounded-full border-[1.5px] border-foreground bg-background" aria-hidden />, show: true },
   ];
