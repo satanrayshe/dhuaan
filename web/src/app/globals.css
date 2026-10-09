@@ -183,6 +183,12 @@
   .maplibregl-ctrl-attrib-button {
     @apply bg-transparent! dark:invert;
   }
+  /* home map below lg: the scrubber spans the bottom edge; lift the attribution above it */
+  @media (width < 64rem) {
+    .map-home .maplibregl-ctrl-bottom-right {
+      bottom: 11.75rem !important; /* maplibre-gl.css is unlayered and would win */
+    }
+  }
 }
 
 @utility label-mono {

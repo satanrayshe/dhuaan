@@ -77,6 +77,17 @@ function SplitHandle({ value, onChange }: { value: number; onChange: (v: number)
 
 const noop = () => () => {};
 
+// desktop is landscape: Lahore's fires to Delhi. Phones are portrait and width-bound, so take
+// in the western fires (and the "across the border" note) and let the height run long.
+const HOME_BOUNDS: [[number, number], [number, number]] = [
+  [73.55, 28.3],
+  [77.55, 32.1],
+];
+const HOME_BOUNDS_PHONE: [[number, number], [number, number]] = [
+  [72.6, 28.4],
+  [77.45, 32.2],
+];
+
 export const DEMO_IDS = { school: "osm-w1090680897", ward: "dlw-21", town: "gn-1260107" } as const;
 
 export function MapApp() {
@@ -164,7 +175,7 @@ ${t("map.borderSub")}` } : null;
 
   return (
     <div className="relative flex h-[calc(100dvh-3.5rem)] min-h-[520px] overflow-hidden">
-      <div className="relative min-w-0 flex-1">
+      <div className="map-home relative min-w-0 flex-1">
         {t0 && (
           <SmokeMap
             className="absolute inset-0"
@@ -182,6 +193,9 @@ ${t("map.borderSub")}` } : null;
             flyTo={fly}
             reducedMotion={reducedMotion}
             initialZoom={isDesktop ? 6.7 : 5.7}
+            // the story on load: fires in both Punjabs (west) to Delhi (south-east), clear of the scrubber
+            initialBounds={isDesktop ? HOME_BOUNDS : HOME_BOUNDS_PHONE}
+            initialPadding={isDesktop ? { top: 28, bottom: 170, left: 28, right: 72 } : { top: 64, bottom: 190, left: 8, right: 8 }}
           />
         )}
 
@@ -258,7 +272,8 @@ ${t("map.borderSub")}` } : null;
 
             {compare && evening && <SplitHandle value={split} onChange={setSplit} />}
 
-            <div className="absolute inset-x-2 bottom-2 z-10 sm:inset-x-3 sm:bottom-3 lg:right-auto lg:left-1/2 lg:w-[min(46rem,calc(100%-1.5rem))] lg:-translate-x-1/2">
+            {/* desktop: left-aligned so the basemap attribution (bottom-right) stays readable */}
+            <div className="absolute inset-x-2 bottom-2 z-10 sm:inset-x-3 sm:bottom-3 lg:right-auto lg:w-[min(46rem,calc(100%-19rem))]">
               <TimeScrubber t0={t0} blh={grid.data?.blh_m} />
             </div>
           </>

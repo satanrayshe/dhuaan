@@ -42,7 +42,10 @@ def model_handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
 
 
 def advise_handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
-    run_id = event["run_id"]
+    # The daily 06:30 IST schedule starts with {"mode": "advise"} and no run_id: advise on the latest published run.
+    run_id = (event or {}).get("run_id") or (get_store().get_json("latest/meta.json") or {}).get("run_id")
+    if not run_id:
+        return {"run_id": None, "advisories": [], "note": "no published run yet"}
     try:
         from dhuaan.agent.advisory import generate_all
     except ImportError as e:

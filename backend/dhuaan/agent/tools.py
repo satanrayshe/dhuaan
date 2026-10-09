@@ -53,6 +53,21 @@ def observed_near(lat: float, lon: float) -> dict | None:
     return obs
 
 
+def _published_baseline(place_id: str) -> dict | None:
+    """The measured baseline the advisory step published in latest/baselines.json, so the chat answer and the
+    Schools page use the same reading. None if absent or not a measurement."""
+    try:
+        from dhuaan.store import get_store
+        doc = get_store().get_json("latest/baselines.json") or {}
+    except Exception:
+        return None
+    b = (doc.get("places") or {}).get(place_id)
+    if not b or b.get("source") != "measured" or b.get("pm25") is None:
+        return None
+    return {"pm25": b["pm25"], "measured_utc": b.get("measured_utc"), "name": b.get("station"),
+            "distance_km": b.get("distance_km")}
+
+
 def _short(t) -> str:
     return t.astimezone(IST).strftime("%d %b %H:%M")
 
@@ -223,7 +238,8 @@ def get_school_day_plan(school_id: str, date_ist: str | None = None) -> dict:
     if not p:
         return _not_found(school_id)
     try:
-        plan = rules.school_day_plan(p, data.alpha_for(p), observed_near(p["lat"], p["lon"]), date_ist or None)
+        plan = rules.school_day_plan(p, data.alpha_for(p), _published_baseline(school_id) or observed_near(p["lat"], p["lon"]),
+                                     date_ist or None)
     except ValueError:
         return {"error": "date_ist must be YYYY-MM-DD"}
     plan["run"] = _run_info()

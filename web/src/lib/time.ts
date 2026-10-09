@@ -28,10 +28,29 @@ export function istTime(iso: UtcIso | number): string {
   return fmt("en", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
 }
 
-/** some engines ship no CLDR names for pa/hi and fall back to "M10"/"W3"; use English then */
+// CLDR short names, for engines that ship no Punjabi date data (Chromium/Edge format pa-IN in English)
+const PA_WEEKDAYS = ["ਐਤ", "ਸੋਮ", "ਮੰਗਲ", "ਬੁੱਧ", "ਵੀਰ", "ਸ਼ੁੱਕਰ", "ਸ਼ਨਿੱਚਰ"];
+const PA_MONTHS = ["ਜਨ", "ਫ਼ਰ", "ਮਾਰਚ", "ਅਪ੍ਰੈ", "ਮਈ", "ਜੂਨ", "ਜੁਲਾ", "ਅਗ", "ਸਤੰ", "ਅਕਤੂ", "ਨਵੰ", "ਦਸੰ"];
+const SCRIPT: Partial<Record<Lang, RegExp>> = { hi: /[\u0900-\u097f]/, pa: /[\u0a00-\u0a7f]/ };
+
+function istParts(d: Date) {
+  const ist = new Date(d.getTime() + IST_OFFSET_MS);
+  return { weekday: ist.getUTCDay(), day: ist.getUTCDate(), month: ist.getUTCMonth() };
+}
+
+/**
+ * Some engines ship no CLDR names for pa/hi: they fall back to "M10"/"W3" or to English.
+ * Punjabi gets the built-in table above; anything else falls back to English.
+ */
 function localised(lang: Lang, opts: Intl.DateTimeFormatOptions, d: Date): string {
   const out = fmt(lang, opts).format(d);
-  return lang !== "en" && /(^|\s)[MW]\d/.test(out) ? fmt("en", opts).format(d) : out;
+  if (lang === "en" || SCRIPT[lang]?.test(out)) return out;
+  if (lang === "pa") {
+    const p = istParts(d);
+    if (opts.weekday) return PA_WEEKDAYS[p.weekday];
+    if (opts.month) return `${p.day} ${PA_MONTHS[p.month]}`;
+  }
+  return /(^|\s)[MW]\d/.test(out) ? fmt("en", opts).format(d) : out;
 }
 
 /** "Sat 23:00" in IST, weekday localised */

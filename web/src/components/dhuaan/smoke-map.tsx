@@ -45,6 +45,10 @@ export interface SmokeMapProps {
   reducedMotion?: boolean;
   initialZoom?: number;
   initialCenter?: [number, number];
+  /** fit these [[west, south], [east, north]] bounds on load instead of center/zoom */
+  initialBounds?: [[number, number], [number, number]];
+  /** padding for initialBounds, px: keeps the framing clear of floating chrome */
+  initialPadding?: { top: number; bottom: number; left: number; right: number };
   className?: string;
   /** geo-anchored note over fires outside India ("Across the border / Pakistani Punjab") */
   borderLabel?: { lon: number; lat: number; text: string } | null;
@@ -136,7 +140,8 @@ function useFieldSource(map: MlMap | null, grid: GridFile | undefined, belowLabe
   useEffect(() => {
     if (!map || !grid) return;
     const state = st.current;
-    if (process.env.NODE_ENV !== "production") (window as unknown as { __dhuaanMap: unknown }).__dhuaanMap = map;
+    // handle for the QA / demo-recording scripts to wait on tile loading ('idle')
+    (window as unknown as { __dhuaanMap: unknown }).__dhuaanMap = map;
     const c = document.createElement("canvas");
     c.width = grid.nx;
     c.height = grid.ny;
@@ -603,6 +608,7 @@ export default function SmokeMap(props: SmokeMapProps) {
         theme={theme}
         center={props.initialCenter ?? INITIAL_CENTER}
         zoom={props.initialZoom ?? 6.6}
+        {...(props.initialBounds ? { bounds: props.initialBounds, fitBoundsOptions: { padding: props.initialPadding ?? 24 } } : {})}
         minZoom={4.5}
         maxZoom={13}
         dragRotate={false}

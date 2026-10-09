@@ -17,7 +17,7 @@ const BOXES: Box[] = [
   { id: "notify", x: 652, y: 150, w: 112, h: 56, title: "Notify", sub: "Lambda", kind: "aws" },
   { id: "tg", x: 820, y: 150, w: 170, h: 56, title: "Telegram", sub: "06:30 school alert", kind: "ext" },
   { id: "s3", x: 262, y: 300, w: 180, h: 56, title: "Amazon S3", sub: "latest/ artifacts", kind: "aws" },
-  { id: "cf", x: 492, y: 300, w: 180, h: 56, title: "CloudFront", sub: "cached JSON", kind: "aws" },
+  { id: "cw", x: 652, y: 10, w: 210, h: 50, title: "Amazon CloudWatch", sub: "logs · dhuaan-ops dashboard", kind: "aws" },
   { id: "web", x: 722, y: 300, w: 268, h: 56, title: "Amplify Hosting", sub: "this app · Next.js static", kind: "app" },
   { id: "llm", x: 262, y: 420, w: 180, h: 56, title: "Gemini / Bedrock Nova", sub: "MODEL_PROVIDER switch", kind: "aws" },
   { id: "agent", x: 492, y: 420, w: 180, h: 56, title: "Strands agent", sub: "tools · number check", kind: "aws" },
@@ -39,8 +39,8 @@ const ARROWS: { d: string; dashed?: boolean; label?: [number, number, string] }[
   { d: `M${right("advise")[0]} ${right("advise")[1]} H ${left("notify")[0]}` },
   { d: `M${right("notify")[0]} ${right("notify")[1]} H ${left("tg")[0]}` },
   { d: `M${bottom("model")[0]} ${bottom("model")[1]} V 256 H ${top("s3")[0]} V ${top("s3")[1]}`, label: [360, 276, "writes"] },
-  { d: `M${right("s3")[0]} ${right("s3")[1]} H ${left("cf")[0]}` },
-  { d: `M${right("cf")[0]} ${right("cf")[1]} H ${left("web")[0]}` },
+  // the browser reads the artifacts straight from the bucket (public read on latest/, CORS)
+  { d: `M${right("s3")[0]} ${right("s3")[1]} H ${left("web")[0]}`, label: [478, 320, "public JSON · CORS"] },
   { d: `M${bottom("web")[0]} ${bottom("web")[1]} V ${top("fn")[1]}`, label: [866, 394, "Ask Dhuaan"] },
   { d: `M${left("fn")[0]} ${left("fn")[1]} H ${right("agent")[0]}` },
   { d: `M${left("agent")[0]} ${left("agent")[1]} H ${right("llm")[0]}` },
@@ -77,8 +77,8 @@ export function ArchitectureDiagram() {
           <title id="arch-title">Dhuaan architecture on AWS</title>
           <desc id="arch-desc">
             EventBridge Scheduler starts a Step Functions state machine every three hours. Its four Lambda steps are Ingest, Model, Advise and Notify.
-            Ingest reads NASA FIRMS, LSA SAF, Open-Meteo and OpenAQ. Model writes forecast artifacts to Amazon S3, served through CloudFront to this
-            app on Amplify Hosting. Notify sends the school alert to Telegram. Questions from the app go to a Lambda Function URL, which runs a Strands
+            Ingest reads NASA FIRMS, LSA SAF, Open-Meteo and OpenAQ. Model writes forecast artifacts to Amazon S3, which this app on Amplify Hosting
+            reads directly. CloudWatch keeps the logs and the dhuaan-ops dashboard. Notify sends the school alert to Telegram. Questions from the app go to a Lambda Function URL, which runs a Strands
             agent on Gemini or Amazon Bedrock Nova; the agent reads the forecast from S3, and DynamoDB holds rate limits and an answer cache.
           </desc>
           <defs>

@@ -22,7 +22,7 @@ export function AttributionBars({ place }: { place: PlaceDetail }) {
           {rows.map((r) => (
             <li key={r.district + r.state} className="grid grid-cols-[minmax(0,8.5rem)_1fr_2.75rem] items-center gap-3 text-sm">
               <span className="truncate">
-                {r.district}
+                {r.district === "Other" ? t("place.other") : r.district}
                 {r.state && r.district !== "Other" && <span className="text-muted-foreground"> · {abbrevState(r.state)}</span>}
               </span>
               <span className="relative h-2 rounded-[2px] bg-muted" aria-hidden>

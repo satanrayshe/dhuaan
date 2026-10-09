@@ -24,6 +24,13 @@
 - Pipeline: Step Functions `dhuaan-pipeline` every 3 h, plus a daily advisory at 06:30 IST. First AWS run 20261008T1500Z succeeded (561 fires, 386 clusters); the agent on AWS answered with 17/17 numbers verified.
 - Redeploy: from Git Bash in infra/: `sam build && sam deploy`. Web: `cd web && npm run build && cd .. && uv run --project backend --with "botocore[crt]" python infra/deploy_web.py`. Secrets: `uv run --project backend --with "botocore[crt]" python infra/put_secrets.py`, then force a fresh API container.
 
+## In progress (workflow `wf_04ffe60d-b9d`, launched about 21:45 IST Thu)
+- QA of the live site in Edge via Playwright, with fixes and a web redeploy. Helpers in `../video/tools`.
+- Fact-check of the pitch numbers. Blog and submission answers to paste: `../video/publish/`, docs/SUBMISSION.md.
+- Video: `../video/narration-script.md`, `captions.srt`, `out/dhuaan-silent.mp4`, `out/dhuaan-guide.mp4` (TTS guide), `mux.ps1` (Shrey's voiceover → `out/dhuaan-final.mp4`), followed by an independent review pass.
+- After it finishes: commit, push, and give Shrey the script.
+- Repo stays private until just before submitting (to avoid copying mid-hackathon).
+
 ## Next (in order)
 1-3. DONE (deployed, smoke-tested, CORS locked).
 4. Fill the README TODOs (live URL), capture docs/img/hero.png, and re-read the per-run numbers in docs/VIDEO.md.

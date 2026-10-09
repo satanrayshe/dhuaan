@@ -2,14 +2,15 @@
 
 **See the smoke before it reaches you.** An hour-by-hour stubble-smoke forecast for North India that ranks tonight's farm fires by the harm they do downwind and writes school advisories in Punjabi, Hindi and English. It runs serverless on AWS, on the Free plan.
 
-![AWS SAM](https://img.shields.io/badge/AWS-SAM%20%C2%B7%20ap--south--1-FF9900?logo=amazonwebservices&logoColor=white) ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) ![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white) ![Strands Agents](https://img.shields.io/badge/agent-Strands%20Agents%20SDK-6E56CF) ![Tests](https://img.shields.io/badge/tests-193%20collected-2EA44F) ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
+![AWS SAM](https://img.shields.io/badge/AWS-SAM%20%C2%B7%20ap--south--1-FF9900?logo=amazonwebservices&logoColor=white) ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) ![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white) ![Strands Agents](https://img.shields.io/badge/agent-Strands%20Agents%20SDK-6E56CF) ![Tests](https://img.shields.io/badge/tests-200%20collected-2EA44F) ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
 ![Dhuaan map: smoke trails from Punjab farm fires drifting over the next 72 hours](docs/img/hero.png)
-<sub>Hero image `docs/img/hero.png` is captured from the deployed site before submission (TODO).</sub>
+<sub>TODO: add `docs/img/hero.png` (a capture of the deployed map).</sub>
 
 | | |
 |---|---|
 | Live site (no login) | https://main.d24aeuy7flk340.amplifyapp.com |
+| Live forecast data (JSON) | [latest/meta.json](https://dhuaan-artifactsbucket-oqallpjfrgta.s3.ap-south-1.amazonaws.com/latest/meta.json) on S3, refreshed every 3 h |
 | Demo video (2:55) | **TODO:** YouTube link |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) |
 | Method | [docs/method.md](docs/method.md) |
@@ -19,9 +20,9 @@ Built for the WeMakeDevs x AWS Environmental Hacks (Air track), 8 to 11 Oct 2026
 
 ## The problem
 
-Punjab reported 5,114 farm fires between 15 Sep and 30 Nov 2025, down from 10,909 in 2024 and 83,002 in 2020 ([CityAirNews, citing the environment ministry](https://www.cityairnews.com/content/5114-farm-fires-reported-in-punjab-since-sep-15-mos-kirti-vardhan-singh)). Those counts come from polar-orbiting satellites that pass over Punjab around 13:30 IST.
+Punjab recorded 5,114 farm fires in the 2025 paddy season, counted from 15 Sep to 30 Nov under the ISRO protocol. That is 53% fewer than in 2024 and 93% fewer than in 2021 ([PIB / CAQM, 1 Dec 2025](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2197201)). The 2024 count was 10,909 ([All India Radio News, 26 Feb 2026](https://www.newsonair.gov.in/punjab-53-decline-in-stubble-burning-recorded-during-kharif-season-2025)) and the 2020 count was 83,002 ([The Tribune, 18 Nov 2024](https://www.tribuneindia.com/news/punjab/of-total-8404-farm-fire-cases-in-punjab-50-reported-in-past-2-weeks/amp)). The counts come from polar-orbiting satellites that, according to iFOREST, observe the fields between 10:30 and 13:30 ([The Tribune, 9 Dec 2025](https://www.tribuneindia.com/news/delhi/satellites-miss-majority-of-stubble-fires-delhi-air-pollution-underestimated-report/amp)).
 
-The burning moved later in the day. Of 33,074 geostationary GK2A fire detections over Punjab between 12:00 and 18:59 IST in Oct to Nov 2025, **93% came at or after 16:00 IST**, after the last polar pass (GK2A-AMI hourly fire detections, Jethva 2026, NASA GSFC / Morgan State Univ., [doi:10.5281/zenodo.20084790](https://doi.org/10.5281/zenodo.20084790), CC BY 4.0; computed in [`backend/data/facts.json`](backend/data/facts.json)).
+The burning moved later in the day. Of 33,074 geostationary GK2A fire detections over Punjab between 12:00 and 18:59 IST in Oct to Nov 2025, **93% came at or after 16:00 IST**, after the polar passes (hourly GK2A-AMI fire detections, Jethva 2026, Morgan State University, [doi:10.5281/zenodo.20084790](https://doi.org/10.5281/zenodo.20084790), CC BY 4.0; computed in [`backend/data/facts.json`](backend/data/facts.json)). iFOREST reached a similar result on its own: over 90% of large farm fires in Punjab in 2024 and 2025 happened after 3 pm ([same Tribune report](https://www.tribuneindia.com/news/delhi/satellites-miss-majority-of-stubble-fires-delhi-air-pollution-underestimated-report/amp)).
 
 Smoke from evening fires settles at night, when the boundary layer is a few hundred metres deep, so the villages and schools next to the fields breathe it first. Nobody tells a school principal in Sangrur at 06:30 whether to hold assembly outside.
 
@@ -41,15 +42,15 @@ The school is a real OpenStreetMap school (`osm-w1090680897`); the people are in
 - Place forecast. Search any of 2,316 villages, towns, cities, schools or pre-2022 Delhi wards. You get arrival time and window, peak, a 72 h median with a p10 to p90 band, the nearest monitor reading and "where your air is from" by district.
 - Ask Dhuaan. A Strands agent answers questions in English, Hindi or Punjabi using 7 read-only tools over the forecast. Every number in the answer is checked against the tool results, and the UI shows a badge such as "5/5 numbers verified" next to the tool trace.
 - School day planner. Hourly outdoor guidance from CPCB NAQI bands, plus the trilingual parent notice. The daily run delivers it to Telegram.
-- District fire list. Clusters ranked by exposure. In the 8 Oct 2026 12:00 UTC run, 19 of 80 clusters in India caused 60% of the exposure from Indian fires. Fires across the border in Pakistani Punjab (240 clusters) stay on the map and are hidden from the list by default, since a district team can't act on them.
+- District fire list. Clusters ranked by exposure. In the deployed run of 8 Oct 2026, 20:30 IST (`20261008T1500Z`), 30 of 97 clusters in India caused 61% of the exposure from Indian fires. Fires across the border in Pakistani Punjab (289 clusters in that run) stay on the map and are hidden from the list by default, since a district team can't act on them.
 - Backtest page. The pre-registered A vs B replay of the November 2025 smoke season, with its weak result shown as it is.
 - Light and dark themes, three UI languages, a freshness chip for every data source and a "sample data" badge whenever the data is synthetic.
 
 ## Architecture
 
-![Dhuaan architecture: EventBridge Scheduler, Step Functions with Ingest, Model, Advise and Notify Lambdas, S3, CloudFront, Amplify, Lambda Function URL, Strands agent, Gemini or Bedrock, DynamoDB, SSM, CloudWatch](docs/architecture.svg)
+![Dhuaan architecture: EventBridge Scheduler, Step Functions with Ingest, Model, Advise and Notify Lambdas, S3 (CloudFront optional), Amplify, Lambda Function URL, Strands agent, Gemini or Bedrock, DynamoDB, SSM, CloudWatch](docs/architecture.svg)
 
-Everything is in one SAM template ([`infra/template.yaml`](infra/template.yaml)) in ap-south-1 (Mumbai): zip Lambdas with two prebuilt layers, no containers, no VPC or NAT, no always-on compute.
+Everything is in one SAM template ([`infra/template.yaml`](infra/template.yaml)) in ap-south-1 (Mumbai): zip Lambdas with two prebuilt layers, no containers, no VPC or NAT, no always-on compute. The diagram shows CloudFront in front of S3; in the current deployment it is switched off (see the table).
 
 | AWS service | What it does in Dhuaan |
 |---|---|
@@ -58,16 +59,16 @@ Everything is in one SAM template ([`infra/template.yaml`](infra/template.yaml))
 | AWS Lambda | `ingest` pulls fires, winds and PM2.5. `model` runs the 5-member smoke ensemble in numpy (3 GB). `advise` writes school plans and trilingual notices. `notify` sends Telegram alerts. `api` serves search, advisories and the agent. |
 | Lambda layers | `dhuaan-deps` (numpy, h5py, requests) and `dhuaan-agent` (Strands + Gemini SDK), 112 MB together, built from manylinux wheels on Windows without Docker. |
 | Lambda Function URL | The public HTTPS endpoint for `/api/*`. No API Gateway, so agent answers aren't capped at 30 s. |
-| Amazon S3 | Private artifact store: `latest/` (what the map reads), `runs/<run_id>/` (30-day history), `raw/` (14 days), advisories and cached answers. |
-| Amazon CloudFront | Serves the artifacts over HTTPS from Indian edge locations through Origin Access Control, with compression and a 5-minute cache on `latest/`. |
+| Amazon S3 | Artifact store: `latest/` (what the map reads), `runs/<run_id>/` (30-day history), `raw/` (14 days), advisories and cached answers. The site reads `latest/` straight from the bucket over HTTPS; public read is granted on `latest/`, `runs/` and `site/` only. |
+| Amazon CloudFront (optional, off) | The template can put CloudFront with Origin Access Control in front of the bucket (`EnableCdn=true`). It is off in this deployment because the first `sam deploy` rolled back with "Your account must be verified before you can add new CloudFront resources", a restriction on new accounts. |
 | Amazon DynamoDB | One on-demand table with TTL: API rate limits (20 asks per IP per hour, 500 per day overall), subscriptions and the run index. |
 | AWS Systems Manager Parameter Store | API keys as SecureString parameters under `/dhuaan/`, read by each Lambda at cold start. |
 | AWS Amplify Hosting | Hosts the Next.js static export (manual zip deploy). |
 | Amazon CloudWatch | The `dhuaan-ops` dashboard (executions, failures, durations, errors, API traffic) and 14-day logs. |
-| Amazon Bedrock | IAM is already granted for Nova 2 Lite. The agent runs on Gemini today because Bedrock is blocked on this new account (see below); switching is one parameter, `ModelProvider=bedrock`. |
+| Amazon Bedrock (not in use yet) | IAM is already granted for Nova 2 Lite (`global.amazon.nova-2-lite-v1:0`). Bedrock returns "Operation not allowed" on this new account (support case open), so the agent runs on Google Gemini through the Strands Agents SDK. Switching is one stack parameter, `ModelProvider=bedrock`. |
 | AWS Open Data | HRSL population tiles read from `s3://dataforgood-fb-data/hrsl-cogs/` at build time; the OpenAQ archive `s3://openaq-data-archive` for backtest observations. |
 
-A full run on 8 Oct 2026 (12:00 UTC) modelled 447 fire detections in 320 clusters with 15,158 particles; the model step took 3.75 s. Cost estimates per service are in [`infra/README.md`](infra/README.md#cost-on-the-free-plan-rough-monthly-figures-at-the-default-3-h-rate).
+The deployed run of 8 Oct 2026, 20:30 IST (`20261008T1500Z`, from [`latest/meta.json`](https://dhuaan-artifactsbucket-oqallpjfrgta.s3.ap-south-1.amazonaws.com/latest/meta.json)) modelled 561 fire detections in 386 clusters with 34,978 particles; the 5-member ensemble took 15.7 s on the 3 GB Lambda. Cost estimates per service are in [`infra/README.md`](infra/README.md#cost-on-the-free-plan-rough-monthly-figures-at-the-default-3-h-rate).
 
 ## How the model works
 
@@ -78,7 +79,7 @@ Full equations and parameters: [docs/method.md](docs/method.md).
 3. Concentration. Particle mass is smoothed with a 10 km Gaussian kernel and divided by boundary-layer height, which is why a shallow night layer traps smoke. The member median is the forecast; p10 and p90 are the band. A calibration factor α from the backtest turns smoke units into estimated PM2.5 (pooled 0.164; provisional regional values in Delhi/NCR and Punjab/Haryana, see below).
 4. Attribution and exposure. Every particle keeps its cluster label, so each place's smoke splits exactly by source district. Each cluster is scored by population × smoke × hours over the next 48 h (HRSL population, school cells weighted 1.5× during school hours).
 
-In the 8 Oct 2026 12:00 UTC run, clusters in Pakistani Punjab account for 85% of all modelled exposure in the domain, which includes people on both sides of the border. For places in Indian Punjab, 73% of the population-weighted smoke forecast for the next 48 h is attributed to districts across the border (computed from `places/*.json`; mostly Kasur, Pakpattan and Okara smoke reaching Firozpur, Fazilka and Muktsar). These shares change with every run and every wind shift.
+In the deployed run of 8 Oct 2026, 20:30 IST (`20261008T1500Z`), clusters in Pakistani Punjab account for 87% of all modelled exposure in the domain, which includes people on both sides of the border (from `clusters.json`). Across the 893 places in Indian Punjab in the search index, at least 75% of the forecast smoke for the next 48 h is attributed to districts across the border, mostly Okara, Kasur and Pakpattan, and most of it lands in Fazilka, then Firozpur. (Computed from `places/*.json`: each place's 48 h smoke total times the share of its named top-5 source districts in Pakistan. The "Other" bucket is not counted, so the figure is a lower bound.) These shares change with every run and every wind shift.
 
 ## Backtest
 
@@ -114,7 +115,7 @@ After seeing the pooled result I fitted one α per region on the same fit period
 | Punjab/Haryana (6 PPCB) | 0.172 | 0.149 | 0 of 34 | 0 of 34 | 0.205 | 0.214 |
 | All 9 stations | | | 57 of 91 | 57 of 91 | 0.131 | 0.229 |
 
-Median lead for the hits is 63 h with no false alarms, but read the Delhi row with care. On held-out hours the observed Delhi excess was at or above 60 µg/m³ 78% of the time, and so was the regionally calibrated forecast (B), so a forecast that is high most of the time scores well on episodes without tracking them. R² is strongly negative (−5.57 for B in Delhi), so the magnitudes are off. The Delhi α rests on 3 stations and also absorbs local non-fire pollution. Pearson r does not depend on α, so it is unchanged. The live pipeline uses these regional values as a provisional calibration in Delhi/NCR and Punjab/Haryana and the pooled α elsewhere.
+Median lead for the hits is 63 h with no false alarms, but read the Delhi row with care. On held-out hours the observed Delhi excess was at or above 60 µg/m³ 78% of the time, and so was the regionally calibrated forecast (B), so a forecast that is high most of the time scores well on episodes without tracking them. R² is strongly negative (−5.57 for B in Delhi), so the magnitudes are off. The Delhi α rests on 3 stations and also absorbs local non-fire pollution. Pearson r does not depend on α, so it is unchanged. When `backtest.json` is in the bucket, the pipeline applies these regional values as a provisional calibration in Delhi/NCR and Punjab/Haryana and the pooled α elsewhere. Each run's `meta.json` states which calibration it used (`calibrated`, `calibration_basis`).
 
 ### Limitations
 
@@ -122,6 +123,7 @@ Median lead for the hits is 63 h with no false alarms, but read the Delhi row wi
 - One lumped removal time, no plume rise, a mixed-layer mean wind and literature-style emission constants.
 - The live evening-fire feed (LSA SAF Meteosat-IODC) reported no detections in the domain on 8 Oct 2026, early in the season. The estimated afternoon ratio is a pixel-count ratio between sensors with very different footprints.
 - The pooled calibration (above) is dominated by Punjab stations.
+- The GK2A dataset comes from a preliminary algorithm and counts fire and hot-smoke pixels at 4 km, so the 93% figure and the afternoon ratio are pixel counts, not fire counts or burnt area.
 - NAQI bands are 24-hour averages, applied to hourly estimates as a guide.
 - OSM school coverage is incomplete, HRSL population is 2016-era and Delhi wards use pre-2022 boundaries.
 - The personas are fictional. No school or district office has used Dhuaan yet.
@@ -154,26 +156,27 @@ npm run dev            # http://localhost:3000
 
 Requirements: AWS CLI v2 signed in, SAM CLI 1.120 or newer, uv, Node 20+. From the repo root on Windows:
 
-```powershell
-.\infra\deploy.ps1 -Web        # stage code, build layers, sam build + deploy, push secrets to SSM, deploy web to Amplify
-.\infra\deploy.ps1 -Origin https://main.<appid>.amplifyapp.com   # lock API CORS to the site
+```bash
+cd infra && sam build && sam deploy        # Lambdas, layers, Step Functions, schedules, S3, DynamoDB, dashboard
+cd .. && uv run --project backend --with "botocore[crt]" python infra/put_secrets.py    # API keys into SSM
+cd web && npm run build && cd .. && uv run --project backend --with "botocore[crt]" python infra/deploy_web.py    # site to Amplify
 ```
 
-The same steps on macOS or Linux: `infra/deploy.sh --web`. By hand, the core is `cd infra && sam build && sam deploy`. Teardown, stack parameters and the Free-plan cost table are in [`infra/README.md`](infra/README.md).
+`infra/deploy.ps1 -Web` and `infra/deploy.sh --web` wrap the same steps. On Windows, run SAM from Git Bash: Windows PowerShell 5.1 treats SAM's progress output on stderr as an error and aborts the script. After `put_secrets`, force a fresh API container, or it keeps the empty values it cached on a cold start before the secrets existed. Teardown, stack parameters and the Free-plan cost table are in [`infra/README.md`](infra/README.md).
 
 ## Tests
 
 ```bash
-cd backend && uv run pytest -q                        # 184 tests
+cd backend && uv run pytest -q                        # 191 tests
 uv run --project backend pytest -q infra/tests        # 9 tests
 ```
 
 | Suite | Tests | What it checks |
 |---|---|---|
 | `tests/model` | 32 | Physics invariants: displacement in uniform wind within 1%, mass conservation, exponential decay, the kernel integrating to 1, halving BLH doubling concentration, attribution shares summing to 1, the adjoint exposure equalling the forward sum, schema validity and determinism. |
-| `tests/agent` | 69 | Tool outputs, NAQI rules, the number-grounding checker in three scripts, script purity for Hindi and Punjabi, the Gemini fallback chain and a scripted-model agent loop. |
+| `tests/agent` | 71 | Tool outputs, NAQI rules, the number-grounding checker in three scripts, script purity for Hindi and Punjabi, the Gemini fallback chain and a scripted-model agent loop. |
 | `tests/ingest` | 33 | FIRMS, LSA SAF, Open-Meteo and OpenAQ parsers on recorded fixtures, and the static hotspot mask. |
-| `tests/api`, `tests/geo`, `tests/backtest`, `tests/pipeline` | 14, 14, 11, 11 | API routes and rate limits, district and population data, the pre-registered metric definitions, the end-to-end pipeline and Telegram formatting. |
+| `tests/api`, `tests/geo`, `tests/backtest`, `tests/pipeline` | 14, 16, 13, 12 | API routes and rate limits, district and population data, the pre-registered metric definitions, the end-to-end pipeline and Telegram formatting. |
 | `infra/tests` | 9 | SAM template contract, state machine ASL, staging and layer limits. |
 
 Counts are from `pytest --co` on 8 Oct 2026.
@@ -216,7 +219,7 @@ docs/                 method, write-up, blog draft, video plan, architecture, co
 | GeoNames | Villages, towns, cities | CC BY 4.0 |
 | OpenStreetMap (`amenity=school`) | Schools | ODbL 1.0 |
 | DataMeet Municipal Spatial Data | Pre-2022 Delhi wards | CC BY-SA 2.5 IN |
-| NASA GSFC GK2A hourly fire detections (Zenodo 10.5281/zenodo.20084790) | Backtest B, afternoon ratio, the 93% fact | CC BY 4.0 |
+| GK2A-AMI hourly fire detections, Jethva 2026, Morgan State University (Zenodo 10.5281/zenodo.20084790) | Backtest B, afternoon ratio, the 93% fact | CC BY 4.0 |
 
 Full attribution lines are in [`backend/data/SOURCES.md`](backend/data/SOURCES.md). NAQI bands follow CPCB (2014); school guidance follows CAQM GRAP and MoHFW advisories.
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import type {
   Advisory,
   AskRequest,
@@ -33,6 +33,9 @@ const IDLE: Resource<never> = { status: "idle" };
 const LOADING: Resource<never> = { status: "loading" };
 
 const entries = new Map<string, Resource<unknown>>();
+/** when each URL last failed: automatic re-subscribes retry an error at most every RETRY_MS */
+const failedAt = new Map<string, number>();
+const RETRY_MS = 15_000;
 const listeners = new Map<string, Set<() => void>>();
 
 function notify(url: string) {
@@ -58,13 +61,17 @@ async function fetchJson<T>(url: string, init?: RequestInit, timeoutMs = 20000):
 function load(url: string) {
   const cur = entries.get(url);
   if (cur && cur.status !== "error") return;
+  if (cur?.status === "error" && Date.now() - (failedAt.get(url) ?? 0) < RETRY_MS) return;
   entries.set(url, LOADING);
   fetchJson<unknown>(url, { cache: "no-cache" })
     .then((data) => entries.set(url, { status: "ready", data }))
     .catch((e: Error & { status?: number }) => {
       // a missing artifact is a normal state (e.g. backtest pending), not an error
       if (e.status === 404 || e.status === 403) entries.set(url, { status: "missing" });
-      else entries.set(url, { status: "error", error: e.message || "network error" });
+      else {
+        failedAt.set(url, Date.now());
+        entries.set(url, { status: "error", error: e.message || "network error" });
+      }
     })
     .finally(() => notify(url));
 }
@@ -82,13 +89,16 @@ export function revalidate(url: string) {
 /** Re-fetch a resource (used by retry buttons). */
 export function reload(url: string) {
   entries.delete(url);
+  failedAt.delete(url);
   load(url);
   notify(url);
 }
 
 export function useResource<T>(url: string | null): Resource<T> {
-  return useSyncExternalStore(
-    (cb) => {
+  // stable per URL: an inline subscribe re-subscribes on every render, and with load() on
+  // subscribe that turned one failed request into a tight retry loop
+  const subscribe = useCallback(
+    (cb: () => void) => {
       if (!url) return () => {};
       let set = listeners.get(url);
       if (!set) listeners.set(url, (set = new Set()));
@@ -96,6 +106,10 @@ export function useResource<T>(url: string | null): Resource<T> {
       load(url);
       return () => set!.delete(cb);
     },
+    [url],
+  );
+  return useSyncExternalStore(
+    subscribe,
     () => (url ? ((entries.get(url) as Resource<T>) ?? LOADING) : IDLE),
     () => (url ? LOADING : IDLE),
   );
@@ -112,7 +126,16 @@ export const usePlace = (id: string | null | undefined) =>
 export const useAdvisoryArtifact = (schoolId: string | null | undefined) =>
   useResource<Advisory>(schoolId ? artifactUrl(`advisories/${encodeURIComponent(schoolId)}.json`) : null);
 export const useBaselines = () => useResource<BaselinesFile>(artifactUrl("baselines.json"));
-export const useBacktest = () => useResource<Backtest>(artifactUrl("backtest.json"));
+/**
+ * The season replay is computed offline, not by the 3-hourly pipeline. If the data bucket
+ * doesn't have it, fall back to the copy shipped with the site build (same origin).
+ */
+export function useBacktest(): Resource<Backtest> {
+  const primary = useResource<Backtest>(artifactUrl("backtest.json"));
+  const fallbackUrl = DATA_BASE !== "/data" && primary.status === "missing" ? "/data/latest/backtest.json" : null;
+  const fallback = useResource<Backtest>(fallbackUrl);
+  return fallbackUrl && fallback.status !== "missing" ? fallback : primary;
+}
 export const useHealth = () => useResource<HealthResponse>(`${API_BASE}/api/health`);
 
 export async function ask(body: AskRequest): Promise<AskResponse> {

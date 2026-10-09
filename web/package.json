@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/flatten-segments.mjs",
     "start": "next start",
     "lint": "eslint",
     "data:sync": "node scripts/sync-data.mjs",

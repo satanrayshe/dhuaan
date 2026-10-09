@@ -415,11 +415,8 @@ Resources:
       Layers: [!Ref DepsLayer, !Ref AgentLayer]
       FunctionUrlConfig:
         AuthType: NONE
-        Cors:
-          AllowOrigins: [!Ref AllowedOrigin]
-          AllowMethods: [GET, POST]
-          AllowHeaders: [content-type]
-          MaxAge: 600
+        # No Cors block here: the handler sets Access-Control-* itself (restricted to ALLOWED_ORIGIN).
+        # Setting both made the Function URL send Access-Control-Allow-Origin twice, which browsers reject.
       Policies:
         - S3CrudPolicy: { BucketName: !Ref ArtifactsBucket }
         - DynamoDBCrudPolicy: { TableName: !Ref Table }

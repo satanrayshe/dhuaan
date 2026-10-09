@@ -9,11 +9,15 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 const notoDeva = Noto_Sans_Devanagari({
   variable: "--font-noto-deva",
   subsets: ["devanagari"],
+  // loaded on demand via unicode-range; preloading every weight only drew "preloaded but not used" warnings
+  preload: false,
   weight: ["400", "500", "600"],
 });
 const notoGuru = Noto_Sans_Gurmukhi({
   variable: "--font-noto-guru",
   subsets: ["gurmukhi"],
+  // loaded on demand via unicode-range; preloading every weight only drew "preloaded but not used" warnings
+  preload: false,
   weight: ["400", "500", "600"],
 });
 

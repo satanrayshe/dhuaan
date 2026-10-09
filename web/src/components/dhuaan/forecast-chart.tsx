@@ -192,7 +192,7 @@ export function ForecastChart({
               <span className="h-0.5 w-4 rounded-full bg-smoke" aria-hidden /> {t("place.median")}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-4 rounded-[2px] bg-smoke/25" aria-hidden /> {t("place.band")} ({meta?.members ?? 5} members)
+              <span className="h-2.5 w-4 rounded-[2px] bg-smoke/25" aria-hidden /> {t("place.band")} ({t("place.members", { n: meta?.members ?? 5 })})
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2.5 w-4 rounded-[2px] bg-[var(--night)] ring-1 ring-border" aria-hidden /> {t("place.night")}

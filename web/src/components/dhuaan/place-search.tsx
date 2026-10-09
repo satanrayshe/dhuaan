@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { SearchIcon } from "lucide-react";
 import {
   Command,
@@ -38,6 +38,29 @@ function useSearchOpen() {
 }
 
 const KIND_ORDER: PlaceKind[] = ["ward", "school", "city", "town", "village"];
+// the demo places (backend/data/demo_places.json) win ties, so "Bhawanigarh" opens the demo school
+const DEMO = new Set(["osm-w1090680897", "dlw-21", "gn-1260107"]);
+const PER_KIND = 8;
+const MAX_RESULTS = 40;
+
+const norm = (s: string) => s.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+
+/**
+ * Rank a place for a query: whole-name match > name starts with it > a word in the name starts
+ * with it > substring of the name > district/state word match. 0 = no match. (cmdk's built-in
+ * fuzzy scorer matched letters scattered across long school names, e.g. "Rohini" -> "Adesh Group…")
+ */
+function score(p: PlaceIndexEntry, q: string): number {
+  const name = norm(p.name);
+  if (name === q) return 100;
+  if (name.startsWith(q)) return 80;
+  const words = name.split(/[^a-z0-9\u0900-\u0a7f]+/);
+  if (words.some((w) => w.startsWith(q))) return 60;
+  if (name.includes(q)) return 40;
+  const where = norm(`${p.district} ${p.state}`).split(/[^a-z0-9]+/);
+  if (where.some((w) => w.startsWith(q))) return 20;
+  return 0;
+}
 
 export function SearchButton({ className }: { className?: string }) {
   const { t } = useI18n();
@@ -69,7 +92,7 @@ export function PlaceSearchDialog({
 }) {
   const isOpen = useSearchOpen();
   const router = useRouter();
-  const { t, kind, lang } = useI18n();
+  const { t, kind } = useI18n();
   const idx = useReceptors();
 
   useEffect(() => {
@@ -87,17 +110,47 @@ export function PlaceSearchDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const [query, setQuery] = useState("");
+  // closing clears the query (adjusting state during render, not in an effect)
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (wasOpen !== isOpen) {
+    setWasOpen(isOpen);
+    if (!isOpen) setQuery("");
+  }
+
+  const pool = useMemo(() => (idx.data?.places ?? []).filter((p) => !kinds || kinds.includes(p.kind)), [idx.data, kinds]);
+
+  // typed: one ranked list (best match first, so Enter picks it). Empty: a short list per kind.
+  const results = useMemo(() => {
+    const q = norm(query.trim());
+    if (!q) return null;
+    return pool
+      .map((p) => ({ p, s: score(p, q) }))
+      .filter((r) => r.s > 0)
+      .sort(
+        (a, b) =>
+          b.s - a.s ||
+          Number(DEMO.has(b.p.id)) - Number(DEMO.has(a.p.id)) ||
+          KIND_ORDER.indexOf(a.p.kind) - KIND_ORDER.indexOf(b.p.kind) ||
+          a.p.name.length - b.p.name.length,
+      )
+      .slice(0, MAX_RESULTS)
+      .map((r) => r.p);
+  }, [pool, query]);
+
   const groups = useMemo(() => {
-    const places = idx.data?.places ?? [];
     const by = new Map<PlaceKind, PlaceIndexEntry[]>();
-    for (const p of places) {
-      if (kinds && !kinds.includes(p.kind)) continue;
+    for (const p of pool) {
       const arr = by.get(p.kind) ?? [];
       arr.push(p);
       by.set(p.kind, arr);
     }
-    return KIND_ORDER.filter((k) => by.has(k)).map((k) => [k, by.get(k)!.sort((a, b) => a.name.localeCompare(b.name))] as const);
-  }, [idx.data, kinds]);
+    // browsing: demo places first, then where smoke arrives soonest
+    const rank = (p: PlaceIndexEntry) => (DEMO.has(p.id) ? -2 : p.arrival_utc ? -1 : 0);
+    return KIND_ORDER.filter((k) => by.has(k)).map(
+      (k) => [k, by.get(k)!.sort((a, b) => rank(a) - rank(b) || (b.peak_smoke ?? 0) - (a.peak_smoke ?? 0)).slice(0, PER_KIND)] as const,
+    );
+  }, [pool]);
 
   const choose = (p: PlaceIndexEntry) => {
     setSearchOpen(false);
@@ -107,29 +160,43 @@ export function PlaceSearchDialog({
 
   return (
     <CommandDialog open={isOpen} onOpenChange={setSearchOpen} title={t("search.placeholder")} description={t("search.placeholder")}>
-      <Command>
-      <CommandInput placeholder={t("search.placeholder")} />
-      <CommandList className="max-h-[min(60vh,420px)]">
+      <Command shouldFilter={false}>
+      <CommandInput placeholder={t("search.placeholder")} value={query} onValueChange={setQuery} />
+      {/* key: each query remounts the list, so it starts scrolled to the top with the best match selected */}
+      <CommandList key={query.trim() || "browse"} className="max-h-[min(60vh,420px)]">
         <CommandEmpty>{idx.status === "loading" ? t("common.loading") : t("search.empty")}</CommandEmpty>
-        {groups.map(([k, list]) => (
-          <CommandGroup key={k} heading={kind(k)}>
-            {list.map((p) => (
-              <CommandItem key={p.id} value={`${p.name} ${p.district} ${p.state} ${p.id}`} onSelect={() => choose(p)}>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate">{p.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {p.district}, {p.state}
-                  </span>
-                </div>
-                <span className="ml-3 shrink-0 font-mono text-xs text-muted-foreground">
-                  {p.arrival_utc ? `${t("search.arrives")} ${istDayTime(p.arrival_utc, lang)}` : t("search.noSmoke")}
-                </span>
-              </CommandItem>
+        {results
+          ? results.length > 0 && (
+              <CommandGroup>
+                {results.map((p) => (
+                  <Row key={p.id} p={p} onPick={choose} sub={`${kind(p.kind)} · ${p.district}, ${p.state}`} />
+                ))}
+              </CommandGroup>
+            )
+          : groups.map(([k, list]) => (
+              <CommandGroup key={k} heading={kind(k)}>
+                {list.map((p) => (
+                  <Row key={p.id} p={p} onPick={choose} sub={`${p.district}, ${p.state}`} />
+                ))}
+              </CommandGroup>
             ))}
-          </CommandGroup>
-        ))}
       </CommandList>
       </Command>
     </CommandDialog>
+  );
+}
+
+function Row({ p, sub, onPick }: { p: PlaceIndexEntry; sub: string; onPick: (p: PlaceIndexEntry) => void }) {
+  const { t, lang } = useI18n();
+  return (
+    <CommandItem value={p.id} onSelect={() => onPick(p)}>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate">{p.name}</span>
+        <span className="truncate text-xs text-muted-foreground">{sub}</span>
+      </div>
+      <span className="ml-3 shrink-0 font-mono text-xs text-muted-foreground">
+        {p.arrival_utc ? `${t("search.arrives")} ${istDayTime(p.arrival_utc, lang)}` : t("search.noSmoke")}
+      </span>
+    </CommandItem>
   );
 }

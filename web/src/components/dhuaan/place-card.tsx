@@ -59,8 +59,11 @@ export function ArrivalPeak({ place, meta, large = false }: { place: PlaceDetail
         )}
       </div>
       <div>
-        <p className="text-xs text-muted-foreground">{t("place.peak")}</p>
-        <p className={cn("mt-0.5 font-semibold tracking-tight", large ? "text-4xl" : "text-2xl")}>{istDayTime(place.peak_utc, lang)}</p>
+        {/* no arrival: the "peak" is just the largest trace below the alert level, so don't headline it */}
+        <p className="text-xs text-muted-foreground">{place.arrival_utc ? t("place.peak") : t("place.peakLow")}</p>
+        <p className={cn("mt-0.5 tracking-tight", place.arrival_utc ? cn("font-semibold", large ? "text-4xl" : "text-2xl") : "mt-1 text-sm")}>
+          {istDayTime(place.peak_utc, lang)}
+        </p>
         <div className="mt-1">
           {calibrated ? (
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">

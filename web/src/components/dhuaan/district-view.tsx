@@ -64,6 +64,11 @@ export function DistrictView() {
   const all = useMemo(() => clusters.data?.clusters ?? [], [clusters.data]);
   const scoped = useMemo(() => (scope === "all" ? all : all.filter((c) => !isAbroad(c.state))), [all, scope]);
   const districts = useMemo(() => [...new Set(scoped.map((c) => c.district))].sort(), [scoped]);
+  // rank within what the list shows: "India only" shouldn't start at #34 because 33 clusters sit across the border
+  const shownRank = useMemo(
+    () => new Map([...scoped].sort((a, b) => a.rank - b.rank).map((c, i) => [c.cluster_id, i + 1])),
+    [scoped],
+  );
   const activeDistrict = district !== "all" && districts.includes(district) ? district : "all";
   const filtered = useMemo(
     () => scoped.filter((c) => activeDistrict === "all" || c.district === activeDistrict),
@@ -219,7 +224,7 @@ ${t("map.borderSub")}` } : null;
                       }}
                       className={cn("cursor-pointer focus-visible:bg-muted focus-visible:outline-none", active && "bg-smoke-soft hover:bg-smoke-soft")}
                     >
-                      <TableCell className="font-mono text-xs">{c.rank}</TableCell>
+                      <TableCell className="font-mono text-xs">{shownRank.get(c.cluster_id) ?? c.rank}</TableCell>
                       <TableCell className="max-w-60 whitespace-normal">
                         <p className="font-medium">{c.nearest_place}</p>
                         <p className="text-xs text-muted-foreground">
@@ -283,9 +288,9 @@ ${t("map.borderSub")}` } : null;
           />
         )}
         {sel && (
-          <div className="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] rounded-md border border-panel-border bg-panel px-3 py-2 text-xs shadow-sm backdrop-blur">
+          <div className="absolute top-3 left-3 max-w-[calc(100%-4.5rem)] rounded-md border border-panel-border bg-panel px-3 py-2 text-xs shadow-sm backdrop-blur">
             <p className="font-medium">
-              #{sel.rank} · {sel.nearest_place}, {sel.district}
+              #{shownRank.get(sel.cluster_id) ?? sel.rank} · {sel.nearest_place}, {sel.district}
             </p>
             <p className="text-muted-foreground">
               {t("district.downwind")}: {sel.downwind.map((d) => d.name).join(", ")}
