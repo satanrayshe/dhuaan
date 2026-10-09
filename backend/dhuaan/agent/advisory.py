@@ -43,34 +43,34 @@ _TAIL = {
 TEMPLATES = {
     "en": {
         "indoors": "Smoke advisory for {name}, {date}: farm-fire smoke is forecast to make the air {cat} during school hours, "
-                   "worst around {hour} IST (est. smoke PM2.5 {worst} µg/m³{rng}, provisional calibration). Assembly, PE and recess will be "
+                   "worst around {hour} IST (est. PM2.5 incl. background {worst} µg/m³{rng}, provisional calibration). Assembly, PE and recess will be "
                    "held indoors and windows kept closed. Children with asthma should carry their usual medicines. ",
         "limit": "Smoke advisory for {name}, {date}: farm-fire smoke may make the air {cat} during school hours, worst around "
-                 "{hour} IST (est. smoke PM2.5 {worst} µg/m³{rng}, provisional calibration). There will be no strenuous outdoor PE, assembly "
+                 "{hour} IST (est. PM2.5 incl. background {worst} µg/m³{rng}, provisional calibration). There will be no strenuous outdoor PE, assembly "
                  "will be short, and children with asthma or heart or lung conditions will stay indoors. ",
-        "ok": "Air update for {name}, {date}: no significant smoke is forecast during school hours (est. smoke PM2.5 up to "
+        "ok": "Air update for {name}, {date}: no significant smoke is forecast during school hours (est. PM2.5 incl. background up to "
               "{worst} µg/m³, {cat}; provisional calibration). Normal outdoor activities will continue. ",
         "none": "Air update for {name}, {date}: the smoke forecast does not cover this day yet. Please check again tomorrow. ",
     },
     "hi": {
         "indoors": "{name} के लिए धुएँ की सूचना, {date}: पराली के धुएँ के कारण स्कूल के समय हवा '{cat}' श्रेणी में रहने का अनुमान है, "
-                   "सबसे ज़्यादा लगभग {hour} बजे (अनुमानित धुआँ PM2.5 {worst} µg/m³{rng}, अस्थायी कैलिब्रेशन)। प्रार्थना सभा, पीटी और खेल का समय "
+                   "सबसे ज़्यादा लगभग {hour} बजे (अनुमानित PM2.5 (पृष्ठभूमि सहित) {worst} µg/m³{rng}, अस्थायी कैलिब्रेशन)। प्रार्थना सभा, पीटी और खेल का समय "
                    "कक्षाओं के अंदर होगा और खिड़कियाँ बंद रखी जाएँगी। दमा (अस्थमा) वाले बच्चे अपनी नियमित दवा साथ रखें। ",
         "limit": "{name} के लिए धुएँ की सूचना, {date}: पराली के धुएँ से स्कूल के समय हवा '{cat}' श्रेणी तक पहुँच सकती है, सबसे ज़्यादा "
-                 "लगभग {hour} बजे (अनुमानित धुआँ PM2.5 {worst} µg/m³{rng}, अस्थायी कैलिब्रेशन)। बाहर भारी पीटी या खेल नहीं होंगे, प्रार्थना सभा "
+                 "लगभग {hour} बजे (अनुमानित PM2.5 (पृष्ठभूमि सहित) {worst} µg/m³{rng}, अस्थायी कैलिब्रेशन)। बाहर भारी पीटी या खेल नहीं होंगे, प्रार्थना सभा "
                  "छोटी रहेगी, और दमा या दिल/फेफड़ों की बीमारी वाले बच्चे अंदर रहेंगे। ",
-        "ok": "{name} के लिए हवा की सूचना, {date}: स्कूल के समय धुएँ का कोई खास असर अपेक्षित नहीं है (अनुमानित धुआँ PM2.5 अधिकतम "
+        "ok": "{name} के लिए हवा की सूचना, {date}: स्कूल के समय धुएँ का कोई खास असर अपेक्षित नहीं है (अनुमानित PM2.5 (पृष्ठभूमि सहित) अधिकतम "
               "{worst} µg/m³, '{cat}'; अस्थायी कैलिब्रेशन)। बाहर की सामान्य गतिविधियाँ जारी रहेंगी। ",
         "none": "{name} के लिए हवा की सूचना, {date}: इस दिन का धुआँ पूर्वानुमान अभी उपलब्ध नहीं है। कृपया कल फिर देखें। ",
     },
     "pa": {
         "indoors": "{name} ਲਈ ਧੂੰਏਂ ਦੀ ਸੂਚਨਾ, {date}: ਪਰਾਲੀ ਦੇ ਧੂੰਏਂ ਕਾਰਨ ਸਕੂਲ ਦੇ ਸਮੇਂ ਹਵਾ '{cat}' ਸ਼੍ਰੇਣੀ ਵਿੱਚ ਰਹਿਣ ਦਾ ਅਨੁਮਾਨ ਹੈ, "
-                   "ਸਭ ਤੋਂ ਵੱਧ ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ ਧੂੰਆਂ PM2.5 {worst} µg/m³{rng}, ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਸਵੇਰ ਦੀ ਸਭਾ, ਪੀਟੀ ਅਤੇ ਛੁੱਟੀ ਦਾ ਸਮਾਂ "
+                   "ਸਭ ਤੋਂ ਵੱਧ ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ PM2.5 (ਪਿਛੋਕੜ ਸਮੇਤ) {worst} µg/m³{rng}, ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਸਵੇਰ ਦੀ ਸਭਾ, ਪੀਟੀ ਅਤੇ ਛੁੱਟੀ ਦਾ ਸਮਾਂ "
                    "ਕਮਰਿਆਂ ਦੇ ਅੰਦਰ ਹੋਵੇਗਾ ਅਤੇ ਖਿੜਕੀਆਂ ਬੰਦ ਰੱਖੀਆਂ ਜਾਣਗੀਆਂ। ਦਮੇ ਵਾਲੇ ਬੱਚੇ ਆਪਣੀ ਨਿਯਮਤ ਦਵਾਈ ਨਾਲ ਰੱਖਣ। ",
         "limit": "{name} ਲਈ ਧੂੰਏਂ ਦੀ ਸੂਚਨਾ, {date}: ਪਰਾਲੀ ਦੇ ਧੂੰਏਂ ਨਾਲ ਸਕੂਲ ਦੇ ਸਮੇਂ ਹਵਾ '{cat}' ਸ਼੍ਰੇਣੀ ਤੱਕ ਪਹੁੰਚ ਸਕਦੀ ਹੈ, ਸਭ ਤੋਂ ਵੱਧ "
-                 "ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ ਧੂੰਆਂ PM2.5 {worst} µg/m³{rng}, ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਬਾਹਰ ਕੋਈ ਭਾਰੀ ਪੀਟੀ ਜਾਂ ਖੇਡ ਨਹੀਂ ਹੋਵੇਗੀ, ਸਭਾ ਛੋਟੀ "
+                 "ਲਗਭਗ {hour} ਵਜੇ (ਅਨੁਮਾਨਿਤ PM2.5 (ਪਿਛੋਕੜ ਸਮੇਤ) {worst} µg/m³{rng}, ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਬਾਹਰ ਕੋਈ ਭਾਰੀ ਪੀਟੀ ਜਾਂ ਖੇਡ ਨਹੀਂ ਹੋਵੇਗੀ, ਸਭਾ ਛੋਟੀ "
                  "ਰੱਖੀ ਜਾਵੇਗੀ, ਅਤੇ ਦਮੇ ਜਾਂ ਦਿਲ/ਫੇਫੜਿਆਂ ਦੀ ਬਿਮਾਰੀ ਵਾਲੇ ਬੱਚੇ ਅੰਦਰ ਰਹਿਣਗੇ। ",
-        "ok": "{name} ਲਈ ਹਵਾ ਦੀ ਸੂਚਨਾ, {date}: ਸਕੂਲ ਦੇ ਸਮੇਂ ਧੂੰਏਂ ਦਾ ਕੋਈ ਖ਼ਾਸ ਅਸਰ ਨਹੀਂ ਹੋਣ ਦਾ ਅਨੁਮਾਨ ਹੈ (ਅਨੁਮਾਨਿਤ ਧੂੰਆਂ PM2.5 ਵੱਧ ਤੋਂ ਵੱਧ "
+        "ok": "{name} ਲਈ ਹਵਾ ਦੀ ਸੂਚਨਾ, {date}: ਸਕੂਲ ਦੇ ਸਮੇਂ ਧੂੰਏਂ ਦਾ ਕੋਈ ਖ਼ਾਸ ਅਸਰ ਨਹੀਂ ਹੋਣ ਦਾ ਅਨੁਮਾਨ ਹੈ (ਅਨੁਮਾਨਿਤ PM2.5 (ਪਿਛੋਕੜ ਸਮੇਤ) ਵੱਧ ਤੋਂ ਵੱਧ "
               "{worst} µg/m³, '{cat}'; ਆਰਜ਼ੀ ਕੈਲੀਬ੍ਰੇਸ਼ਨ)। ਬਾਹਰ ਦੀਆਂ ਆਮ ਗਤੀਵਿਧੀਆਂ ਜਾਰੀ ਰਹਿਣਗੀਆਂ। ",
         "none": "{name} ਲਈ ਹਵਾ ਦੀ ਸੂਚਨਾ, {date}: ਇਸ ਦਿਨ ਦਾ ਧੂੰਆਂ ਪੂਰਵ-ਅਨੁਮਾਨ ਅਜੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਕੱਲ੍ਹ ਦੁਬਾਰਾ ਦੇਖੋ। ",
     },

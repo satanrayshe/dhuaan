@@ -21,7 +21,7 @@ from dhuaan.agent.timeutil import IST, hours_between, iso_utc, parse_utc
 
 DEFAULT_BASELINE = 60.0
 OBS_MAX_AGE_H = 36.0
-EST_LABEL = "est. smoke PM2.5 (provisional calibration)"
+EST_LABEL = "est. PM2.5, background + smoke (provisional calibration)"  # school-plan totals; smoke-only values use geo.regions.EST_LABEL
 SCHOOL_START_H, SCHOOL_END_H = 7, 14  # [07:00, 14:00) IST
 OK_MAX, LIMIT_MAX = 60, 120
 
@@ -53,7 +53,7 @@ SOURCES = [
      "url": "https://ncdc.mohfw.gov.in/"},
 ]
 CAVEATS = [
-    "Estimate, not a measurement: est. smoke PM2.5 (provisional calibration) = baseline + alpha x (forecast smoke minus the smoke already present when the baseline was measured).",
+    "Estimate, not a measurement: est. PM2.5 (provisional calibration) = background baseline + alpha x (forecast smoke minus the smoke already present when the baseline was measured).",
     "The baseline is the nearest station's latest reading if it is at most 36 h old (CPCB data arrive about 20 h late), otherwise a fixed 60 ug/m3.",
     "NAQI breakpoints are 24-hour averages; applied here to hourly estimates as a guide.",
     "If the baseline is a recent observation it already includes current smoke, so totals may be overstated during an episode.",
