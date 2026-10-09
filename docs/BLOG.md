@@ -6,7 +6,7 @@
 
 **Cover image:** `video/publish/img/cover-1600x900.png` (dark map: smoke trails from the 8 Oct 2026 run drifting across Punjab, with the "Across the border" label).
 
-**Links:** Live site https://main.d24aeuy7flk340.amplifyapp.com · Repo TODO (github.com/satanrayshe/dhuaan) · Demo video TODO
+**Links:** Live site https://main.d24aeuy7flk340.amplifyapp.com · Repo https://github.com/satanrayshe/dhuaan · Demo video https://youtu.be/ggdbMIAmj-Y
 
 ---
 
@@ -100,4 +100,4 @@ Next: Bedrock Nova once the account is unblocked, and a pilot with one real scho
 
 Built solo, with Claude Code as my pair programmer. It wrote most of the code and tests while I made the design and physics calls. Data from NASA FIRMS, EUMETSAT LSA SAF, Open-Meteo, OpenAQ, Meta/CIESIN HRSL, the GK2A detections (Jethva 2026), geoBoundaries, GeoNames, OpenStreetMap contributors and DataMeet. Licences are listed in the repo.
 
-Live site: https://main.d24aeuy7flk340.amplifyapp.com · Repo: TODO · Video: TODO
+Live site: https://main.d24aeuy7flk340.amplifyapp.com · Repo: https://github.com/satanrayshe/dhuaan · Video: https://youtu.be/ggdbMIAmj-Y

@@ -22,7 +22,7 @@ Solo: Shrey Sati (GitHub @satanrayshe, AWS Builder Center @shreysati).
 
 - Repo: TODO https://github.com/satanrayshe/dhuaan (make it public before submitting)
 - Live site (no login): https://main.d24aeuy7flk340.amplifyapp.com
-- Demo video (YouTube, unlisted): TODO
+- Demo video (YouTube, unlisted): https://youtu.be/ggdbMIAmj-Y
 - Builder Center article: TODO
 - Live forecast data: https://dhuaan-artifactsbucket-oqallpjfrgta.s3.ap-south-1.amazonaws.com/latest/meta.json
 

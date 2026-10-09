@@ -11,7 +11,7 @@
 |---|---|
 | Live site (no login) | https://main.d24aeuy7flk340.amplifyapp.com |
 | Live forecast data (JSON) | [latest/meta.json](https://dhuaan-artifactsbucket-oqallpjfrgta.s3.ap-south-1.amazonaws.com/latest/meta.json) on S3, refreshed every 3 h |
-| Demo video (2:55) | **TODO:** YouTube link |
+| Demo video (2:54) | https://youtu.be/ggdbMIAmj-Y |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) |
 | Method | [docs/method.md](docs/method.md) |
 | Builder Center article | **TODO:** link ([draft](docs/BLOG.md)) |
