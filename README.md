@@ -5,7 +5,6 @@
 ![AWS SAM](https://img.shields.io/badge/AWS-SAM%20%C2%B7%20ap--south--1-FF9900?logo=amazonwebservices&logoColor=white) ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) ![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white) ![Strands Agents](https://img.shields.io/badge/agent-Strands%20Agents%20SDK-6E56CF) ![Tests](https://img.shields.io/badge/tests-200%20collected-2EA44F) ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
 ![Dhuaan map: smoke trails from Punjab farm fires drifting over the next 72 hours](docs/img/hero.png)
-<sub>TODO: add `docs/img/hero.png` (a capture of the deployed map).</sub>
 
 | | |
 |---|---|
