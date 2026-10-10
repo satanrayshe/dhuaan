@@ -20,7 +20,7 @@ Solo: Shrey Sati (GitHub @satanrayshe, AWS Builder Center @shreysati).
 
 ## Links
 
-- Repo: TODO https://github.com/satanrayshe/dhuaan (make it public before submitting)
+- Repo: https://github.com/satanrayshe/dhuaan
 - Live site (no login): https://main.d24aeuy7flk340.amplifyapp.com
 - Demo video (YouTube, unlisted): https://youtu.be/ggdbMIAmj-Y
 - Builder Center article: TODO
