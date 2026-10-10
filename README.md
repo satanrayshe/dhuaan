@@ -13,7 +13,7 @@
 | Demo video (2:54) | https://youtu.be/ggdbMIAmj-Y |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) |
 | Method | [docs/method.md](docs/method.md) |
-| Builder Center article | **TODO:** link ([draft](docs/BLOG.md)) |
+| Builder Center article | https://builder.aws.com/content/3KUc5XLFqOUJolBgu2tLP3mSexE/the-fires-moved-to-4-pm-a-solo-stubble-smoke-forecast-on-aws-for-dollar0-in-72-hours |
 
 Built for the WeMakeDevs x AWS Environmental Hacks (Air track), 8 to 11 Oct 2026, by one person.
 

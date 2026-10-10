@@ -23,7 +23,7 @@ Solo: Shrey Sati (GitHub @satanrayshe, AWS Builder Center @shreysati).
 - Repo: https://github.com/satanrayshe/dhuaan
 - Live site (no login): https://main.d24aeuy7flk340.amplifyapp.com
 - Demo video (YouTube, unlisted): https://youtu.be/ggdbMIAmj-Y
-- Builder Center article: TODO
+- Builder Center article: https://builder.aws.com/content/3KUc5XLFqOUJolBgu2tLP3mSexE/the-fires-moved-to-4-pm-a-solo-stubble-smoke-forecast-on-aws-for-dollar0-in-72-hours
 - Live forecast data: https://dhuaan-artifactsbucket-oqallpjfrgta.s3.ap-south-1.amazonaws.com/latest/meta.json
 
 ## Problem (short)
