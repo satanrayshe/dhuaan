@@ -1,6 +1,6 @@
 # Dhuaan progress log (resume from here)
 
-**Event:** Environmental Hacks. The clock opened **Thu 8 Oct 2026, 11:04 IST**. **Submissions close Sun 11 Oct, 8:00 PM IST** (WeMakeDevs email of 9 Oct). Target submitting by 16:00 IST.
+**Event:** Environmental Hacks. The clock opened **Thu 8 Oct 2026, 11:04 IST**. **Submission form opens Sun 11 Oct 08:00 IST and closes 20:00 IST** (WeMakeDevs API /hackathons/env: submissions_open_at 2026-10-11T02:30Z, end_date 14:30Z; form at https://www.wemakedevs.org/aws/env/submit). Target submitting by 16:00 IST.
 **Plans:** `../prep/` (00-PLAYBOOK, 01-project-spec, 02-design-spec, 03-demo-video-script, 04-data-sources, 06-submission-guide). **Contracts:** `docs/CONTRACTS.md`. **Repo:** github.com/satanrayshe/dhuaan (private, in sync).
 
 ## State at Thu 8 Oct, 18:10 IST: built, tested locally, not deployed
