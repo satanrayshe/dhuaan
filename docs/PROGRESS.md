@@ -21,7 +21,7 @@
 - Site: https://main.d24aeuy7flk340.amplifyapp.com (Amplify app d24aeuy7flk340)
 - API: https://lkxdwcryhncjrfjrleddzvhh6q0bqenw.lambda-url.ap-south-1.on.aws (CORS locked to the site; persisted in infra/samconfig.toml)
 - Data: https://dhuaan-artifactsbucket-oqallpjfrgta.s3.ap-south-1.amazonaws.com/latest/ (direct S3, because CloudFront is blocked on the new account)
-- Pipeline: Step Functions `dhuaan-pipeline` every 3 h, plus a daily advisory at 06:30 IST. First AWS run 20261008T1500Z succeeded (561 fires, 386 clusters); the agent on AWS answered with 17/17 numbers verified.
+- Pipeline: Step Functions `dhuaan-pipeline` every 6 h (was 3 h until Sun 11 Oct 09:07 IST), plus a daily advisory at 06:30 IST. First AWS run 20261008T1500Z succeeded (561 fires, 386 clusters); the agent on AWS answered with 17/17 numbers verified.
 - Redeploy: from Git Bash in infra/: `sam build && sam deploy`. Web: `cd web && npm run build && cd .. && uv run --project backend --with "botocore[crt]" python infra/deploy_web.py`. Secrets: `uv run --project backend --with "botocore[crt]" python infra/put_secrets.py`, then force a fresh API container.
 
 ## In progress (workflow `wf_04ffe60d-b9d`, launched about 21:45 IST Thu)
